@@ -29,6 +29,7 @@ damage_calc.c
 */
 
 // For Terastallization
+extern u8 GetTeraType(u8 bank);
 extern bool8 IsTerastallized(u8 bank);
 
 extern const struct NaturalGiftStruct gNaturalGiftTable[];
@@ -832,8 +833,10 @@ void atk06_typecalc(void)
             u8 originalType1 = gBaseStats[gBattleMons[gBankAttacker].species].type1;
             u8 originalType2 = gBaseStats[gBattleMons[gBankAttacker].species].type2;
 
-            // Check original types for STAB
-            if (moveType == originalType1 || moveType == originalType2)
+            // Check original types and added type (atkType3) for STAB (For example, through Trick-or-Treat and Forest's Curse)
+            if (moveType == originalType1
+			   || moveType == originalType2
+			   || (!IsTerastallized(gBankAttacker) && moveType == atkType3))
                 isStab = TRUE;
 
             // Check Tera Type for STAB
