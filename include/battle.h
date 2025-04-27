@@ -995,6 +995,18 @@ struct NewBattleStruct
 		u16 backupRaidMonItem;
 	} dynamaxData;
 
+	// For Terastallization
+	struct TeraData
+	{
+		u8 done[4];                           // To check if the Pokemon on field used it
+		u8 activeBank;						  // Pokemon in turn order
+		u8 teraSpriteID[MAX_BATTLERS_COUNT];  // Adds Tera Crown (TO BE IMPLEMENTED LATER)
+		u8 state;							  // For looping
+		u8 chosen[MAX_BATTLERS_COUNT];		  // Whether the user chooses to Terastallize or not
+		bool8 teraInProgress : 1;             // A needed flag
+		bool8 viewing : 1;                    // For Pokemon Summary Screen menu
+	} teraData;
+
 	struct 
 	{
 		u16 zMoveHelper; //~0x2017B74

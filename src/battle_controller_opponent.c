@@ -134,7 +134,7 @@ void OpponentHandleChooseMove(void)
 				gChosenMovesByBanks[gActiveBattler] = chosenMove;
 				TryRemovePartnerDoublesKillingScoreComplete(gActiveBattler, gBankTarget, chosenMove, moveTarget, TRUE); //Allow the partner to choose a new target if its best move was this target
 
-				EmitMoveChosen(1, chosenMovePos, gBankTarget, gNewBS->megaData.chosen[gActiveBattler], gNewBS->ultraData.chosen[gActiveBattler], gNewBS->zMoveData.toBeUsed[gActiveBattler], gNewBS->dynamaxData.toBeUsed[gActiveBattler]);
+				EmitMoveChosen(1, chosenMovePos, gBankTarget, gNewBS->megaData.chosen[gActiveBattler], gNewBS->ultraData.chosen[gActiveBattler], gNewBS->zMoveData.toBeUsed[gActiveBattler], gNewBS->dynamaxData.toBeUsed[gActiveBattler], gNewBS->teraData.chosen[gActiveBattler]); // For Terastallization
 				TryRechoosePartnerMove(moveInfo->moves[chosenMovePos]);
 				break;
 		}
@@ -152,11 +152,11 @@ void OpponentHandleChooseMove(void)
 		} while (move == MOVE_NONE);
 
 		if (GetBaseMoveTarget(move, gActiveBattler) & (MOVE_TARGET_USER_OR_PARTNER | MOVE_TARGET_USER))
-			EmitMoveChosen(1, chosenMovePos, gActiveBattler, 0, 0, 0, FALSE);
+			EmitMoveChosen(1, chosenMovePos, gActiveBattler, 0, 0, 0, FALSE, 0); // For Terastallization
 		else if (IS_DOUBLE_BATTLE)
-			EmitMoveChosen(1, chosenMovePos, GetBattlerAtPosition(Random() & 2), 0, 0, 0, FALSE);
+			EmitMoveChosen(1, chosenMovePos, GetBattlerAtPosition(Random() & 2), 0, 0, 0, FALSE, 0); // For Terastallization
 		else
-			EmitMoveChosen(1, chosenMovePos, FOE(gActiveBattler), 0, 0, 0, FALSE);
+			EmitMoveChosen(1, chosenMovePos, FOE(gActiveBattler), 0, 0, 0, FALSE, 0); // For Terastallization
 
 		OpponentBufferExecCompleted();
 	}

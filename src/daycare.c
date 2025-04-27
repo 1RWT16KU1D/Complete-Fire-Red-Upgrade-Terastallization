@@ -678,6 +678,10 @@ static void SetInitialEggData(struct Pokemon* mon, u16 species, u32 personality)
 	SetMonData(mon, MON_DATA_MET_LEVEL, &metLevel);
 	SetMonData(mon, MON_DATA_LANGUAGE, &language);
 	mon->hiddenAbility = hiddenAbility;
+
+	// For Terastallization
+	u8 defaultTeraType = TYPE_BLANK;
+	mon->teraType = defaultTeraType;
 }
 
 void CreateEgg(struct Pokemon *mon, u16 species) //The function used by the giveegg scripting command

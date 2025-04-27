@@ -4,6 +4,9 @@
 #include "include/constants/tutors.h"
 #include "include/new/catching.h"
 
+## Scrolling Multichoice Fix
+080CBB84 00 00 00 00
+
 ##Optional Byte Changes##
 ##Don't Count Eggs Healing PKMN Centre
 08083B8E 08 F0 D5 FA
@@ -693,3 +696,4 @@
 08740F45 16 C2 50 32 00 16 00 80 00 00 25 67 00 02
 ##Battle BG
 087803A5 3
+

@@ -1968,3 +1968,7 @@ map \map
 .hword \var, \val
 .word \script
 .endm
+
+.macro resetvar var:req
+	setvar \var 0
+.endm

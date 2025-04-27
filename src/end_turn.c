@@ -1749,6 +1749,7 @@ u8 TurnBasedEffects(void)
 				gBattleStruct->turnEffectsBank = gBattlersCount;
 				gNewBS->endTurnDone = TRUE;
 				gNewBS->megaData.state = 0;
+				gNewBS->teraData.state = 0; // For Terastallization
 				gNewBS->calculatedAIPredictions = FALSE;
 				gNewBS->batonPassing = FALSE;
 				gNewBS->NoMoreMovingThisTurn = 0; //May be set during end turn Emergency Exit

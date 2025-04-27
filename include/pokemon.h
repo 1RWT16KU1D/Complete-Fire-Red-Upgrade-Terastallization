@@ -291,7 +291,7 @@ struct BoxPokemon
     u8 otName[OT_NAME_LENGTH];
     u8 markings;
     u16 checksum;
-    u16 unknown;
+    u16 teraType; // For Terastallization
 
     struct PokemonSubstruct0 substruct0;
     struct PokemonSubstruct1 substruct1;
@@ -309,7 +309,7 @@ typedef struct Pokemon
 	u8 otname[7];
 	u8 markings;
 	u16 backupSpecies;
-	u16 unused;
+	u16 teraType;       // For Terastallization
 
 //Substructure Growth
     u16 species;

@@ -111,30 +111,33 @@ struct ChooseMoveStruct
     u8 monType2;
 
 //New Data - Old data is memcpy so don't touch
-	u8 moveTypes[MAX_MON_MOVES];
-	u8 moveResults[MAX_BATTLERS_COUNT][MAX_MON_MOVES];
-	u8 zMoveResults[MAX_BATTLERS_COUNT][MAX_MON_MOVES];
-	u16 movePowers[MAX_MON_MOVES];
-	u16 moveAcc[MAX_MON_MOVES];
+    u8 moveTypes[MAX_MON_MOVES];
+    u8 moveResults[MAX_BATTLERS_COUNT][MAX_MON_MOVES];
+    u8 zMoveResults[MAX_BATTLERS_COUNT][MAX_MON_MOVES];
+    u16 movePowers[MAX_MON_MOVES];
+    u16 moveAcc[MAX_MON_MOVES];
 	u8 moveSplit[MAX_MON_MOVES];
 	bool8 makesContact[MAX_MON_MOVES];
-	u8 monType3;
-	bool8 canMegaEvolve;
-	u8 megaVariance;
-	bool8 zMoveUsed : 1;
-	bool8 megaDone : 1;
-	bool8 ultraDone : 1;
-	bool8 dynamaxDone : 1;
-	bool8 dynamaxed : 1;
-	bool8 atkIsGrounded : 1;
-	bool8 bank;
-	u8 zPartyIndex;
-	u16 possibleZMoves[MAX_MON_MOVES];
-	u8 ability;
-	bool8 canDynamax;
-	u16 possibleMaxMoves[MAX_MON_MOVES];
-	u16 maxMovePowers[MAX_MON_MOVES];
-	u8 dynamaxPartyIndex;
+    u8 monType3;
+    bool8 canMegaEvolve;
+    u8 megaVariance;
+    bool8 zMoveUsed : 1;
+    bool8 megaDone : 1;
+    bool8 ultraDone : 1;
+    bool8 dynamaxDone : 1;
+    bool8 dynamaxed : 1;
+    bool8 atkIsGrounded : 1;
+    bool8 teraDone : 1; // For Terastallization
+    bool8 bank;
+    u8 zPartyIndex;
+    u16 possibleZMoves[MAX_MON_MOVES];
+    u8 ability;
+    bool8 canDynamax;
+    bool8 canTera;      // For Terastallization
+    u8 teraType;        // For Terastallization
+    u16 possibleMaxMoves[MAX_MON_MOVES];
+    u16 maxMovePowers[MAX_MON_MOVES];
+    u8 dynamaxPartyIndex;
 };
 
 

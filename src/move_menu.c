@@ -23,6 +23,7 @@
 #include "../include/new/move_tables.h"
 #include "../include/new/multi.h"
 #include "../include/new/set_z_effect.h"
+#include "../include/new/terastallization.h"
 #include "../include/new/text.h"
 #include "../include/new/util.h"
 #include "../include/new/z_move_effects.h"
@@ -42,8 +43,12 @@ extern const u8 sTargetIdentities[];
 extern const u16 gUserInterfaceGfx_TypeHighlightingPal[];
 extern const u8 PSSIconsTiles[];
 
+// For Terastallization
+extern u8 GetTeraType(u8 bank);
+
 //This file's functions:
 static bool8 TriggerMegaEvolution(void);
+static bool8 TriggerTerastallization(void); // For Terastallization
 static void MoveNameToDisplayedStringBattle(u8 moveIndex);
 static void MoveSelectionDisplayMoveNames(void);
 static void MoveSelectionDisplayMoveType(void);
@@ -70,6 +75,7 @@ void InitMoveSelectionsVarsAndStrings(void)
 {
 	LoadMenuElementsPalette(6 * 0x10, 1); //For move type and split
 
+	TryLoadTeraTrigger(); // For Terastallization
 	TryLoadMegaTriggers();
 	TryLoadZTrigger();
 	TryLoadDynamaxTrigger();
@@ -176,7 +182,7 @@ void HandleInputChooseMove(void)
 				TryRemovePartnerDoublesKillingScoreComplete(gActiveBattler, gMultiUsePlayerCursor, chosenMove, moveTarget, FALSE);
 			}
 
-			EmitMoveChosen(1, gMoveSelectionCursor[gActiveBattler], gMultiUsePlayerCursor, gNewBS->megaData.chosen[gActiveBattler], gNewBS->ultraData.chosen[gActiveBattler], gNewBS->zMoveData.toBeUsed[gActiveBattler], gNewBS->dynamaxData.toBeUsed[gActiveBattler]);
+			EmitMoveChosen(1, gMoveSelectionCursor[gActiveBattler], gMultiUsePlayerCursor, gNewBS->megaData.chosen[gActiveBattler], gNewBS->ultraData.chosen[gActiveBattler], gNewBS->zMoveData.toBeUsed[gActiveBattler], gNewBS->dynamaxData.toBeUsed[gActiveBattler], gNewBS->teraData.chosen[gActiveBattler]); // For Terastallization
 			PlayerBufferExecCompleted();
 		}
 		else
@@ -290,9 +296,9 @@ void HandleInputChooseMove(void)
 	}
 	else if (gMain.newKeys & (START_BUTTON | R_BUTTON))
 	{
-		if (!MoveSelectionDisplayZMove()) //Only one is allowed at a time
+		if (!MoveSelectionDisplayZMove()) // Only one special mechanic is allowed at a time
 		{
-			if (!TriggerMegaEvolution() && gBattleTypeFlags & BATTLE_TYPE_DYNAMAX)
+			if (!TriggerTerastallization() && (!TriggerMegaEvolution() && (gBattleTypeFlags & BATTLE_TYPE_DYNAMAX)))
 				MoveSelectionDisplayMaxMove();
 		}
 	}
@@ -348,6 +354,37 @@ static bool8 TriggerMegaEvolution(void)
 	#endif
 }
 
+// For Terastallization
+static bool8 TriggerTerastallization(void)
+{
+    struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][4]);
+
+    // Return FALSE if can't Tera
+    if (GetTeraType(gActiveBattler) == TYPE_BLANK
+    || CanMegaEvolve(gActiveBattler, FALSE) != NULL
+    || IsMega(gActiveBattler)
+    || !moveInfo->canTera
+	|| moveInfo->canMegaEvolve)
+        return FALSE;
+
+    if (gNewBS->teraData.chosen[gActiveBattler])
+    { 
+        // Turn Off Terastallization
+        PlaySE(3);
+        gNewBS->teraData.chosen[gActiveBattler] = FALSE;
+        return TRUE;
+    }
+    else
+    { 
+        // Turn On Terastallization
+        PlaySE(2);
+        gNewBS->teraData.chosen[gActiveBattler] = TRUE;
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 //This function sends useful data over Link Cable for the move menu to use
 void EmitChooseMove(u8 bufferId, bool8 isDoubleBattle, bool8 NoPpNumber, struct ChooseMoveStruct *movePpData)
 {
@@ -361,6 +398,10 @@ void EmitChooseMove(u8 bufferId, bool8 isDoubleBattle, bool8 NoPpNumber, struct 
 	tempMoveStruct->monType3 = gBattleMons[gActiveBattler].type3;
 	tempMoveStruct->ability = ABILITY(gActiveBattler);
 	tempMoveStruct->atkIsGrounded = CheckGrounding(gActiveBattler);
+
+	// For Terastallization
+	tempMoveStruct->teraType = GetTeraType(gActiveBattler);
+	tempMoveStruct->teraDone = gNewBS->teraData.done[gActiveBattler];
 
 	//Fix Transformed Move PP
 	if (IS_TRANSFORMED(gActiveBattler))
@@ -507,6 +548,13 @@ void EmitChooseMove(u8 bufferId, bool8 isDoubleBattle, bool8 NoPpNumber, struct 
 		}
 	}
 
+	// For Terastallization
+	tempMoveStruct->teraDone = gNewBS->teraData.done[gActiveBattler];
+
+	// Return TRUE if Terastallization NOT USED
+	if (!gNewBS->teraData.done[gActiveBattler])
+		tempMoveStruct->canTera = TRUE;
+
 	gBattleBuffersTransferData[0] = CONTROLLER_CHOOSEMOVE;
 	gBattleBuffersTransferData[1] = isDoubleBattle;
 	gBattleBuffersTransferData[2] = NoPpNumber;
@@ -518,7 +566,7 @@ void EmitChooseMove(u8 bufferId, bool8 isDoubleBattle, bool8 NoPpNumber, struct 
 	Free(tempMoveStruct);
 }
 
-void EmitMoveChosen(u8 bufferId, u8 chosenMoveIndex, u8 target, u8 megaState, u8 ultraState, u8 zMoveState, u8 dynamaxState)
+void EmitMoveChosen(u8 bufferId, u8 chosenMoveIndex, u8 target, u8 megaState, u8 ultraState, u8 zMoveState, u8 dynamaxState, u8 teraState)
 {
 	gBattleBuffersTransferData[0] = CONTROLLER_TWORETURNVALUES;
 	gBattleBuffersTransferData[1] = ACTION_RUN_BATTLESCRIPT;
@@ -528,7 +576,8 @@ void EmitMoveChosen(u8 bufferId, u8 chosenMoveIndex, u8 target, u8 megaState, u8
 	gBattleBuffersTransferData[5] = ultraState;
 	gBattleBuffersTransferData[6] = zMoveState;
 	gBattleBuffersTransferData[7] = dynamaxState;
-	PrepareBufferDataTransfer(bufferId, gBattleBuffersTransferData, 8);
+	gBattleBuffersTransferData[8] = teraState; // For Terastallization
+	PrepareBufferDataTransfer(bufferId, gBattleBuffersTransferData, 9);
 }
 
 const u8 sText_StabMoveInterfaceType[] = {0xFC, 0x05, 0x05, 0xFC, 0x04, 0x09, 0x0E, 0x08, 0xFF};
@@ -1406,7 +1455,7 @@ void HandleInputChooseTarget(void)
 		gSprites[gBattlerSpriteIds[gMultiUsePlayerCursor]].callback = SpriteCb_HideAsMoveTarget;
 		if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER)
 			TryRemovePartnerDoublesKillingScore(gActiveBattler, gMultiUsePlayerCursor, moveInfo->moves[gMoveSelectionCursor[gActiveBattler]], FALSE);
-		EmitMoveChosen(1, gMoveSelectionCursor[gActiveBattler], gMultiUsePlayerCursor, gNewBS->megaData.chosen[gActiveBattler], gNewBS->ultraData.chosen[gActiveBattler], gNewBS->zMoveData.toBeUsed[gActiveBattler], gNewBS->dynamaxData.toBeUsed[gActiveBattler]);
+		EmitMoveChosen(1, gMoveSelectionCursor[gActiveBattler], gMultiUsePlayerCursor, gNewBS->megaData.chosen[gActiveBattler], gNewBS->ultraData.chosen[gActiveBattler], gNewBS->zMoveData.toBeUsed[gActiveBattler], gNewBS->dynamaxData.toBeUsed[gActiveBattler], gNewBS->teraData.chosen[gActiveBattler]); // For Terastallization
 		CloseZMoveDetails();
 		CloseMaxMoveDetails();
 		EndBounceEffect(gMultiUsePlayerCursor, BOUNCE_HEALTHBOX);
@@ -1422,6 +1471,7 @@ void HandleInputChooseTarget(void)
 		EndBounceEffect(gMultiUsePlayerCursor, BOUNCE_HEALTHBOX);
 
 		ReloadMoveNamesIfNecessary();
+		TryLoadTeraTrigger(); // For Terastallization
 		TryLoadMegaTriggers();
 		TryLoadZTrigger();
 		TryLoadDynamaxTrigger();
@@ -2155,7 +2205,7 @@ bool8 CheckCantMoveThisTurn(void)
 {
 	if (gNewBS->NoMoreMovingThisTurn & gBitTable[gActiveBattler])
 	{
-		EmitMoveChosen(1, 0, gMultiUsePlayerCursor, FALSE, FALSE, FALSE, FALSE);
+		EmitMoveChosen(1, 0, gMultiUsePlayerCursor, FALSE, FALSE, FALSE, FALSE, FALSE); // For Terastallization
 		return TRUE;
 	}
 	return FALSE;

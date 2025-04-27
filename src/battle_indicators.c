@@ -91,6 +91,17 @@ static void DestroyLastBallTriggerBall(struct Sprite* sprite);
 static void DestroyTeamPreviewTrigger(struct Sprite* sprite);
 static void DestroyTypeIcon(struct Sprite* sprite);
 
+// For Terastallization - Custom functions in this file
+static void SpriteCB_TeraTrigger(struct Sprite* self);
+static void DestroyTeraTrigger(void);
+
+// Exported functions
+extern u8 GetTeraType(u8 bank);
+
+// Tera Triggers and Indicators
+extern const u8 Tera_TriggerTiles[];
+extern const u16 Tera_TriggerPal[];
+
 enum MegaGraphicsTags
 {
 	GFX_TAG_MEGA_INDICATOR = 0xFDF0,
@@ -108,14 +119,15 @@ enum MegaGraphicsTags
 	GFX_TAG_TEAM_PREVIEW_TRIGGER,
 	GFX_TAG_FAINTED_TEAM_PREVIEW_ICON,
 	GFX_TAG_TEAM_PREVIEW_STATUS_ICON,
+	GFX_TAG_TERA_TRIGGER,
 };
 
-enum
+enum TriggerStates
 {
-	MegaTriggerNothing,
-	MegaTriggerLightUp,
-	MegaTriggerNormalColour,
-	MegaTriggerGrayscale,
+	TriggerNothing,
+	TriggerLightUp,
+	TriggerNormalColour,
+	TriggerGrayscale,
 };
 
 static const struct Coords16 sTypeIconPositions[][/*IS_SINGLE_BATTLE*/2] =
@@ -193,6 +205,10 @@ static const struct CompressedSpriteSheet sTeamPreviewStatusIconsSpriteSheet = {
 
 static const struct SpritePalette sTypeIconPalTemplate = {CamomonsTypeIconsPal, TYPE_ICON_TAG};
 static const struct SpritePalette sTypeIconPalTemplate2 = {CamomonsTypeIcons2Pal, TYPE_ICON_TAG_2};
+
+// For Terastallization
+static const struct CompressedSpriteSheet sTeraTriggerSpriteSheet = {Tera_TriggerTiles, (32 * 32) / 2, GFX_TAG_TERA_TRIGGER};
+static const struct SpritePalette sTeraTriggerPalette = {Tera_TriggerPal, GFX_TAG_TERA_TRIGGER};
 
 static const struct OamData sIndicatorOam =
 {
@@ -455,6 +471,18 @@ static struct SpriteTemplate sTypeIconSpriteTemplate2 =
 	.callback = SpriteCB_CamomonsTypeIcon,
 };
 
+// For Terastallization
+static const struct SpriteTemplate sTeraTriggerSpriteTemplate =
+{
+	.tileTag = GFX_TAG_TERA_TRIGGER,
+	.paletteTag = GFX_TAG_TERA_TRIGGER,
+	.oam = &sTriggerOam,
+	.anims = gDummySpriteAnimTable,
+	.images = NULL,
+	.affineAnims = gDummySpriteAffineAnimTable,
+	.callback = SpriteCB_TeraTrigger,
+};
+
 //Declare the colours the trigger button doesn't light up
 static const u16 sIgnoredTriggerColours[] =
 {
@@ -591,13 +619,13 @@ static void SpriteCB_MegaTrigger(struct Sprite* self)
 		if (evo->unknown != MEGA_VARIANT_ULTRA_BURST)
 		{
 			if (!moveInfo->canMegaEvolve)
-				PALETTE_STATE = MegaTriggerGrayscale;
+				PALETTE_STATE = TriggerGrayscale;
 			else
 			{
 				if (gNewBS->megaData.chosen[TRIGGER_BANK])
-					PALETTE_STATE = MegaTriggerLightUp;
+					PALETTE_STATE = TriggerLightUp;
 				else
-					PALETTE_STATE = MegaTriggerNormalColour;
+					PALETTE_STATE = TriggerNormalColour;
 			}
 		}
 	}
@@ -607,13 +635,13 @@ static void SpriteCB_MegaTrigger(struct Sprite* self)
 		if (evo->unknown == MEGA_VARIANT_ULTRA_BURST)
 		{
 			if (!moveInfo->canMegaEvolve)
-				PALETTE_STATE = MegaTriggerGrayscale;
+				PALETTE_STATE = TriggerGrayscale;
 			else
 			{
 				if (gNewBS->ultraData.chosen[TRIGGER_BANK])
-					PALETTE_STATE = MegaTriggerLightUp;
+					PALETTE_STATE = TriggerLightUp;
 				else
-					PALETTE_STATE = MegaTriggerNormalColour;
+					PALETTE_STATE = TriggerNormalColour;
 			}
 		}
 	}
@@ -630,13 +658,13 @@ static void SpriteCB_MegaTrigger(struct Sprite* self)
 			if (IsIgnoredTriggerColour(romPal[i])) continue;
 
 			switch(PALETTE_STATE) {
-				case MegaTriggerLightUp:
+				case TriggerLightUp:
 					pal[i] = LightUpTriggerSymbol(romPal[i]);
 					break;
-				case MegaTriggerNormalColour:
+				case TriggerNormalColour:
 					pal[i] = romPal[i];
 					break;
-				case MegaTriggerGrayscale:
+				case TriggerGrayscale:
 					pal[i] = ConvertColorToGrayscale(romPal[i]);
 					break;
 			}
@@ -644,6 +672,106 @@ static void SpriteCB_MegaTrigger(struct Sprite* self)
 
 		self->data[2] = PALETTE_STATE;
 	}
+}
+
+static void SpriteCB_TeraTrigger(struct Sprite* self)
+{
+    struct ChooseMoveStruct* moveInfo = (struct ChooseMoveStruct*) (&gBattleBufferA[TRIGGER_BANK][4]);
+
+    // Determine eligibility
+    bool8 hasTeraType = (GetTeraType(TRIGGER_BANK) != TYPE_BLANK);
+    bool8 hasMegaEvolved = IsMega(TRIGGER_BANK);
+    bool8 hasTerastallized = gNewBS->teraData.done[TRIGGER_BANK]; // New flag to track if Tera has been used
+    bool8 teraAllowed = moveInfo->canTera;
+
+    // The sprite appears if the Pokemon has a Tera Type, hasn’t Mega Evolved, and hasn’t Terastallized
+    bool8 shouldAppear = hasTeraType && !hasMegaEvolved && !hasTerastallized;
+
+    // The sprite is usable (not grayed out) if Tera is allowed
+    bool8 shouldBeActive = teraAllowed;
+
+    self->invisible = !shouldAppear;
+
+    // Position handling
+    s16 xShift = 0;
+    if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+    {
+        if (GetBattlerPosition(TRIGGER_BANK) == B_POSITION_PLAYER_LEFT)
+            xShift = -48;
+        else
+            xShift = 10;
+    }
+
+    self->pos1.x = 64 + (32 / 2);
+    self->pos1.y = 80 + (32 / 2);
+    self->pos2.x = xShift;
+    self->pos2.y = self->data[3];
+
+    // Slide in/out animation
+    if (gBattlerControllerFuncs[TRIGGER_BANK] == (void*) (0x0802EA10 | 1) ||  // Old HandleInputChooseMove
+        gBattlerControllerFuncs[TRIGGER_BANK] == HandleInputChooseMove ||
+        gBattlerControllerFuncs[TRIGGER_BANK] == HandleMoveSwitching)
+    {
+        if (hasTerastallized) // Force trigger to slide out after Terastallization
+        {
+            if (self->data[3] < 32)
+                self->data[3] += 2;
+            else
+            {
+                DestroyTeraTrigger();
+                return;
+            }
+        }
+        else if (self->data[3] > 0)
+            self->data[3] -= 2; // Slide in
+        else
+            self->data[3] = 0;
+    }
+    else if (gBattlerControllerFuncs[TRIGGER_BANK] != (void*) (0x08032C90 | 1) && // PlayerHandleChooseMove
+             gBattlerControllerFuncs[TRIGGER_BANK] != (void*) (0x08032C4C | 1)) // HandleChooseMoveAfterDma3
+    {
+        if (self->data[3] < 32)
+            self->data[3] += 2; // Slide out
+        else
+        {
+            DestroyTeraTrigger();
+            return;
+        }
+    }
+
+    // Palette state handling
+    if (!shouldBeActive || hasTerastallized)
+        PALETTE_STATE = TriggerGrayscale;
+    else if (gNewBS->teraData.chosen[TRIGGER_BANK])
+        PALETTE_STATE = TriggerLightUp;
+    else
+        PALETTE_STATE = TriggerNormalColour;
+
+    if (PALETTE_STATE != self->data[2])
+    {
+        u16* pal = &gPlttBufferFaded2[IndexOfSpritePaletteTag(PAL_TAG) * 16];
+
+        for (u8 i = 1; i < 16; i++)
+        {
+            if (IsIgnoredTriggerColour(Tera_TriggerPal[i]))
+                continue;
+
+            switch (PALETTE_STATE)
+            {
+                case TriggerLightUp:
+                    pal[i] = LightUpTriggerSymbol(Tera_TriggerPal[i]);
+                    break;
+                case TriggerNormalColour:
+                    pal[i] = Tera_TriggerPal[i];
+                    break;
+                case TriggerGrayscale:
+                    pal[i] = ConvertColorToGrayscale(Tera_TriggerPal[i]);
+                    break;
+            }
+        }
+
+        self->data[2] = PALETTE_STATE;
+    }
 }
 
 #define INDICATOR_BANK self->data[0]
@@ -822,9 +950,9 @@ static void SpriteCB_ZTrigger(struct Sprite* self)
 	}
 
 	if (gNewBS->zMoveData.viewing)
-		PALETTE_STATE = MegaTriggerLightUp;
+		PALETTE_STATE = TriggerLightUp;
 	else
-		PALETTE_STATE = MegaTriggerNormalColour;
+		PALETTE_STATE = TriggerNormalColour;
 
 	// Only change the palette if the state has changed
 	if (PALETTE_STATE != self->data[2])
@@ -837,10 +965,10 @@ static void SpriteCB_ZTrigger(struct Sprite* self)
 			if (IsIgnoredTriggerColour(Z_Move_TriggerPal[i])) continue;
 
 			switch(PALETTE_STATE) {
-				case MegaTriggerLightUp:
+				case TriggerLightUp:
 					pal[i] = LightUpTriggerSymbol(Z_Move_TriggerPal[i]);
 					break;
-				case MegaTriggerNormalColour:
+				case TriggerNormalColour:
 					pal[i] = Z_Move_TriggerPal[i];
 					break;
 			}
@@ -902,9 +1030,9 @@ static void SpriteCB_DynamaxTrigger(struct Sprite* self)
 	}
 
 	if (gNewBS->dynamaxData.viewing)
-		PALETTE_STATE = MegaTriggerLightUp;
+		PALETTE_STATE = TriggerLightUp;
 	else
-		PALETTE_STATE = MegaTriggerNormalColour;
+		PALETTE_STATE = TriggerNormalColour;
 
 	// Only change the palette if the state has changed
 	if (PALETTE_STATE != self->data[2])
@@ -917,10 +1045,10 @@ static void SpriteCB_DynamaxTrigger(struct Sprite* self)
 			if (IsIgnoredTriggerColour(Dynamax_TriggerPal[i])) continue;
 
 			switch(PALETTE_STATE) {
-				case MegaTriggerLightUp:
+				case TriggerLightUp:
 					pal[i] = LightUpTriggerSymbol(Dynamax_TriggerPal[i]);
 					break;
-				case MegaTriggerNormalColour:
+				case TriggerNormalColour:
 					pal[i] = Dynamax_TriggerPal[i];
 					break;
 			}
@@ -1285,6 +1413,23 @@ void TryLoadMegaTriggers(void)
 	}
 }
 
+// For Terastallization
+void TryLoadTeraTrigger(void)
+{
+	u8 spriteId;
+
+	if (gBattleTypeFlags & (BATTLE_TYPE_SAFARI | BATTLE_TYPE_POKE_DUDE | BATTLE_TYPE_OLD_MAN))
+		return;
+
+	LoadSpritePalette(&sTeraTriggerPalette);
+	LoadCompressedSpriteSheetUsingHeap(&sTeraTriggerSpriteSheet);
+
+	spriteId = CreateSprite(&sTeraTriggerSpriteTemplate, 130, 90, 1);
+	gSprites[spriteId].data[3] = 32;
+	gSprites[spriteId].pos1.y = -32;
+	gSprites[spriteId].data[4] = gActiveBattler;
+}
+
 static void DestroyMegaTriggers(struct Sprite* sprite)
 {
 	u32 i;
@@ -1304,6 +1449,21 @@ static void DestroyMegaTriggers(struct Sprite* sprite)
 	FreeSpriteTilesByTag(GFX_TAG_MEGA_TRIGGER);
 	FreeSpritePaletteByTag(GFX_TAG_ULTRA_TRIGGER);
 	FreeSpriteTilesByTag(GFX_TAG_ULTRA_TRIGGER);
+}
+
+// For Terastallization
+static void DestroyTeraTrigger(void)
+{
+    // Free palette and tiles
+    FreeSpritePaletteByTag(GFX_TAG_TERA_TRIGGER);
+    FreeSpriteTilesByTag(GFX_TAG_TERA_TRIGGER);
+    
+    // Destroy all Tera Trigger sprites
+    for (int i = 0; i < MAX_SPRITES; ++i)
+    {
+        if (gSprites[i].inUse && gSprites[i].template->tileTag == GFX_TAG_TERA_TRIGGER)
+            DestroySprite(&gSprites[i]);
+    }
 }
 
 void TryLoadZTrigger(void)

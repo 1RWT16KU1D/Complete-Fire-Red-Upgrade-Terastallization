@@ -607,6 +607,10 @@ u8 GiveMonToPlayer(struct Pokemon* mon) //Hook in
 	SetMonData(mon, MON_DATA_OT_GENDER, &gSaveBlock2->playerGender);
 	SetMonData(mon, MON_DATA_OT_ID, gSaveBlock2->playerTrainerId);
 
+	// For Terastallization
+	u8 defaultTeraType = TYPE_BLANK;
+	mon->teraType = defaultTeraType;
+
 	u8 freeSlot = GetFreeSlotInPartyForMon();
 	if (freeSlot >= PARTY_SIZE) //Can't add mon
 	{

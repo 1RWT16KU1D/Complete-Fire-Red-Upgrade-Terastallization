@@ -18,6 +18,7 @@
 #include "../include/new/item.h"
 #include "../include/new/move_tables.h"
 #include "../include/new/switching.h"
+#include "../include/new/terastallization.h"
 #include "../include/new/util.h"
 
 #include "Tables/type_tables.h"
@@ -26,6 +27,9 @@
 damage_calc.c
 	functions responsible for calculating damage, including modifications from abilities, effects, etc...
 */
+
+// For Terastallization
+extern bool8 IsTerastallized(u8 bank);
 
 extern const struct NaturalGiftStruct gNaturalGiftTable[];
 extern const struct FlingStruct gFlingTable[];
@@ -794,141 +798,175 @@ u32 AI_CalcMonDefDmg(u8 bankAtk, u8 bankDef, u16 move, struct Pokemon* monDef, s
 //This is type calc BS Command
 void atk06_typecalc(void)
 {
-	u8 moveType = gBattleStruct->dynamicMoveType & 0x3F;
-	u8 atkAbility = ABILITY(gBankAttacker);
-	u8 atkType1 = gBattleMons[gBankAttacker].type1;
-	u8 atkType2 = gBattleMons[gBankAttacker].type2;
-	u8 atkType3 = gBattleMons[gBankAttacker].type3;
-	u8 moveTarget = GetBaseMoveTarget(gCurrentMove, gBankAttacker);
-	bool8 calcSpreadMove = IS_DOUBLE_BATTLE && moveTarget & (MOVE_TARGET_BOTH | MOVE_TARGET_ALL);
+    u8 moveType = gBattleStruct->dynamicMoveType & 0x3F;
+    u8 atkAbility = ABILITY(gBankAttacker);
+    u8 atkType1 = gBattleMons[gBankAttacker].type1;
+    u8 atkType2 = gBattleMons[gBankAttacker].type2;
+    u8 atkType3 = gBattleMons[gBankAttacker].type3;
+    u8 moveTarget = GetBaseMoveTarget(gCurrentMove, gBankAttacker);
+    bool8 calcSpreadMove = IS_DOUBLE_BATTLE && moveTarget & (MOVE_TARGET_BOTH | MOVE_TARGET_ALL);
 
-	if (gCurrentMove != MOVE_STRUGGLE)
-	{
-		for (u32 bankDef = 0; bankDef < gBattlersCount; ++bankDef)
-		{
-			if (!calcSpreadMove) //Single target move
-				bankDef = gBankTarget;
-			else if (gNewBS->calculatedSpreadMoveData)
-				break; //Already calculated type adjustment
-			else if (!BATTLER_ALIVE(bankDef) || bankDef == gBankAttacker
-			|| (bankDef == PARTNER(gBankAttacker) && !(moveTarget & MOVE_TARGET_ALL))
-			|| gNewBS->noResultString[bankDef])
-				continue;
+    if (gCurrentMove != MOVE_STRUGGLE)
+    {
+        for (u32 bankDef = 0; bankDef < gBattlersCount; ++bankDef)
+        {
+            if (!calcSpreadMove) // Single target move
+                bankDef = gBankTarget;
+            else if (gNewBS->calculatedSpreadMoveData)
+                break; // Already calculated type adjustment
+            else if (!BATTLER_ALIVE(bankDef) || bankDef == gBankAttacker
+                || (bankDef == PARTNER(gBankAttacker) && !(moveTarget & MOVE_TARGET_ALL))
+                || gNewBS->noResultString[bankDef])
+                continue;
 
-			u8 defAbility = ABILITY(bankDef);
-			u8 defEffect = ITEM_EFFECT(bankDef);
-			gBattleMoveDamage = gNewBS->DamageTaken[bankDef];
-			gNewBS->ResultFlags[bankDef] &= ~(MOVE_RESULT_SUPER_EFFECTIVE | MOVE_RESULT_NOT_VERY_EFFECTIVE | MOVE_RESULT_DOESNT_AFFECT_FOE); //Reset for now so damage can be modulated properly
+            u8 defAbility = ABILITY(bankDef);
+            u8 defEffect = ITEM_EFFECT(bankDef);
+            gBattleMoveDamage = gNewBS->DamageTaken[bankDef];
+            gNewBS->ResultFlags[bankDef] &= ~(MOVE_RESULT_SUPER_EFFECTIVE | MOVE_RESULT_NOT_VERY_EFFECTIVE | MOVE_RESULT_DOESNT_AFFECT_FOE); // Reset for now so damage can be modulated properly
 
-			//Check Stab
-			if (atkType1 == moveType || atkType2 == moveType || atkType3 == moveType)
-			{
-				if (atkAbility == ABILITY_ADAPTABILITY)
-					gBattleMoveDamage *= 2;
-				else
-					gBattleMoveDamage = (gBattleMoveDamage * 15) / 10;
-			}
+            // Check STAB with Terastallization support
+            bool8 isStab = FALSE;
+            bool8 isEnhancedTeraStab = FALSE;
 
-			//Check Special Ground Immunities
-			if (moveType == TYPE_GROUND && !CheckGrounding(bankDef) && gCurrentMove != MOVE_THOUSANDARROWS)
-			{
-				if (defAbility == ABILITY_LEVITATE)
+            // Check original types for STAB
+            if (atkType1 == moveType || atkType2 == moveType || atkType3 == moveType)
+                isStab = TRUE;
+
+            // Check Tera Type if Terastallized
+            if (IsTerastallized(gBankAttacker))
+            {
+                u8 teraType = GetTeraType(gBankAttacker);
+				u8 originalType1 = gBaseStats[gBattleMons[gBankAttacker].species].type1;
+				u8 originalType2 = gBaseStats[gBattleMons[gBankAttacker].species].type2;
+
+                if ((originalType1 == moveType)
+				|| (originalType2 == moveType)
+				|| (teraType == moveType))
+                {
+                    isStab = TRUE;
+
+                    // Enhanced STAB (2x) if Tera Type matches an original type
+                    if (teraType == originalType1 || teraType == originalType2)
+                        isEnhancedTeraStab = TRUE;
+                }
+            }
+
+            // Apply STAB multiplier
+            if (isStab)
+            {
+				if (isEnhancedTeraStab)
 				{
-					gLastUsedAbility = defAbility;
-					gNewBS->ResultFlags[bankDef] |= (MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE);
-					gLastLandedMoves[bankDef] = 0;
-					gLastHitByType[bankDef] = 0;
-					gNewBS->missStringId[bankDef] = 3;
-					RecordAbilityBattle(bankDef, gLastUsedAbility);
+					if (atkAbility == ABILITY_ADAPTABILITY)
+						gBattleMoveDamage = (gBattleMoveDamage * 25) / 10; // Tera + Type Matching + Adaptabliity
+					else
+						gBattleMoveDamage *= 2;
 				}
-				else if (defEffect == ITEM_EFFECT_AIR_BALLOON)
-				{
-					gNewBS->ResultFlags[bankDef] |= (MOVE_RESULT_DOESNT_AFFECT_FOE);
-					gLastLandedMoves[bankDef] = 0;
-					gLastHitByType[bankDef] = 0;
-					RecordItemEffectBattle(bankDef, defEffect);
-				}
-				else if ((gStatuses3[bankDef] & (STATUS3_LEVITATING | STATUS3_TELEKINESIS))
-				|| IsFloatingWithMagnetism(bankDef))
-				{
-					gNewBS->ResultFlags[bankDef] |= (MOVE_RESULT_DOESNT_AFFECT_FOE);
-					gLastLandedMoves[bankDef] = 0;
-					gLastHitByType[bankDef] = 0;
-				}
-				else
-					goto RE_ENTER_TYPE_CHECK;	//You're a flying type
-			}
+                else if (atkAbility == ABILITY_ADAPTABILITY)
+                    gBattleMoveDamage *= 2; // 2x for any STAB with Adaptability
+                else
+                    gBattleMoveDamage = (gBattleMoveDamage * 15) / 10; // 1.5x for normal STAB
+            }
 
-			//Check Powder Moves
-			else if (gSpecialMoveFlags[gCurrentMove].gPowderMoves)
-			{
-				if (defAbility == ABILITY_OVERCOAT)
-				{
-					gLastUsedAbility = defAbility;
-					gNewBS->ResultFlags[bankDef] |= (MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE);
-					gLastLandedMoves[bankDef] = 0;
-					gLastHitByType[bankDef] = 0xFF;
-					gNewBS->missStringId[bankDef] = 3;
-					RecordAbilityBattle(bankDef, gLastUsedAbility);
-				}
-				else if (defEffect == ITEM_EFFECT_SAFETY_GOGGLES)
-				{
-					gNewBS->ResultFlags[bankDef] |= (MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE);
-					gLastLandedMoves[bankDef] = 0;
-					gLastHitByType[bankDef] = 0xFF;
-					TrySetMissStringForSafetyGoggles(bankDef);
-					RecordItemEffectBattle(bankDef, defEffect);
-				}
-				else if (IsOfType(bankDef, TYPE_GRASS))
-				{
-					gNewBS->ResultFlags[bankDef] |= (MOVE_RESULT_DOESNT_AFFECT_FOE);
-					gLastLandedMoves[bankDef] = 0;
-					gLastHitByType[bankDef] = 0xFF;
-				}
-				else
-					goto RE_ENTER_TYPE_CHECK;
-			}
-			else if ((gBattleMoves[gCurrentMove].effect == EFFECT_SKY_DROP && IsOfType(bankDef, TYPE_FLYING))
-			|| (gCurrentMove == MOVE_SYNCHRONOISE && WillSyncronoiseFail(gBankAttacker, bankDef)))
-			{
-				gNewBS->ResultFlags[bankDef] |= (MOVE_RESULT_DOESNT_AFFECT_FOE);
-				gLastLandedMoves[bankDef] = 0;
-				gLastHitByType[bankDef] = 0xFF;
-			}
-			else
-			{
-			RE_ENTER_TYPE_CHECK:
-				TypeDamageModification(atkAbility, bankDef, gCurrentMove, moveType, &gNewBS->ResultFlags[bankDef]);
-			}
+            // Check Special Ground Immunities
+            if (moveType == TYPE_GROUND && !CheckGrounding(bankDef) && gCurrentMove != MOVE_THOUSANDARROWS)
+            {
+                if (defAbility == ABILITY_LEVITATE)
+                {
+                    gLastUsedAbility = defAbility;
+                    gNewBS->ResultFlags[bankDef] |= (MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE);
+                    gLastLandedMoves[bankDef] = 0;
+                    gLastHitByType[bankDef] = 0;
+                    gNewBS->missStringId[bankDef] = 3;
+                    RecordAbilityBattle(bankDef, gLastUsedAbility);
+                }
+                else if (defEffect == ITEM_EFFECT_AIR_BALLOON)
+                {
+                    gNewBS->ResultFlags[bankDef] |= (MOVE_RESULT_DOESNT_AFFECT_FOE);
+                    gLastLandedMoves[bankDef] = 0;
+                    gLastHitByType[bankDef] = 0;
+                    RecordItemEffectBattle(bankDef, defEffect);
+                }
+                else if ((gStatuses3[bankDef] & (STATUS3_LEVITATING | STATUS3_TELEKINESIS))
+                    || IsFloatingWithMagnetism(bankDef))
+                {
+                    gNewBS->ResultFlags[bankDef] |= (MOVE_RESULT_DOESNT_AFFECT_FOE);
+                    gLastLandedMoves[bankDef] = 0;
+                    gLastHitByType[bankDef] = 0;
+                }
+                else
+                    goto RE_ENTER_TYPE_CHECK; // You're a flying type
+            }
 
-			if (defAbility == ABILITY_WONDERGUARD
-			 //&& AttacksThisTurn(gBankAttacker, gCurrentMove) == 2
-			 && (!(gNewBS->ResultFlags[bankDef] & MOVE_RESULT_SUPER_EFFECTIVE)
-				|| ((gNewBS->ResultFlags[bankDef] & (MOVE_RESULT_SUPER_EFFECTIVE | MOVE_RESULT_NOT_VERY_EFFECTIVE)) == (MOVE_RESULT_SUPER_EFFECTIVE | MOVE_RESULT_NOT_VERY_EFFECTIVE)))
-			 && SPLIT(gCurrentMove) != SPLIT_STATUS)
-			 {
-				gLastUsedAbility = defAbility;
-				gNewBS->ResultFlags[bankDef] |= MOVE_RESULT_MISSED;
-				gLastLandedMoves[bankDef] = 0;
-				gLastHitByType[bankDef] = 0;
-				gNewBS->missStringId[bankDef] = 3;
-				RecordAbilityBattle(bankDef, gLastUsedAbility);
-			}
+            // Check Powder Moves
+            else if (gSpecialMoveFlags[gCurrentMove].gPowderMoves)
+            {
+                if (defAbility == ABILITY_OVERCOAT)
+                {
+                    gLastUsedAbility = defAbility;
+                    gNewBS->ResultFlags[bankDef] |= (MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE);
+                    gLastLandedMoves[bankDef] = 0;
+                    gLastHitByType[bankDef] = 0xFF;
+                    gNewBS->missStringId[bankDef] = 3;
+                    RecordAbilityBattle(bankDef, gLastUsedAbility);
+                }
+                else if (defEffect == ITEM_EFFECT_SAFETY_GOGGLES)
+                {
+                    gNewBS->ResultFlags[bankDef] |= (MOVE_RESULT_MISSED | MOVE_RESULT_DOESNT_AFFECT_FOE);
+                    gLastLandedMoves[bankDef] = 0;
+                    gLastHitByType[bankDef] = 0xFF;
+                    TrySetMissStringForSafetyGoggles(bankDef);
+                    RecordItemEffectBattle(bankDef, defEffect);
+                }
+                else if (IsOfType(bankDef, TYPE_GRASS))
+                {
+                    gNewBS->ResultFlags[bankDef] |= (MOVE_RESULT_DOESNT_AFFECT_FOE);
+                    gLastLandedMoves[bankDef] = 0;
+                    gLastHitByType[bankDef] = 0xFF;
+                }
+                else
+                    goto RE_ENTER_TYPE_CHECK;
+            }
+            else if ((gBattleMoves[gCurrentMove].effect == EFFECT_SKY_DROP && IsOfType(bankDef, TYPE_FLYING))
+                || (gCurrentMove == MOVE_SYNCHRONOISE && WillSyncronoiseFail(gBankAttacker, bankDef)))
+            {
+                gNewBS->ResultFlags[bankDef] |= (MOVE_RESULT_DOESNT_AFFECT_FOE);
+                gLastLandedMoves[bankDef] = 0;
+                gLastHitByType[bankDef] = 0xFF;
+            }
+            else
+            {
+            RE_ENTER_TYPE_CHECK:
+                TypeDamageModification(atkAbility, bankDef, gCurrentMove, moveType, &gNewBS->ResultFlags[bankDef]);
+            }
 
-			if (gNewBS->ResultFlags[bankDef] & MOVE_RESULT_DOESNT_AFFECT_FOE)
-				gProtectStructs[gBankAttacker].targetNotAffected = 1;
+            if (defAbility == ABILITY_WONDERGUARD
+                // && AttacksThisTurn(gBankAttacker, gCurrentMove) == 2
+                && (!(gNewBS->ResultFlags[bankDef] & MOVE_RESULT_SUPER_EFFECTIVE)
+                    || ((gNewBS->ResultFlags[bankDef] & (MOVE_RESULT_SUPER_EFFECTIVE | MOVE_RESULT_NOT_VERY_EFFECTIVE)) == (MOVE_RESULT_SUPER_EFFECTIVE | MOVE_RESULT_NOT_VERY_EFFECTIVE)))
+                && SPLIT(gCurrentMove) != SPLIT_STATUS)
+            {
+                gLastUsedAbility = defAbility;
+                gNewBS->ResultFlags[bankDef] |= MOVE_RESULT_MISSED;
+                gLastLandedMoves[bankDef] = 0;
+                gLastHitByType[bankDef] = 0;
+                gNewBS->missStringId[bankDef] = 3;
+                RecordAbilityBattle(bankDef, gLastUsedAbility);
+            }
 
-			gNewBS->DamageTaken[bankDef] = gBattleMoveDamage;
+            if (gNewBS->ResultFlags[bankDef] & MOVE_RESULT_DOESNT_AFFECT_FOE)
+                gProtectStructs[gBankAttacker].targetNotAffected = 1;
 
-			if (!calcSpreadMove)
-				break; //Only 1 target
-		}
+            gNewBS->DamageTaken[bankDef] = gBattleMoveDamage;
 
-		gBattleMoveDamage = gNewBS->DamageTaken[gBankTarget];
-		gMoveResultFlags = gNewBS->ResultFlags[gBankTarget];
-	}
+            if (!calcSpreadMove)
+                break; // Only 1 target
+        }
 
-	++gBattlescriptCurrInstr;
+        gBattleMoveDamage = gNewBS->DamageTaken[gBankTarget];
+        gMoveResultFlags = gNewBS->ResultFlags[gBankTarget];
+    }
+
+    ++gBattlescriptCurrInstr;
 }
 
 //This is the type calc that doesn't modify the damage

@@ -16,6 +16,7 @@ void CreateMegaIndicatorAfterAnim(void);
 void TryLoadIndicatorForEachBank(void);
 void DestroyMegaIndicator(u8 bank);
 void TryLoadMegaTriggers(void);
+void TryLoadTeraTrigger(void); // For Terastallization
 void TryLoadZTrigger(void);
 void TryLoadDynamaxTrigger(void);
 void TryLoadLastUsedBallTrigger(void);

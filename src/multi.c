@@ -739,7 +739,7 @@ static void PlayerPartnerHandleChooseMove(void)
 	if (IsMockBattle())
 		TryRemovePartnerDoublesKillingScoreComplete(gActiveBattler, gBankTarget, chosenMove, moveTarget, FALSE); //Moves are chosen in order of bank
 
-	EmitMoveChosen(1, chosenMovePos, gBankTarget, gNewBS->megaData.chosen[gActiveBattler], gNewBS->ultraData.chosen[gActiveBattler], gNewBS->zMoveData.toBeUsed[gActiveBattler], FALSE);
+	EmitMoveChosen(1, chosenMovePos, gBankTarget, gNewBS->megaData.chosen[gActiveBattler], gNewBS->ultraData.chosen[gActiveBattler], gNewBS->zMoveData.toBeUsed[gActiveBattler], FALSE, gNewBS->teraData.chosen[gActiveBattler]); // For Terastallization
 	PlayerPartnerBufferExecComplete();
 }
 
