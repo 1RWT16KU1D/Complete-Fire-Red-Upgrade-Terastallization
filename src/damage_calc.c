@@ -826,43 +826,42 @@ void atk06_typecalc(void)
 
             // Check STAB with Terastallization support
             bool8 isStab = FALSE;
-            bool8 isEnhancedTeraStab = FALSE;
+            bool8 isDoubleTeraStab = FALSE;
+
+            // Use original types from gBaseStats to preserve pre-Terastallization types
+            u8 originalType1 = gBaseStats[gBattleMons[gBankAttacker].species].type1;
+            u8 originalType2 = gBaseStats[gBattleMons[gBankAttacker].species].type2;
 
             // Check original types for STAB
-            if (atkType1 == moveType || atkType2 == moveType || atkType3 == moveType)
+            if (moveType == originalType1 || moveType == originalType2)
                 isStab = TRUE;
 
-            // Check Tera Type if Terastallized
+            // Check Tera Type for STAB
             if (IsTerastallized(gBankAttacker))
             {
                 u8 teraType = GetTeraType(gBankAttacker);
-				u8 originalType1 = gBaseStats[gBattleMons[gBankAttacker].species].type1;
-				u8 originalType2 = gBaseStats[gBattleMons[gBankAttacker].species].type2;
-
-                if ((originalType1 == moveType)
-				|| (originalType2 == moveType)
-				|| (teraType == moveType))
+                if (moveType == teraType)
                 {
                     isStab = TRUE;
 
-                    // Enhanced STAB (2x) if Tera Type matches an original type
+                    // Double STAB if Tera Type matches an original type
                     if (teraType == originalType1 || teraType == originalType2)
-                        isEnhancedTeraStab = TRUE;
+                        isDoubleTeraStab = TRUE;
                 }
             }
 
-            // Apply STAB multiplier
+            // Apply STAB multipliers
             if (isStab)
             {
-				if (isEnhancedTeraStab)
-				{
-					if (atkAbility == ABILITY_ADAPTABILITY)
-						gBattleMoveDamage = (gBattleMoveDamage * 25) / 10; // Tera + Type Matching + Adaptabliity
-					else
-						gBattleMoveDamage *= 2;
-				}
-                else if (atkAbility == ABILITY_ADAPTABILITY)
-                    gBattleMoveDamage *= 2; // 2x for any STAB with Adaptability
+                if (atkAbility == ABILITY_ADAPTABILITY)
+                {
+                    if (isDoubleTeraStab)
+                        gBattleMoveDamage = (gBattleMoveDamage * 266) / 100; // 2.66x for double STAB
+                    else
+                        gBattleMoveDamage *= 2; // 2.0x for normal STAB
+                }
+                else if (isDoubleTeraStab)
+                    gBattleMoveDamage *= 2; // 2.0x for double STAB
                 else
                     gBattleMoveDamage = (gBattleMoveDamage * 15) / 10; // 1.5x for normal STAB
             }
