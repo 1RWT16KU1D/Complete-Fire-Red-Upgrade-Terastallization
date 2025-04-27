@@ -833,10 +833,11 @@ void atk06_typecalc(void)
             u8 originalType1 = gBaseStats[gBattleMons[gBankAttacker].species].type1;
             u8 originalType2 = gBaseStats[gBattleMons[gBankAttacker].species].type2;
 
-            // Check original types and added type (atkType3) for STAB (For example, through Trick-or-Treat and Forest's Curse)
-            if (moveType == originalType1
-			   || moveType == originalType2
-			   || (!IsTerastallized(gBankAttacker) && moveType == atkType3))
+            // Check Normal STAB
+            if (moveType == atkType1
+			 || moveType == atkType2
+			 || moveType == atkType3
+			 || atkAbility == ABILITY_PROTEAN)
                 isStab = TRUE;
 
             // Check Tera Type for STAB
@@ -859,14 +860,14 @@ void atk06_typecalc(void)
                 if (atkAbility == ABILITY_ADAPTABILITY)
                 {
                     if (isDoubleTeraStab)
-                        gBattleMoveDamage = (gBattleMoveDamage * 266) / 100; // 2.66x for double STAB
+                        gBattleMoveDamage = udivsi((gBattleMoveDamage * 266), 100); // 2.66x for double STAB
                     else
                         gBattleMoveDamage *= 2; // 2.0x for normal STAB
                 }
                 else if (isDoubleTeraStab)
                     gBattleMoveDamage *= 2; // 2.0x for double STAB
                 else
-                    gBattleMoveDamage = (gBattleMoveDamage * 15) / 10; // 1.5x for normal STAB
+                    gBattleMoveDamage = udivsi((gBattleMoveDamage * 15), 10); // 1.5x for normal STAB
             }
 
             // Check Special Ground Immunities
@@ -1109,15 +1110,50 @@ u8 TypeCalc(u16 move, u8 bankAtk, u8 bankDef, struct Pokemon* monAtk)
 	if (IsTargetAbilityIgnored(defAbility, atkAbility, move))
 		defAbility = ABILITY_NONE; //Ignore Ability
 
-	//Check stab
-	if (atkType1 == moveType || atkType2 == moveType || atkType3 == moveType
-	|| atkAbility == ABILITY_PROTEAN) //Will change type to get STAB
-	{
-		if (atkAbility == ABILITY_ADAPTABILITY)
-			gBattleMoveDamage *= 2;
-		else
-			gBattleMoveDamage = udivsi(gBattleMoveDamage * 15, 10);
-	}
+    // Check STAB with Terastallization support
+    bool8 isStab = FALSE;
+    bool8 isDoubleTeraStab = FALSE;
+
+    // Use original types from gBaseStats to preserve pre-Terastallization types
+    u8 originalType1 = gBaseStats[gBattleMons[gBankAttacker].species].type1;
+    u8 originalType2 = gBaseStats[gBattleMons[gBankAttacker].species].type2;
+
+    // Check Normal STAB
+    if (moveType == atkType1
+	 || moveType == atkType2
+	 || moveType == atkType3
+	 || atkAbility == ABILITY_PROTEAN)
+        isStab = TRUE;
+
+    // Check Tera Type for STAB
+    if (IsTerastallized(gBankAttacker))
+    {
+        u8 teraType = GetTeraType(gBankAttacker);
+        if (moveType == teraType)
+        {
+            isStab = TRUE;
+
+            // Double STAB if Tera Type matches an original type
+            if (teraType == originalType1 || teraType == originalType2)
+                isDoubleTeraStab = TRUE;
+        }
+    }
+
+    // Apply STAB multipliers
+    if (isStab)
+    {
+        if (atkAbility == ABILITY_ADAPTABILITY)
+        {
+            if (isDoubleTeraStab)
+                gBattleMoveDamage = udivsi((gBattleMoveDamage * 266), 100); // 2.66x for double STAB
+            else
+                gBattleMoveDamage *= 2; // 2.0x for normal STAB
+        }
+        else if (isDoubleTeraStab)
+            gBattleMoveDamage *= 2; // 2.0x for double STAB
+        else
+            gBattleMoveDamage = udivsi((gBattleMoveDamage * 15), 10); // 1.5x for normal STAB
+    }
 
 	//Check Special Ground Immunities
 	if (moveType == TYPE_GROUND
@@ -1192,14 +1228,49 @@ u8 AI_TypeCalc(u16 move, u8 bankAtk, u8 bankDef, struct Pokemon* monDef) //bankD
 	if (IsTargetAbilityIgnored(defAbility, atkAbility, move))
 		defAbility = ABILITY_NONE; //Ignore Ability
 
-	//Check STAB
-	if (atkType1 == moveType || atkType2 == moveType || atkType3 == moveType
-	|| atkAbility == ABILITY_PROTEAN) //Will change type to get STAB
+	// Check STAB with Terastallization support
+	bool8 isStab = FALSE;
+	bool8 isDoubleTeraStab = FALSE;
+
+	// Use original types from gBaseStats to preserve pre-Terastallization types
+	u8 originalType1 = gBaseStats[gBattleMons[gBankAttacker].species].type1;
+	u8 originalType2 = gBaseStats[gBattleMons[gBankAttacker].species].type2;
+
+	// Check Normal STAB
+	if (moveType == atkType1
+	|| moveType == atkType2
+	|| moveType == atkType3
+	|| atkAbility == ABILITY_PROTEAN)
+		isStab = TRUE;
+
+	// Check Tera Type for STAB
+	if (IsTerastallized(gBankAttacker))
+	{
+		u8 teraType = GetTeraType(gBankAttacker);
+		if (moveType == teraType)
+		{
+			isStab = TRUE;
+
+			// Double STAB if Tera Type matches an original type
+			if (teraType == originalType1 || teraType == originalType2)
+				isDoubleTeraStab = TRUE;
+		}
+	}
+
+	// Apply STAB multipliers
+	if (isStab)
 	{
 		if (atkAbility == ABILITY_ADAPTABILITY)
-			gBattleMoveDamage *= 2;
+		{
+			if (isDoubleTeraStab)
+				gBattleMoveDamage = udivsi((gBattleMoveDamage * 266), 100); // 2.66x for double STAB
+			else
+				gBattleMoveDamage *= 2; // 2.0x for normal STAB
+		}
+		else if (isDoubleTeraStab)
+			gBattleMoveDamage *= 2; // 2.0x for double STAB
 		else
-			gBattleMoveDamage = udivsi(gBattleMoveDamage * 15, 10);
+			gBattleMoveDamage = udivsi((gBattleMoveDamage * 15), 10); // 1.5x for normal STAB
 	}
 
 	//Check Special Ground Immunities
@@ -1275,14 +1346,49 @@ u8 AI_SpecialTypeCalc(u16 move, u8 bankAtk, u8 bankDef)
 	if (IsTargetAbilityIgnored(defAbility, atkAbility, move))
 		defAbility = ABILITY_NONE; //Ignore Ability
 
-	//Check STAB
-	if (atkType1 == moveType || atkType2 == moveType || atkType3 == moveType
-	|| atkAbility == ABILITY_PROTEAN) //Will change type to get STAB
+	// Check STAB with Terastallization support
+	bool8 isStab = FALSE;
+	bool8 isDoubleTeraStab = FALSE;
+
+	// Use original types from gBaseStats to preserve pre-Terastallization types
+	u8 originalType1 = gBaseStats[gBattleMons[gBankAttacker].species].type1;
+	u8 originalType2 = gBaseStats[gBattleMons[gBankAttacker].species].type2;
+
+	// Check Normal STAB
+	if (moveType == atkType1
+	|| moveType == atkType2
+	|| moveType == atkType3
+	|| atkAbility == ABILITY_PROTEAN)
+		isStab = TRUE;
+
+	// Check Tera Type for STAB
+	if (IsTerastallized(gBankAttacker))
+	{
+		u8 teraType = GetTeraType(gBankAttacker);
+		if (moveType == teraType)
+		{
+			isStab = TRUE;
+
+			// Double STAB if Tera Type matches an original type
+			if (teraType == originalType1 || teraType == originalType2)
+				isDoubleTeraStab = TRUE;
+		}
+	}
+
+	// Apply STAB multipliers
+	if (isStab)
 	{
 		if (atkAbility == ABILITY_ADAPTABILITY)
-			gBattleMoveDamage *= 2;
+		{
+			if (isDoubleTeraStab)
+				gBattleMoveDamage = udivsi((gBattleMoveDamage * 266), 100); // 2.66x for double STAB
+			else
+				gBattleMoveDamage *= 2; // 2.0x for normal STAB
+		}
+		else if (isDoubleTeraStab)
+			gBattleMoveDamage *= 2; // 2.0x for double STAB
 		else
-			gBattleMoveDamage = (gBattleMoveDamage * 15) / 10;
+			gBattleMoveDamage = udivsi((gBattleMoveDamage * 15), 10); // 1.5x for normal STAB
 	}
 
 	//Check Special Ground Immunities
