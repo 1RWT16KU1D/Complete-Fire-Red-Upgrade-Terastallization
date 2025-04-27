@@ -82,6 +82,7 @@ void RevertMonTypes(u8 bank)
 
     gBattleMons[bank].type1 = originalType1;
     gBattleMons[bank].type2 = originalType2;
+    gBattleMons[bank].type3 = TYPE_BLANK;
 }
 
 // Main Function
