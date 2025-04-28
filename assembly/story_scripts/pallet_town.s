@@ -46,7 +46,7 @@ EventScriptP_PalletTown_YoungLadySelected:
     setvar 0x8001 6 @ Number of options to display at once
     special 0x158   @ Scrolling Multichoice
     waitstate
-    
+
     @ Based on Tera Type
     switch LASTRESULT
         case 0, EventScriptP_PalletTown_YoungLady_SetNormal
