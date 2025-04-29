@@ -1417,10 +1417,10 @@ void TryLoadMegaTriggers(void)
 void TryLoadTeraTrigger(void)
 {
 	u8 spriteId;
-
+	if (!FlagGet(FLAG_TERA)) // Prevent trigger if Tera is not available
+		return;
 	if (gBattleTypeFlags & (BATTLE_TYPE_SAFARI | BATTLE_TYPE_POKE_DUDE | BATTLE_TYPE_OLD_MAN))
 		return;
-
 	LoadSpritePalette(&sTeraTriggerPalette);
 	LoadCompressedSpriteSheetUsingHeap(&sTeraTriggerSpriteSheet);
 

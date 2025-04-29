@@ -88,11 +88,12 @@ void RevertMonTypes(u8 bank)
 // Main Function
 u8 *DoTerastallize(u8 bank)
 {
-    if (!IsTerastallized(bank))
+    if (!IsTerastallized(bank) && FlagGet(FLAG_TERA))
     {
         SET_BATTLER_TYPE(bank, GetTeraType(bank));
         PREPARE_TYPE_BUFFER(gBattleTextBuff1, GetTeraType(bank));
         gNewBS->teraData.done[bank] = TRUE;
+        FlagClear(FLAG_TERA);
         return BattleScript_Terastallize;
     }
     return NULL;

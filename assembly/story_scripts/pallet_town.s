@@ -249,3 +249,13 @@ EventScriptP_PalletTown_YoungLady_SetFairy:
     msgbox gText_PalletTown_YoungLadyFetchTeraFairy MSG_NORMAL
     release
     end
+.align 2
+.global EventScript_Pallet_FatGuy
+
+EventScript_Pallet_FatGuy:
+    faceplayer
+    lock
+    setflag 0xA07
+    msgbox gText_TestScript MSG_NORMAL
+    release
+    end
