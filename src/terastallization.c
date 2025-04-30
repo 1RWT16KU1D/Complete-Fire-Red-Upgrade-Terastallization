@@ -16,6 +16,7 @@
 #include "../include/new/battle_script_util.h"
 #include "../include/new/move_battle_scripts.h"
 #include "../include/new/terastallization.h"
+#include "../include/field_weather.h"
 
 // Defines for later functions
 #define BATTLER_HP(bank) gBattleMons[bank].hp
@@ -94,6 +95,7 @@ u8 *DoTerastallize(u8 bank)
         PREPARE_TYPE_BUFFER(gBattleTextBuff1, GetTeraType(bank));
         gNewBS->teraData.done[bank] = TRUE;
         FlagClear(FLAG_TERA);
+        FadeScreen(FADE_FROM_BLACK, 10);
         return BattleScript_Terastallize;
     }
     return NULL;
