@@ -23,6 +23,7 @@
 #include "../include/new/new_bs_commands.h"
 #include "../include/new/set_effect.h"
 #include "../include/new/stat_buffs.h"
+#include "../include/new/terastallization.h"
 #include "../include/new/util.h"
 
 /*
@@ -32,6 +33,10 @@ new_bs_commands.c
 
 extern void (* const gBattleScriptingCommandsTable[])(void);
 extern void (* const gBattleScriptingCommandsTable2[])(void);
+
+// For Terastallization
+extern bool8 IsTerastallized(u8 bank);
+
 
 //callasm FUNCTION_OFFSET
 void atkF8_callasm(void)
@@ -1288,7 +1293,8 @@ void atkFF27_tryactivateprotean(void)
 	&& !(gMoveResultFlags & MOVE_RESULT_FAILED)
 	&& gCurrentMove != MOVE_STRUGGLE
 	&& !(gHitMarker & HITMARKER_UNABLE_TO_USE_MOVE)
-	&& !gSpecialMoveFlags[gCurrentMove].gMovesThatCallOtherMoves)
+	&& !gSpecialMoveFlags[gCurrentMove].gMovesThatCallOtherMoves
+	&& !IsTerastallized(gBankAttacker))
 	{
 		if (gBattleMons[gBankAttacker].type1 != moveType
 		||  gBattleMons[gBankAttacker].type2 != moveType

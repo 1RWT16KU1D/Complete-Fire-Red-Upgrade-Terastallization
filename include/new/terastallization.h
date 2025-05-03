@@ -11,7 +11,7 @@
 extern u8 BattleScript_Terastallize[];
 
 // Custom Functions
-bool8 IsTerastallized(u8 bank);
+extern bool8 IsTerastallized(u8 bank);
 extern u8 GetTeraType(u8 bank);
 extern void ChangeTeraTypeInOW(void);
 extern void RevertMonTypes(u8 bank);

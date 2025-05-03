@@ -22,6 +22,7 @@
 #include "../include/new/form_change.h"
 #include "../include/new/move_battle_scripts.h"
 #include "../include/new/move_tables.h"
+#include "../include/new/terastallization.h"
 #include "../include/new/text.h"
 #include "../include/new/util.h"
 
@@ -383,6 +384,9 @@ static u8 TryActivateTerrainAbility(u8 terrain, u8 anim, u8 bank);
 static bool8 ImmunityAbilityCheck(u8 bank, u32 status, const u8* string);
 static bool8 CanBeAffectedByIntimidate(u8 bank);
 static bool8 AllMainStatsButOneAreMinned(u8 bank);
+
+// For Terastallization
+extern bool8 IsTerastallized(u8 bank);
 
 u8 AbilityBattleEffects(u8 caseID, u8 bank, u8 ability, u8 special, u16 moveArg)
 {
@@ -1799,7 +1803,8 @@ u8 AbilityBattleEffects(u8 caseID, u8 bank, u8 ability, u8 special, u16 moveArg)
 				&& BATTLER_ALIVE(bank)
 				&& gBankAttacker != bank
 				&& !SheerForceCheck()
-				&& gMultiHitCounter <= 1)
+				&& gMultiHitCounter <= 1
+				&& !IsTerastallized(bank))
 				{
 					SET_BATTLER_TYPE(bank, moveType);
 					PREPARE_TYPE_BUFFER(gBattleTextBuff1, moveType);
