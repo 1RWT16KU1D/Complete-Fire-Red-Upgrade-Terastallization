@@ -1508,6 +1508,10 @@ static void ModulateDmgByType(u8 multiplier, const u16 move, const u8 moveType, 
 	if (moveType == TYPE_FIRE && gNewBS->tarShotBits & gBitTable[bankDef]) //Fire always Super-Effective if covered in tar
 		multiplier = TYPE_MUL_SUPER_EFFECTIVE;
 
+	// Add Stellar Type Check
+	if (moveType == TYPE_STELLAR && IsTerastallized(bankDef))
+		multiplier = TYPE_MUL_SUPER_EFFECTIVE;
+
 	if (defType == TYPE_FLYING && multiplier == TYPE_MUL_SUPER_EFFECTIVE && gBattleWeather & WEATHER_AIR_CURRENT_PRIMAL && move != MOVE_STEALTHROCK && WEATHER_HAS_EFFECT)
 		multiplier = TYPE_MUL_NORMAL; //Actually changes the modifier including the "it's super effective" string
 
@@ -4622,21 +4626,14 @@ static void ApplySTABMultipliers(void)
         {
             // Double STAB (Tera matches original type)
             gBattleMoveDamage = (atkAbility == ABILITY_ADAPTABILITY) 
-            ? (gBattleMoveDamage * 25) / 10                  // 2.5x
-            : gBattleMoveDamage * 2;                         // 2.0x
-        }
-        else if (hasOriginalStab && hasTeraStab)
-        {
-            // Dual STAB
-            gBattleMoveDamage = (atkAbility == ABILITY_ADAPTABILITY)
-            ? (gBattleMoveDamage * 20) / 10          	     // 2.0x
-            : (gBattleMoveDamage * 175) / 100;       	     // 1.75x
+            ? (gBattleMoveDamage * 266) / 100                // 2.66x
+            : (gBattleMoveDamage * 20) / 10;          	     // 2.0x
         }
         else
         {
-            // Single STAB
+            // Single STAB (Tera matches only one type or no Tera, simple STAB)
             gBattleMoveDamage = (atkAbility == ABILITY_ADAPTABILITY)
-            ? gBattleMoveDamage * 2                  	     // 2.0x
+            ? (gBattleMoveDamage * 20) / 10          	     // 2.0x
             : (gBattleMoveDamage * 15) / 10;                 // 1.5x
         }
     }

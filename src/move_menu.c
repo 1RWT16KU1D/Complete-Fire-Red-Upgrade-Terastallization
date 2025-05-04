@@ -648,10 +648,15 @@ void MoveSelectionDisplayMoveEffectiveness(void)
 	u8 *txtPtr, moveType, split;
 	const u8* string;
 	bool8 stab = FALSE;
+	bool8 doubleTeraStab = FALSE;
 	u8 stabPalIndex = 5 * 0x10 + 6;
 	u8 palIndex = stabPalIndex + 2;
 	struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][4]);
 	u16 move = moveInfo->moves[gMoveSelectionCursor[gActiveBattler]];
+
+    // For Terastallization - Get original types from base stats
+    u8 originalType1 = gBaseStats[gBattleMons[gActiveBattler].species].type1;
+    u8 originalType2 = gBaseStats[gBattleMons[gActiveBattler].species].type2;
 
 	#ifdef DISPLAY_REAL_MOVE_TYPE_ON_MENU
 	moveType = moveInfo->moveTypes[gMoveSelectionCursor[gActiveBattler]];
@@ -673,8 +678,13 @@ void MoveSelectionDisplayMoveEffectiveness(void)
 		stab = split != SPLIT_STATUS
 			&& (moveType == moveInfo->monType1
 			 || moveType == moveInfo->monType2
-			 || moveType == moveInfo->monType3)
+			 || moveType == moveInfo->monType3
+			 || (IsTerastallized(gActiveBattler) && (moveType == originalType1 || moveType == originalType2))) // Show STAB for original types too
 			&& !CheckTableForMovesEffect(move, gMoveEffectsThatIgnoreWeaknessResistance); //These moves can't have STAB
+
+		doubleTeraStab = split != SPLIT_STATUS
+						&& (IsTerastallized(gActiveBattler) && (moveType == originalType1 || moveType == originalType2)
+						&& moveType == GetTeraType(gActiveBattler));
 
 		if (IS_SINGLE_BATTLE)
 		{
@@ -742,7 +752,11 @@ void MoveSelectionDisplayMoveEffectiveness(void)
 	{
 		gPlttBufferUnfaded[stabPalIndex + 0] = RGB(27, 27, 27); //Copy over PP colours so it's unaffected by low PP
 		gPlttBufferUnfaded[stabPalIndex + 1] = RGB(4, 4, 4);
-		StringCopy(txtPtr, gText_BattleUI_STAB);
+
+		if (doubleTeraStab)
+			StringCopy(txtPtr, gText_BattleUI_DoubleTeraSTAB);
+		else
+			StringCopy(txtPtr, gText_BattleUI_STAB);
 	}
 
     BattlePutTextOnWindow(gDisplayedStringBattle, 7);
