@@ -786,6 +786,7 @@ gMoveAnimations:
 .word ANIM_DRAGON_ENERGY
 .word ANIM_ASTRAL_BARRAGE
 .word ANIM_GLACIAL_LANCE
+.word ANIM_TERA_BLAST
 .word ANIM_DIRE_CLAW
 .word ANIM_PSYSHIELD_BASH
 .word ANIM_POWER_SHIFT
@@ -18893,6 +18894,12 @@ ANIM_GLACIAL_LANCE:
 
 .align 2
 LARGE_ICE_LANCE: objtemplate ANIM_TAG_ICICLE_SPEAR ANIM_TAG_ICICLE_SPEAR OAM_DOUBLE_32x32 gDummySpriteAnimTable 0x0 gSpriteAffineAnimTable_GlacialLance SpriteCB_GlacialLance 
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+.pool
+ANIM_TERA_BLAST:
+	goto ANIM_AURASPHERE
+	endanimation
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 .pool

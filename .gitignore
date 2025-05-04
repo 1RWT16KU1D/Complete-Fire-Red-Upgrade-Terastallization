@@ -35,3 +35,4 @@ scripts/snippets.py
 
 # pycache files
 *.pyc
+test.ss4

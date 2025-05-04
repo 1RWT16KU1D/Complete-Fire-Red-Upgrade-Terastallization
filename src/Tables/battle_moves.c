@@ -12046,6 +12046,22 @@ const struct BattleMove gBattleMoves[] =
 		.z_move_effect = 0
 	},
 
+	[MOVE_TERABLAST] =
+	{
+		.effect = EFFECT_HIT,
+		.power = 80,
+		.type = TYPE_NORMAL,
+		.accuracy = 100,
+		.pp = 10,
+		.secondaryEffectChance = 0,
+		.target = MOVE_TARGET_SELECTED,
+		.priority = 0,
+		.flags = FLAG_PROTECT_AFFECTED | FLAG_MIRROR_MOVE_AFFECTED,
+		.z_move_power = 130,
+		.split = SPLIT_SPECIAL,
+		.z_move_effect = 0
+	},
+
 	[MOVE_DIRECLAW] =
 	{
 		.effect = EFFECT_TRI_ATTACK,
@@ -15501,6 +15517,7 @@ const u8 gDynamaxMovePowers[MOVES_COUNT] =
 	[MOVE_DRAGONENERGY] = 150,
 	[MOVE_ASTRALBARRAGE] = 140,
 	[MOVE_GLACIALLANCE] = 140,
+	[MOVE_TERABLAST] = 120,
 	[MOVE_DIRECLAW] = 110,
 	[MOVE_PSYSHIELDBASH] = 120,
 	[MOVE_MYSTICALPOWER] = 120,

@@ -1226,6 +1226,9 @@ A frightful amount of\nsmall ghosts are sent\nto attack opposing\nPok\emon.
 #org @DESC_GLACIAL_LANCE
 The user attacks by\nhurling a blizzard-\ncloaked icicle lance\nat opposing Pok\emon.
 
+#org @DESC_TERA_BLAST
+If the user has\nTerastallized, it\nunleashes energy of\nits Tera Type.
+
 #org @DESC_DIRE_CLAW
 A slash that may\npoison, paralyze, or\nsleep the foe. It\nhas a high crit ratio.
 
