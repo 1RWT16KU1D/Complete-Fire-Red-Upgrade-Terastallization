@@ -4585,7 +4585,7 @@ static void BoostMonDefensesForTotemBoost(struct DamageCalc* data, u8 bankDef, b
 		data->spDefBuff = min(data->spDefBuff + TotemRaiseAmountToStatMod(raiseAmount), STAT_STAGE_MAX);
 }
 
-// For Terastallization - Added STAB support (Code for Stellar Type in comments)
+// For Terastallization - Added STAB support
 static void ApplySTABMultipliers(void)
 {
     u8 moveType = gBattleStruct->dynamicMoveType & 0x3F;

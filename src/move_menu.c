@@ -649,6 +649,7 @@ void MoveSelectionDisplayMoveEffectiveness(void)
 	const u8* string;
 	bool8 stab = FALSE;
 	bool8 doubleTeraStab = FALSE;
+	bool8 resultTracker = FALSE;
 	u8 stabPalIndex = 5 * 0x10 + 6;
 	u8 palIndex = stabPalIndex + 2;
 	struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][4]);
@@ -716,6 +717,7 @@ void MoveSelectionDisplayMoveEffectiveness(void)
 			gPlttBufferUnfaded[palIndex + 0] = palPtr[NO_EFFECT_COLOURS + 0]; //No STAB for moves with no effect
 			gPlttBufferUnfaded[palIndex + 1] = palPtr[NO_EFFECT_COLOURS + 1];
 			string = gText_BattleUI_NoEffect;
+			resultTracker = TRUE;
 			stab = FALSE; //No STAB on a move that does no damage
 		}
 		else if (moveResult & MOVE_RESULT_SUPER_EFFECTIVE)
@@ -723,12 +725,14 @@ void MoveSelectionDisplayMoveEffectiveness(void)
 			gPlttBufferUnfaded[palIndex + 0] = palPtr[SUPER_EFFECTIVE_COLOURS + 0];
 			gPlttBufferUnfaded[palIndex + 1] = palPtr[SUPER_EFFECTIVE_COLOURS + 1];
 			string = gText_BattleUI_SuperEffective;
+			resultTracker = TRUE;
 		}
 		else if (moveResult & MOVE_RESULT_NOT_VERY_EFFECTIVE)
 		{
 			gPlttBufferUnfaded[palIndex + 0] = palPtr[NOT_VERY_EFFECTIVE_COLOURS + 0];
 			gPlttBufferUnfaded[palIndex + 1] = palPtr[NOT_VERY_EFFECTIVE_COLOURS + 1];
 			string = gText_BattleUI_NotVeryEffective;
+			resultTracker = TRUE;
 		}
 		else //Nothing special about move
 		{
@@ -753,7 +757,7 @@ void MoveSelectionDisplayMoveEffectiveness(void)
 		gPlttBufferUnfaded[stabPalIndex + 0] = RGB(27, 27, 27); //Copy over PP colours so it's unaffected by low PP
 		gPlttBufferUnfaded[stabPalIndex + 1] = RGB(4, 4, 4);
 
-		if (doubleTeraStab)
+		if (doubleTeraStab && !resultTracker)
 			StringCopy(txtPtr, gText_BattleUI_DoubleTeraSTAB);
 		else
 			StringCopy(txtPtr, gText_BattleUI_STAB);
