@@ -256,7 +256,7 @@ EventScriptP_PalletTown_YoungLady_SetFairy:
 EventScript_Pallet_FatGuy:
     lock
     faceplayer
-    setvar 0x8000 MOVE_ICEBEAM
+    setvar 0x8000 MOVE_GLACIALLANCE
     setvar 0x8001 MOVE_TACKLE
     setvar 0x8002 MOVE_THUNDERWAVE
     setvar 0x8003 0x2E7
@@ -268,7 +268,7 @@ EventScript_Pallet_FatGuy:
     setvar 0x8009 16
     setvar 0x800A 16
     setvar 0x800B 16
-    givepokemon SPECIES_EEVEE 3 ITEM_LEFTOVERS 0 1 10
+    givepokemon SPECIES_GLASTRIER 3 ITEM_LEFTOVERS 0 1 10
     setvar 0x8000 MOVE_WEATHERBALL
     setvar 0x8001 MOVE_THUNDERSHOCK
     setvar 0x8002 MOVE_THUNDERWAVE
