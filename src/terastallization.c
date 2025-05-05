@@ -31,7 +31,7 @@ extern u8 BattleScript_Terastallize[];
 // Check if the Pokemon has terastallized or not
 bool8 IsTerastallized(u8 bank)
 {
-    return gNewBS->teraData.done[bank];
+    return gNewBS->teraData.done[gBattlerPartyIndexes[bank]];
 }
 
 // Fetch the Pokemon's current Tera Type
@@ -93,7 +93,7 @@ u8 *DoTerastallize(u8 bank)
     {
         SET_BATTLER_TYPE(bank, GetTeraType(bank));
         PREPARE_TYPE_BUFFER(gBattleTextBuff1, GetTeraType(bank));
-        gNewBS->teraData.done[bank] = TRUE;
+        gNewBS->teraData.done[gBattlerPartyIndexes[bank]] = TRUE;
         FlagClear(FLAG_TERA);
         FadeScreen(FADE_FROM_BLACK, 10);
         return BattleScript_Terastallize;

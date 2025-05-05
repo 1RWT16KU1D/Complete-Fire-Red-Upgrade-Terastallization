@@ -37,3 +37,4 @@ scripts/snippets.py
 *.pyc
 test.ss4
 assembly/story_scripts/pallet_town.s
+test.toml

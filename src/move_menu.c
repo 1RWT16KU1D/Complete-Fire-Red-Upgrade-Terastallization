@@ -401,7 +401,7 @@ void EmitChooseMove(u8 bufferId, bool8 isDoubleBattle, bool8 NoPpNumber, struct 
 
 	// For Terastallization
 	tempMoveStruct->teraType = GetTeraType(gActiveBattler);
-	tempMoveStruct->teraDone = gNewBS->teraData.done[gActiveBattler];
+	tempMoveStruct->teraDone = IsTerastallized(gActiveBattler);
 
 	//Fix Transformed Move PP
 	if (IS_TRANSFORMED(gActiveBattler))
@@ -549,10 +549,10 @@ void EmitChooseMove(u8 bufferId, bool8 isDoubleBattle, bool8 NoPpNumber, struct 
 	}
 
 	// For Terastallization
-	tempMoveStruct->teraDone = gNewBS->teraData.done[gActiveBattler];
+	tempMoveStruct->teraDone = IsTerastallized(gActiveBattler);
 
 	// Return TRUE if Terastallization NOT USED
-	if (!gNewBS->teraData.done[gActiveBattler])
+	if (!IsTerastallized(gActiveBattler))
 		tempMoveStruct->canTera = TRUE;
 
 	gBattleBuffersTransferData[0] = CONTROLLER_CHOOSEMOVE;

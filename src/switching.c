@@ -27,6 +27,7 @@
 #include "../include/new/mega.h"
 #include "../include/new/multi.h"
 #include "../include/new/switching.h"
+#include "../include/new/terastallization.h"
 #include "../include/new/trainer_sliding.h"
 #include "../include/new/z_move_battle_scripts.h"
 /*
@@ -59,6 +60,7 @@ enum SwitchInStates
 	SwitchIn_TrainerMessage,
 	SwitchIn_PreEnd,
 	SwitchIn_EjectPack,
+	SwitchIn_ReactivateTera,
 	SwitchIn_End,
 };
 
@@ -1024,6 +1026,11 @@ void atk52_switchineffects(void)
 				&& ItemBattleEffects(ItemEffects_SwitchIn, i, TRUE, FALSE))  //Try to trigger White Herbs or Eject Packs after Intimidate
 					return;
 			}
+		__attribute__ ((fallthrough));
+
+		case SwitchIn_ReactivateTera:
+			if (IsTerastallized(gActiveBattler))
+				SET_BATTLER_TYPE(gActiveBattler, GetTeraType(gActiveBattler));
 		__attribute__ ((fallthrough));
 
 		case SwitchIn_End:

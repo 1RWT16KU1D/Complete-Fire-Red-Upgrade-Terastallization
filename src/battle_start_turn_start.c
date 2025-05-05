@@ -33,6 +33,7 @@
 #include "../include/new/move_battle_scripts.h"
 #include "../include/new/move_tables.h"
 #include "../include/new/set_z_effect.h"
+#include "../include/new/terastallization.h"
 #include "../include/new/util.h"
 
 /*
@@ -77,6 +78,7 @@ enum SpeedWarResults
 
 // For Terastallization
 extern u8* DoTerastallize(u8 bank);
+extern bool8 IsTerastallized(u8 bank);
 
 extern void (* const sTurnActionsFuncsTable[])(void);
 extern void (* const sEndTurnFuncsTable[])(void);
@@ -1216,13 +1218,13 @@ void RunTurnActionsFunctions(void)
 				u8 bank = gActiveBattler = gBanksByTurnOrder[i];
 
 				if (gNewBS->teraData.chosen[bank]
-				&& !gNewBS->teraData.done[bank]
+				&& !IsTerastallized(bank)
 				&& gCurrentActionFuncId == ACTION_USE_MOVE)
 				{
 					const u8* script = DoTerastallize(bank);
 					if (script != NULL)
 					{
-						gNewBS->teraData.done[bank] = TRUE;
+						gNewBS->teraData.done[gBattlerPartyIndexes[bank]] = TRUE;
 						gNewBS->teraData.chosen[bank] = 0;
 						gNewBS->teraData.teraInProgress = TRUE;
 						
@@ -1230,13 +1232,13 @@ void RunTurnActionsFunctions(void)
 						&& SIDE(bank) == B_SIDE_PLAYER)
 						{
 							gNewBS->teraData.chosen[PARTNER(bank)] = 0;
-							gNewBS->teraData.done[PARTNER(bank)] = TRUE;
+							gNewBS->teraData.done[gBattlerPartyIndexes[PARTNER(bank)]] = TRUE;
 						}
 						else if (!(gBattleTypeFlags & (BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_MULTI))
 						&& SIDE(bank) == B_SIDE_OPPONENT)
 						{
 							gNewBS->teraData.chosen[PARTNER(bank)] = 0;
-							gNewBS->teraData.done[PARTNER(bank)] = TRUE;
+							gNewBS->teraData.done[gBattlerPartyIndexes[PARTNER(bank)]] = TRUE;
 						}
 						
 						BattleScriptExecute(script);

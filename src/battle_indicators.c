@@ -21,6 +21,7 @@
 #include "../include/new/move_menu.h"
 #include "../include/new/multi.h"
 #include "../include/new/set_z_effect.h"
+#include "../include/new/terastallization.h"
 #include "../include/new/util.h"
 
 /*
@@ -97,6 +98,7 @@ static void DestroyTeraTrigger(void);
 
 // Exported functions
 extern u8 GetTeraType(u8 bank);
+extern bool8 IsTerastallized(u8 bank);
 
 // Tera Triggers and Indicators
 extern const u8 Tera_TriggerTiles[];
@@ -268,7 +270,7 @@ static const struct SpriteFrameImage sTypeIconPicTable[] =
 	[TYPE_ICE] =		type_icon_frame(CamomonsTypeIconsTiles, TYPE_ICE),
 	[TYPE_DRAGON] =		type_icon_frame(CamomonsTypeIcons2Tiles, TYPE_DRAGON),
 	[TYPE_DARK] =		type_icon_frame(CamomonsTypeIconsTiles, TYPE_DARK),
-	[0x12] =			type_icon_frame(CamomonsTypeIcons2Tiles, TYPE_MYSTERY),
+	[TYPE_STELLAR] =	type_icon_frame(CamomonsTypeIcons2Tiles, TYPE_MYSTERY),
 	[TYPE_ROOSTLESS] = 	type_icon_frame(CamomonsTypeIcons2Tiles, TYPE_MYSTERY),
 	[TYPE_BLANK] = 		type_icon_frame(CamomonsTypeIcons2Tiles, TYPE_MYSTERY),
 	[0x15] = 			type_icon_frame(CamomonsTypeIcons2Tiles, TYPE_MYSTERY),
@@ -681,7 +683,7 @@ static void SpriteCB_TeraTrigger(struct Sprite* self)
     // Determine eligibility
     bool8 hasTeraType = (GetTeraType(TRIGGER_BANK) != TYPE_BLANK);
     bool8 hasMegaEvolved = IsMega(TRIGGER_BANK);
-    bool8 hasTerastallized = gNewBS->teraData.done[TRIGGER_BANK]; // New flag to track if Tera has been used
+    bool8 hasTerastallized = IsTerastallized(TRIGGER_BANK); // New flag to track if Tera has been used
     bool8 teraAllowed = moveInfo->canTera;
 
     // The sprite appears if the Pokemon has a Tera Type, hasn’t Mega Evolved, and hasn’t Terastallized
