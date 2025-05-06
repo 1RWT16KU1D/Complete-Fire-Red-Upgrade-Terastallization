@@ -546,7 +546,7 @@ const struct BattleMove gBattleMoves[] =
 	{
 		.effect = EFFECT_HIT,
 		.power = 40,
-		.type = TYPE_NORMAL,
+		.type = TYPE_STELLAR,
 		.accuracy = 100,
 		.pp = 35,
 		.secondaryEffectChance = 0,

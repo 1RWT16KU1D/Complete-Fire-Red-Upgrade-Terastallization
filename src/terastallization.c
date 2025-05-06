@@ -9,6 +9,7 @@
 #include "../include/battle_message.h"
 #include "../include/battle.h"
 #include "../include/event_data.h"
+#include "../include/mgba.h"
 #include "../include/pokemon.h"
 
 #include "../include/constants/vars.h"
@@ -73,6 +74,12 @@ void ChangeTeraTypeInOW(void)
         return;
 
     gPlayerParty[partySlot].teraType = newTeraType;
+}
+
+// Check whether Pokemon can Tera
+bool8 CanTerastallize(u8 bank)
+{
+    return (!IsTerastallized(bank) && (GetTeraType(bank) != TYPE_BLANK));
 }
 
 // Change back the Pokemon's types to what they were before

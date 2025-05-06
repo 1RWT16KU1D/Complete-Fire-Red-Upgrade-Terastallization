@@ -6,6 +6,7 @@
 .include "../asm_defines.s"
 
 .global EventScriptP_PalletTown_YoungLady
+.global EventScript_Pallet_FatGuy
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 EventScriptP_PalletTown_YoungLady:
@@ -67,6 +68,7 @@ EventScriptP_PalletTown_YoungLadySelected:
         case 15, EventScriptP_PalletTown_YoungLady_SetDragon
         case 16, EventScriptP_PalletTown_YoungLady_SetDark
         case 17, EventScriptP_PalletTown_YoungLady_SetFairy
+        case 18, EventScriptP_PalletTown_YoungLady_SetStellar
         case 0x7F, EventScriptP_PalletTown_YoungLadyNo
 
 
@@ -250,9 +252,17 @@ EventScriptP_PalletTown_YoungLady_SetFairy:
     release
     end
 
-.align 2
-.global EventScript_Pallet_FatGuy
+EventScriptP_PalletTown_YoungLady_SetStellar:
+    setvar 0x8001 TYPE_STELLAR
+    callasm ChangeTeraTypeInOW
+    callasm GetTeraTypeInOW
+    buffernumber 0x1 0x4001
 
+    msgbox gText_PalletTown_YoungLadyFetchTeraStellar MSG_NORMAL
+    release
+    end
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 EventScript_Pallet_FatGuy:
     lock
     faceplayer
@@ -286,3 +296,5 @@ EventScript_Pallet_FatGuy:
     msgbox gText_TestScript MSG_NORMAL
     release
     end
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

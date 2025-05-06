@@ -17,6 +17,8 @@ extern void ChangeTeraTypeInOW(void);
 extern void RevertMonTypes(u8 bank);
 extern u8* DoTerastallize(u8 bank);
 extern void GetTeraTypeInOW(void);
+extern bool8 CanTerastallize(u8 bank);
+
 /* NEXT TWO TO BE IMPLEMENTED LATER*/
 // extern void ChangeMonPalette(u8 bank, u8 teraType);
 // extern void AddTeraCrownSprite(u8 bank, u8 teraType, u8 x, u8 y);

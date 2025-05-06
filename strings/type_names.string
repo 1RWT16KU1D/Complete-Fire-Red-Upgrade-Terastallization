@@ -56,8 +56,8 @@ Dragon
 #org @NAME_DARK
 Dark
 
-#org @NAME_STELLAR
-Stellr
+#org @FAIRY_TYPE_ALIGNMENT_1
+-
 
 #org @FAIRY_TYPE_ALIGNMENT_2
 -
@@ -73,3 +73,6 @@ Stellr
 
 #org @NAME_FAIRY
 Fairy
+
+#org @NAME_STELLAR
+Stellr
