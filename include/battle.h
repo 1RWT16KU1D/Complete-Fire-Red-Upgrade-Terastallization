@@ -998,7 +998,7 @@ struct NewBattleStruct
 	// For Terastallization
 	struct TeraData
 	{
-		u8 done[PARTY_SIZE];                  // To check if the Pokemon on field used it
+		u8 done[2][PARTY_SIZE];                  // To check if the Pokemon on field used it
 		u8 activeBank;						  // Pokemon in turn order
 		u8 teraSpriteID[MAX_BATTLERS_COUNT];  // Adds Tera Crown (TO BE IMPLEMENTED LATER)
 		u8 state;							  // For looping
