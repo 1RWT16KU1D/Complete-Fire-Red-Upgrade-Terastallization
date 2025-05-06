@@ -1511,12 +1511,10 @@ static void ModulateDmgByType(u8 multiplier, const u16 move, const u8 moveType, 
 	// For Terastallization - Stellar Type Check
 	if (moveType == TYPE_STELLAR)
 	{
-		// Default: Neutral damage to all types
-		multiplier = TYPE_MUL_NORMAL; // 1× damage
-		
-		// Enhanced damage vs Terastallized targets
 		if (IsTerastallized(bankDef))
-			multiplier = TYPE_MUL_SUPER_EFFECTIVE; // 2× damage
+			multiplier = TYPE_MUL_SUPER_EFFECTIVE;
+		else
+			multiplier = TYPE_MUL_NORMAL;
 	}
 
 	if (defType == TYPE_FLYING && multiplier == TYPE_MUL_SUPER_EFFECTIVE && gBattleWeather & WEATHER_AIR_CURRENT_PRIMAL && move != MOVE_STEALTHROCK && WEATHER_HAS_EFFECT)

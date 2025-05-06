@@ -1224,23 +1224,23 @@ void RunTurnActionsFunctions(void)
 					const u8* script = DoTerastallize(bank);
 					if (script != NULL)
 					{
-						gNewBS->teraData.done[gBattlerPartyIndexes[bank]] = TRUE;
+						u8 side = GetBattlerSide(bank);
+						u8 partyId = gBattlerPartyIndexes[bank];
+
+						gNewBS->teraData.done[side][partyId] = TRUE;
 						gNewBS->teraData.chosen[bank] = 0;
 						gNewBS->teraData.teraInProgress = TRUE;
-						
-						if (!(gBattleTypeFlags & (BATTLE_TYPE_INGAME_PARTNER | BATTLE_TYPE_MULTI))
-						&& SIDE(bank) == B_SIDE_PLAYER)
+
+						// Handle partner clearing (prevent partner from using Terastal in single side battles)
+						if (!(gBattleTypeFlags & (BATTLE_TYPE_INGAME_PARTNER | BATTLE_TYPE_MULTI)) && side == B_SIDE_PLAYER)
 						{
 							gNewBS->teraData.chosen[PARTNER(bank)] = 0;
-							gNewBS->teraData.done[gBattlerPartyIndexes[PARTNER(bank)]] = TRUE;
 						}
-						else if (!(gBattleTypeFlags & (BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_MULTI))
-						&& SIDE(bank) == B_SIDE_OPPONENT)
+						else if (!(gBattleTypeFlags & (BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_MULTI)) && side == B_SIDE_OPPONENT)
 						{
 							gNewBS->teraData.chosen[PARTNER(bank)] = 0;
-							gNewBS->teraData.done[gBattlerPartyIndexes[PARTNER(bank)]] = TRUE;
 						}
-						
+
 						BattleScriptExecute(script);
 						gCurrentActionFuncId = savedActionFuncId;
 						return;
