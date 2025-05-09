@@ -10,17 +10,19 @@
 #include "../include/battle.h"
 #include "../include/event_data.h"
 #include "../include/mgba.h"
+#include "../include/palette.h"
 #include "../include/pokemon.h"
 
 #include "../include/constants/vars.h"
 
+#include "../include/gba/macro.h"
+
+#include "../include/new/battle_indicators.h"
 #include "../include/new/battle_script_util.h"
 #include "../include/new/move_battle_scripts.h"
+#include "../include/new/ram_locs.h"
 #include "../include/new/terastallization.h"
 #include "../include/field_weather.h"
-
-// Defines for later functions
-#define BATTLER_HP(bank) gBattleMons[bank].hp
 
 // Exported Functions
 extern u16 VarGet(u16 var);
@@ -28,6 +30,32 @@ extern bool8 VarSet(u16 var, u16 value);
 
 // BattleScript(s)
 extern u8 BattleScript_Terastallize[];
+
+const u16 gTeraBlendColors[] =
+{
+    [TYPE_NORMAL]   = RGB(25, 25, 25),  // Light Gray
+    [TYPE_FIGHTING] = RGB(27, 6, 4),    // Crimson Red
+    [TYPE_FLYING]   = RGB(18, 22, 31),  // Sky Blue
+    [TYPE_POISON]   = RGB(22, 2, 28),   // Deep Violet
+    [TYPE_GROUND]   = RGB(21, 16, 4),   // Rich Ochre Brown
+    [TYPE_ROCK]     = RGB(15, 13, 6),   // Dusty Beige
+    [TYPE_BUG]      = RGB(18, 25, 6),   // Leafy Green
+    [TYPE_GHOST]    = RGB(10, 6, 16),   // Haunting Indigo
+    [TYPE_STEEL]    = RGB(19, 19, 23),  // Bluish Steel Gray
+    [TYPE_MYSTERY]  = RGB(31, 31, 31),  // White
+    [TYPE_FIRE]     = RGB(30, 12, 4),   // Fiery Orange
+    [TYPE_GRASS]    = RGB(6, 26, 8),    // Forest Green
+    [TYPE_WATER]    = RGB(8, 17, 31),   // Watery Blue?
+    [TYPE_ELECTRIC] = RGB(31, 28, 5),   // Vivid Yellow
+    [TYPE_PSYCHIC]  = RGB(31, 6, 18),   // Magenta
+    [TYPE_ICE]      = RGB(20, 28, 31),  // Ice Blue
+    [TYPE_DRAGON]   = RGB(8, 10, 31),   // Indigo
+    [TYPE_DARK]     = RGB(5, 5, 5),     // Black
+    [TYPE_FAIRY]    = RGB(31, 18, 24),  // Rose Pink
+    [TYPE_BLANK]    = RGB(31, 31, 31),  // White
+    [TYPE_STELLAR]  = RGB(28, 28, 31),  // Still unsure - Gave it a Silvery Blue Tint
+};
+
 
 // Check if the Pokemon has terastallized or not
 bool8 IsTerastallized(u8 bank)
@@ -82,15 +110,16 @@ bool8 CanTerastallize(u8 bank)
     return (!IsTerastallized(bank) && (GetTeraType(bank) != TYPE_BLANK));
 }
 
-// Change back the Pokemon's types to what they were before
-void RevertMonTypes(u8 bank)
+// Fades palette according to teraType
+void FadeBankPaletteForTera(u8 bank, u16 paletteOffset)
 {
-    u8 originalType1 = gBaseStats[gBattleMons[bank].species].type1;
-    u8 originalType2 = gBaseStats[gBattleMons[bank].species].type2;
+    u8 teraType = GetTeraType(bank);
 
-    gBattleMons[bank].type1 = originalType1;
-    gBattleMons[bank].type2 = originalType2;
-    gBattleMons[bank].type3 = TYPE_BLANK;
+	if (IsTerastallized(bank))
+	{
+		BlendPalette(paletteOffset, 16, 6, gTeraBlendColors[teraType]);
+		CpuCopy32(gPlttBufferFaded + paletteOffset, gPlttBufferUnfaded + paletteOffset, 32);
+	}
 }
 
 // Main Function
@@ -98,11 +127,15 @@ u8 *DoTerastallize(u8 bank)
 {
     if (!IsTerastallized(bank) && FlagGet(FLAG_TERA))
     {
-        SET_BATTLER_TYPE(bank, GetTeraType(bank));
-        PREPARE_TYPE_BUFFER(gBattleTextBuff1, GetTeraType(bank));
+        u16 paletteOffset = 0x100 + bank * 16;
+        u8 teraType = GetTeraType(bank);
+
+        SET_BATTLER_TYPE(bank, teraType);
+        PREPARE_TYPE_BUFFER(gBattleTextBuff1, teraType);
         gNewBS->teraData.done[GetBattlerSide(bank)][gBattlerPartyIndexes[bank]] = TRUE;
         FlagClear(FLAG_TERA);
-        FadeScreen(FADE_FROM_BLACK, 10);
+      //LoadMegaGraphics(0xFF);
+        FadeBankPaletteForTera(bank, paletteOffset);
         return BattleScript_Terastallize;
     }
     return NULL;

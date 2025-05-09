@@ -266,35 +266,35 @@ EventScriptP_PalletTown_YoungLady_SetStellar:
 EventScript_Pallet_FatGuy:
     lock
     faceplayer
-    setvar 0x8000 MOVE_GLACIALLANCE
-    setvar 0x8001 MOVE_TACKLE
-    setvar 0x8002 MOVE_THUNDERWAVE
-    setvar 0x8003 0x2E7
-    setvar 0x8004 NATURE_MODEST
-    setvar 0x8005 0
-    setvar 0x8006 16
-    setvar 0x8007 16
-    setvar 0x8008 16
-    setvar 0x8009 16
-    setvar 0x800A 16
-    setvar 0x800B 16
-    givepokemon SPECIES_GLASTRIER 3 ITEM_LEFTOVERS 0 1 10
-    setvar 0x8000 MOVE_WEATHERBALL
-    setvar 0x8001 MOVE_THUNDERSHOCK
-    setvar 0x8002 MOVE_THUNDERWAVE
-    setvar 0x8003 0x2E7
-    setvar 0x8004 NATURE_MODEST
-    setvar 0x8005 0
-    setvar 0x8006 16
-    setvar 0x8007 16
-    setvar 0x8008 16
-    setvar 0x8009 16
-    setvar 0x800A 16
-    setvar 0x800B 16
-    givepokemon SPECIES_PIKACHU 2 ITEM_LEFTOVERS 0 1 10
-    setflag 0xA07
-    msgbox gText_TestScript MSG_NORMAL
-    release
-    end
+        setvar 0x8000 MOVE_GLACIALLANCE
+        setvar 0x8001 MOVE_TACKLE
+        setvar 0x8002 MOVE_THUNDERWAVE
+        setvar 0x8003 0x2E7
+        setvar 0x8004 NATURE_MODEST
+        setvar 0x8005 0
+        setvar 0x8006 16
+        setvar 0x8007 16
+        setvar 0x8008 16
+        setvar 0x8009 16
+        setvar 0x800A 16
+        setvar 0x800B 16
+        givepokemon SPECIES_GLASTRIER 3 ITEM_LEFTOVERS 0 1 10
+        setvar 0x8000 MOVE_WEATHERBALL
+        setvar 0x8001 MOVE_THUNDERSHOCK
+        setvar 0x8002 MOVE_THUNDERWAVE
+        setvar 0x8003 0x2E7
+        setvar 0x8004 NATURE_MODEST
+        setvar 0x8005 0
+        setvar 0x8006 16
+        setvar 0x8007 16
+        setvar 0x8008 16
+        setvar 0x8009 16
+        setvar 0x800A 16
+        setvar 0x800B 16
+        givepokemon SPECIES_PIKACHU 2 ITEM_LEFTOVERS 0 1 10
+        setflag 0xA07
+        msgbox gText_TestScript MSG_NORMAL
+        release
+        end
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
