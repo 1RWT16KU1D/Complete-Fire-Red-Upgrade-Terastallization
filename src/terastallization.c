@@ -37,7 +37,7 @@ const u16 gTeraBlendColors[] =
     [TYPE_FIGHTING] = RGB(27, 6, 4),    // Crimson Red
     [TYPE_FLYING]   = RGB(18, 22, 31),  // Sky Blue
     [TYPE_POISON]   = RGB(22, 2, 28),   // Deep Violet
-    [TYPE_GROUND]   = RGB(21, 16, 4),   // Rich Ochre Brown
+    [TYPE_GROUND]   = RGB(16, 7, 1),    // Deep Brown
     [TYPE_ROCK]     = RGB(15, 13, 6),   // Dusty Beige
     [TYPE_BUG]      = RGB(18, 25, 6),   // Leafy Green
     [TYPE_GHOST]    = RGB(10, 6, 16),   // Haunting Indigo
@@ -133,7 +133,6 @@ u8 *DoTerastallize(u8 bank)
         PREPARE_TYPE_BUFFER(gBattleTextBuff1, teraType);
         gNewBS->teraData.done[GetBattlerSide(bank)][gBattlerPartyIndexes[bank]] = TRUE;
         FlagClear(FLAG_TERA);
-      //LoadMegaGraphics(0xFF);
         return BattleScript_Terastallize;
     }
     return NULL;
