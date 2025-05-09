@@ -127,7 +127,6 @@ u8 *DoTerastallize(u8 bank)
 {
     if (!IsTerastallized(bank) && FlagGet(FLAG_TERA))
     {
-        u16 paletteOffset = 0x100 + bank * 16;
         u8 teraType = GetTeraType(bank);
 
         SET_BATTLER_TYPE(bank, teraType);
@@ -135,7 +134,6 @@ u8 *DoTerastallize(u8 bank)
         gNewBS->teraData.done[GetBattlerSide(bank)][gBattlerPartyIndexes[bank]] = TRUE;
         FlagClear(FLAG_TERA);
       //LoadMegaGraphics(0xFF);
-        FadeBankPaletteForTera(bank, paletteOffset);
         return BattleScript_Terastallize;
     }
     return NULL;
