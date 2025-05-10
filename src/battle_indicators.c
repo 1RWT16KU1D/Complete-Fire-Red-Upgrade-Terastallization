@@ -104,64 +104,28 @@ extern bool8 IsTerastallized(u8 bank);
 extern const u8 Tera_TriggerTiles[];
 extern const u16 Tera_TriggerPal[];
 
-/*
-extern const u8 Tera_NormalIndicatorTiles[];
-extern const u8 Tera_NormalIndicatorPal[];
+extern const u8 Tera_IndicatorNormalTiles[];
+extern const u8 Tera_IndicatorFightingTiles[];
+extern const u8 Tera_IndicatorFlyingTiles[];
+extern const u8 Tera_IndicatorPoisonTiles[];
+extern const u8 Tera_IndicatorGroundTiles[];
+extern const u8 Tera_IndicatorRockTiles[];
+extern const u8 Tera_IndicatorBugTiles[];
+extern const u8 Tera_IndicatorGhostTiles[];
+extern const u8 Tera_IndicatorSteelTiles[];
+extern const u8 Tera_IndicatorFireTiles[];
+extern const u8 Tera_IndicatorWaterTiles[];
+extern const u8 Tera_IndicatorGrassTiles[];
+extern const u8 Tera_IndicatorElectricTiles[];
+extern const u8 Tera_IndicatorPsychicTiles[];
+extern const u8 Tera_IndicatorIceTiles[];
+extern const u8 Tera_IndicatorDragonTiles[];
+extern const u8 Tera_IndicatorDarkTiles[];
+extern const u8 Tera_IndicatorFairyTiles[];
+extern const u8 Tera_IndicatorStellarTiles[];
 
-extern const u8 Tera_FightingIndicatorTiles[];
-extern const u8 Tera_FightingIndicatorPal[];
+extern const u16 Tera_IndicatorNormalPal[];
 
-extern const u8 Tera_FlyingIndicatorTiles[];
-extern const u8 Tera_FlyingIndicatorPal[];
-
-extern const u8 Tera_PoisonIndicatorTiles[];
-extern const u8 Tera_PoisonIndicatorPal[];
-
-extern const u8 Tera_GroundIndicatorTiles[];
-extern const u8 Tera_GroundIndicatorPal[];
-
-extern const u8 Tera_RockIndicatorTiles[];
-extern const u8 Tera_RockIndicatorPal[];
-
-extern const u8 Tera_BugIndicatorTiles[];
-extern const u8 Tera_BugIndicatorPal[];
-
-extern const u8 Tera_GhostIndicatorTiles[];
-extern const u8 Tera_GhostIndicatorPal[];
-
-extern const u8 Tera_SteelIndicatorTiles[];
-extern const u8 Tera_SteelIndicatorPal[];
-
-extern const u8 Tera_FireIndicatorTiles[];
-extern const u8 Tera_FireIndicatorPal[];
-
-extern const u8 Tera_WaterIndicatorTiles[];
-extern const u8 Tera_WaterIndicatorPal[];
-
-extern const u8 Tera_GrassIndicatorTiles[];
-extern const u8 Tera_GrassIndicatorPal[];
-
-extern const u8 Tera_ElectricIndicatorTiles[];
-extern const u8 Tera_ElectricIndicatorPal[];
-
-extern const u8 Tera_PsychicIndicatorTiles[];
-extern const u8 Tera_PsychicIndicatorPal[];
-
-extern const u8 Tera_IceIndicatorTiles[];
-extern const u8 Tera_IceIndicatorPal[];
-
-extern const u8 Tera_DragonIndicatorTiles[];
-extern const u8 Tera_DragonIndicatorPal[];
-
-extern const u8 Tera_DarkIndicatorTiles[];
-extern const u8 Tera_DarkIndicatorPal[];
-
-extern const u8 Tera_FairyIndicatorTiles[];
-extern const u8 Tera_FairyIndicatorPal[];
-
-extern const u8 Tera_StellarIndicatorTiles[];
-extern const u8 Tera_StellarIndicatorPal[];
-*/
 enum MegaGraphicsTags
 {
     GFX_TAG_MEGA_INDICATOR = 0xFDF0,
@@ -182,8 +146,8 @@ enum MegaGraphicsTags
     GFX_TAG_TERA_TRIGGER,
 
 	// An Indicator for each type
-    GFX_TAG_TERA_NORMAL_INDICATOR,
-/*  GFX_TAG_TERA_INDICATOR_FIGHTING,
+    GFX_TAG_TERA_INDICATOR_NORMAL,
+    GFX_TAG_TERA_INDICATOR_FIGHTING,
     GFX_TAG_TERA_INDICATOR_FLYING,
     GFX_TAG_TERA_INDICATOR_POISON,
     GFX_TAG_TERA_INDICATOR_GROUND,
@@ -200,7 +164,7 @@ enum MegaGraphicsTags
     GFX_TAG_TERA_INDICATOR_DRAGON,
     GFX_TAG_TERA_INDICATOR_DARK,
     GFX_TAG_TERA_INDICATOR_FAIRY,
-    GFX_TAG_TERA_INDICATOR_STELLAR,*/
+    GFX_TAG_TERA_INDICATOR_STELLAR,
 };
 
 enum TriggerStates
@@ -260,8 +224,28 @@ static const struct CompressedSpriteSheet sOmegaIndicatorSpriteSheet = {Omega_In
 static const struct CompressedSpriteSheet sUltraIndicatorSpriteSheet = {Ultra_IndicatorTiles, (8 * 8) / 2, GFX_TAG_ULTRA_INDICATOR};
 
 // For Terastallization - Indicators for every type
-// static const struct CompressedSpriteSheet sTeraNormalIndicatorSpriteSheet = {Tera_NormalIndicatorTiles, (8 * 8) / 2, GFX_TAG_TERA_NORMAL_INDICATOR};
+static const struct CompressedSpriteSheet sTeraIndicatorNormalSpriteSheet = {Tera_IndicatorNormalTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_NORMAL};
+static const struct CompressedSpriteSheet sTeraIndicatorFightingSpriteSheet = {Tera_IndicatorFightingTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_FIGHTING};
+static const struct CompressedSpriteSheet sTeraIndicatorFlyingSpriteSheet = {Tera_IndicatorFlyingTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_FLYING};
+static const struct CompressedSpriteSheet sTeraIndicatorPoisonSpriteSheet = {Tera_IndicatorPoisonTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_POISON};
+static const struct CompressedSpriteSheet sTeraIndicatorGroundSpriteSheet = {Tera_IndicatorGroundTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_GROUND};
+static const struct CompressedSpriteSheet sTeraIndicatorRockSpriteSheet = {Tera_IndicatorRockTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_ROCK};
+static const struct CompressedSpriteSheet sTeraIndicatorBugSpriteSheet = {Tera_IndicatorBugTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_BUG};
+static const struct CompressedSpriteSheet sTeraIndicatorGhostSpriteSheet = {Tera_IndicatorGhostTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_GHOST};
+static const struct CompressedSpriteSheet sTeraIndicatorSteelSpriteSheet = {Tera_IndicatorSteelTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_STEEL};
+static const struct CompressedSpriteSheet sTeraIndicatorFireSpriteSheet = {Tera_IndicatorFireTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_FIRE};
+static const struct CompressedSpriteSheet sTeraIndicatorWaterSpriteSheet = {Tera_IndicatorWaterTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_WATER};
+static const struct CompressedSpriteSheet sTeraIndicatorGrassSpriteSheet = {Tera_IndicatorGrassTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_GRASS};
+static const struct CompressedSpriteSheet sTeraIndicatorElectricSpriteSheet = {Tera_IndicatorElectricTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_ELECTRIC};
+static const struct CompressedSpriteSheet sTeraIndicatorPsychicSpriteSheet = {Tera_IndicatorPsychicTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_PSYCHIC};
+static const struct CompressedSpriteSheet sTeraIndicatorIceSpriteSheet = {Tera_IndicatorIceTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_ICE};
+static const struct CompressedSpriteSheet sTeraIndicatorDragonSpriteSheet = {Tera_IndicatorDragonTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_DRAGON};
+static const struct CompressedSpriteSheet sTeraIndicatorDarkSpriteSheet = {Tera_IndicatorDarkTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_DARK};
+static const struct CompressedSpriteSheet sTeraIndicatorFairySpriteSheet = {Tera_IndicatorFairyTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_FAIRY};
+static const struct CompressedSpriteSheet sTeraIndicatorStellarSpriteSheet = {Tera_IndicatorStellarTiles, (8 * 8) / 2, GFX_TAG_TERA_INDICATOR_STELLAR};
+
 static const struct SpritePalette sMegaIndicatorPalette = {Mega_IndicatorPal, GFX_TAG_MEGA_INDICATOR};
+static const struct SpritePalette sTeraNormalIndicatorPalette = {Tera_IndicatorNormalPal, GFX_TAG_TERA_INDICATOR_NORMAL};
 
 static const struct CompressedSpriteSheet sMegaTriggerSpriteSheet = {Mega_TriggerTiles, (32 * 32) / 2, GFX_TAG_MEGA_TRIGGER};
 static const struct SpritePalette sMegaTriggerPalette = {Mega_TriggerPal, GFX_TAG_MEGA_TRIGGER};
@@ -423,18 +407,215 @@ static const struct SpriteTemplate sUltraIndicatorSpriteTemplate =
 	.callback = SpriteCB_MegaIndicator,
 };
 
-/*
-static const struct SpriteTemplate sTeraNormalIndicatorSpriteSheetTemplate =
+static const struct SpriteTemplate sTeraIndicatorNormalSpriteSheetTemplate =
 {
-	.tileTag = GFX_TAG_TERA_NORMAL_INDICATOR,
-	.paletteTag = GFX_TAG_MEGA_INDICATOR,
-	.oam = &sIndicatorOam,
-	.anims = gDummySpriteAnimTable,
-	.images = NULL,
-	.affineAnims = gDummySpriteAffineAnimTable,
-	.callback = SpriteCB_MegaIndicator,
+    .tileTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
 };
-*/
+
+static const struct SpriteTemplate sTeraIndicatorFightingSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_FIGHTING,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorFlyingSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_FLYING,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorPoisonSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_POISON,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorGroundSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_GROUND,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorRockSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_ROCK,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorBugSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_BUG,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorGhostSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_GHOST,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorSteelSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_STEEL,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorFireSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_FIRE,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorWaterSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_WATER,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorGrassSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_GRASS,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorElectricSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_ELECTRIC,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorPsychicSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_PSYCHIC,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorIceSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_ICE,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorDragonSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_DRAGON,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorDarkSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_DARK,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorFairySpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_FAIRY,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
+static const struct SpriteTemplate sTeraIndicatorStellarSpriteSheetTemplate =
+{
+    .tileTag = GFX_TAG_TERA_INDICATOR_STELLAR,
+    .paletteTag = GFX_TAG_TERA_INDICATOR_NORMAL,
+    .oam = &sIndicatorOam,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MegaIndicator,
+};
+
 static const struct SpriteTemplate sMegaTriggerSpriteTemplate =
 {
 	.tileTag = GFX_TAG_MEGA_TRIGGER,
@@ -924,9 +1105,152 @@ static void SpriteCB_MegaIndicator(struct Sprite* self)
 			break;
 
 		// Add case for Terastallization
-		case GFX_TAG_TERA_NORMAL_INDICATOR:
-			if (!IsTerastallized(INDICATOR_BANK)
-			&& GetTeraType(INDICATOR_BANK) != TYPE_NORMAL)
+		case GFX_TAG_TERA_INDICATOR_NORMAL:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_NORMAL)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_FIGHTING:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_FIGHTING)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_FLYING:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_FLYING)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_POISON:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_POISON)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_GROUND:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_GROUND)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_ROCK:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_ROCK)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_BUG:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_BUG)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_GHOST:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_GHOST)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_STEEL:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_STEEL)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_FIRE:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_FIRE)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_WATER:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_WATER)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_GRASS:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_GRASS)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_ELECTRIC:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_ELECTRIC)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_PSYCHIC:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_PSYCHIC)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_ICE:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_ICE)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_DRAGON:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_DRAGON)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_DARK:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_DARK)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_FAIRY:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_FAIRY)
+			{
+				self->invisible = TRUE;
+				return;
+			}
+			break;
+
+		case GFX_TAG_TERA_INDICATOR_STELLAR:
+			if (!IsTerastallized(INDICATOR_BANK) && GetTeraType(INDICATOR_BANK) != TYPE_STELLAR)
 			{
 				self->invisible = TRUE;
 				return;
@@ -1358,10 +1682,31 @@ void LoadMegaGraphics(u8 state)
 		unusedArg bool8 loadedOmegaGfx = IndexOfSpriteTileTag(GFX_TAG_OMEGA_INDICATOR) != 0xFF;
 		unusedArg bool8 loadedUltraGfx = IndexOfSpriteTileTag(GFX_TAG_ULTRA_INDICATOR) != 0xFF;;
 		unusedArg bool8 loadedDynamaxGfx = IndexOfSpriteTileTag(GFX_TAG_DYNAMAX_INDICATOR) != 0xFF;
-//		unusedArg bool8 loadedTeraGfx = IndexOfSpriteTileTag(GFX_TAG_TERA_NORMAL_INDICATOR) != 0xFF;
+
+		// Tera Trackers for each type
+		unusedArg bool8 loadedTeraNormalGfx   = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_NORMAL)   != 0xFF;
+		unusedArg bool8 loadedTeraFightingGfx = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_FIGHTING) != 0xFF;
+		unusedArg bool8 loadedTeraFlyingGfx   = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_FLYING)   != 0xFF;
+		unusedArg bool8 loadedTeraPoisonGfx   = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_POISON)   != 0xFF;
+		unusedArg bool8 loadedTeraGroundGfx   = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_GROUND)   != 0xFF;
+		unusedArg bool8 loadedTeraRockGfx     = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_ROCK)     != 0xFF;
+		unusedArg bool8 loadedTeraBugGfx      = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_BUG)      != 0xFF;
+		unusedArg bool8 loadedTeraGhostGfx    = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_GHOST)    != 0xFF;
+		unusedArg bool8 loadedTeraSteelGfx    = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_STEEL)    != 0xFF;
+		unusedArg bool8 loadedTeraFireGfx     = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_FIRE)     != 0xFF;
+		unusedArg bool8 loadedTeraWaterGfx    = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_WATER)    != 0xFF;
+		unusedArg bool8 loadedTeraGrassGfx    = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_GRASS)    != 0xFF;
+		unusedArg bool8 loadedTeraElectricGfx = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_ELECTRIC) != 0xFF;
+		unusedArg bool8 loadedTeraPsychicGfx  = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_PSYCHIC)  != 0xFF;
+		unusedArg bool8 loadedTeraIceGfx      = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_ICE)      != 0xFF;
+		unusedArg bool8 loadedTeraDragonGfx   = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_DRAGON)   != 0xFF;
+		unusedArg bool8 loadedTeraDarkGfx     = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_DARK)     != 0xFF;
+		unusedArg bool8 loadedTeraFairyGfx    = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_FAIRY)    != 0xFF;
+		unusedArg bool8 loadedTeraStellarGfx  = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_STELLAR)  != 0xFF;
 
 		#if (defined MEGA_EVOLUTION_FEATURE || defined DYNAMAX_FEATURE)
 		LoadSpritePalette(&sMegaIndicatorPalette);
+		LoadSpritePalette(&sTeraNormalIndicatorPalette);
 		#endif
 
 		// Create a Mega Indicator for every bank
@@ -1418,27 +1763,191 @@ void LoadMegaGraphics(u8 state)
 				spriteId = CreateSprite(&sUltraIndicatorSpriteTemplate, -10, 0, 1);
 				gSprites[spriteId].data[0] = bank;
 				gNewBS->megaIndicatorObjIds[bank] = spriteId + 1;
-			}/*
+			}
 			else if (IsTerastallized(bank))
 			{
 				u8 teraType = GetTeraType(bank);
 
-				switch (teraType) {
-				case TYPE_NORMAL:
-					if (!loadedTeraGfx)
-					{
-						LoadCompressedSpriteSheetUsingHeap(&sTeraNormalIndicatorSpriteSheet);
-						loadedTeraGfx = TRUE;
-					}
-					spriteId = CreateSprite(&sTeraNormalIndicatorSpriteSheetTemplate, -10, 0, 1);
-					break;
-				default:
-					break;
+				switch (teraType)
+				{
+					case TYPE_NORMAL:
+						if (!loadedTeraNormalGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorNormalSpriteSheet);
+							loadedTeraNormalGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorNormalSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_FIGHTING:
+						if (!loadedTeraFightingGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorFightingSpriteSheet);
+							loadedTeraFightingGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorFightingSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_FLYING:
+						if (!loadedTeraFlyingGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorFlyingSpriteSheet);
+							loadedTeraFlyingGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorFlyingSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_POISON:
+						if (!loadedTeraPoisonGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorPoisonSpriteSheet);
+							loadedTeraPoisonGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorPoisonSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_GROUND:
+						if (!loadedTeraGroundGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorGroundSpriteSheet);
+							loadedTeraGroundGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorGroundSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_ROCK:
+						if (!loadedTeraRockGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorRockSpriteSheet);
+							loadedTeraRockGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorRockSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_BUG:
+						if (!loadedTeraBugGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorBugSpriteSheet);
+							loadedTeraBugGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorBugSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_GHOST:
+						if (!loadedTeraGhostGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorGhostSpriteSheet);
+							loadedTeraGhostGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorGhostSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_STEEL:
+						if (!loadedTeraSteelGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorSteelSpriteSheet);
+							loadedTeraSteelGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorSteelSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_FIRE:
+						if (!loadedTeraFireGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorFireSpriteSheet);
+							loadedTeraFireGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorFireSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_WATER:
+						if (!loadedTeraWaterGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorWaterSpriteSheet);
+							loadedTeraWaterGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorWaterSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_GRASS:
+						if (!loadedTeraGrassGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorGrassSpriteSheet);
+							loadedTeraGrassGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorGrassSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_ELECTRIC:
+						if (!loadedTeraElectricGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorElectricSpriteSheet);
+							loadedTeraElectricGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorElectricSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_PSYCHIC:
+						if (!loadedTeraPsychicGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorPsychicSpriteSheet);
+							loadedTeraPsychicGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorPsychicSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_ICE:
+						if (!loadedTeraIceGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorIceSpriteSheet);
+							loadedTeraIceGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorIceSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_DRAGON:
+						if (!loadedTeraDragonGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorDragonSpriteSheet);
+							loadedTeraDragonGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorDragonSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_DARK:
+						if (!loadedTeraDarkGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorDarkSpriteSheet);
+							loadedTeraDarkGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorDarkSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_FAIRY:
+						if (!loadedTeraFairyGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorFairySpriteSheet);
+							loadedTeraFairyGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorFairySpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					case TYPE_STELLAR:
+						if (!loadedTeraStellarGfx)
+						{
+							LoadCompressedSpriteSheetUsingHeap(&sTeraIndicatorStellarSpriteSheet);
+							loadedTeraStellarGfx = TRUE;
+						}
+						spriteId = CreateSprite(&sTeraIndicatorStellarSpriteSheetTemplate, -10, 0, 1);
+						break;
+
+					default:
+						return;
 				}
 
 				gSprites[spriteId].data[0] = bank;
 				gNewBS->megaIndicatorObjIds[bank] = spriteId + 1;
-			}*/
+			}
 			else
 			#endif
 				if (HasDynamaxSymbol(bank))

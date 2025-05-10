@@ -98,7 +98,7 @@ gBattleAnims_General:
 .word ANIM_AI_ITEM_HEAL
 .word ANIM_HOOPA_RING_SPAWN
 .word ANIM_SPLINTER_DAMAGE
-.word ANIM_TERASTALL
+.word ANIM_TERASTAL
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 .pool
@@ -1184,8 +1184,9 @@ ANIM_FROSTBITE:
 	endanimation
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Credits to grilokapu
 .pool
-ANIM_TERASTALL:
+ANIM_TERASTAL:
 	loadparticle ANIM_TAG_FOCUS_ENERGY @focus energy
 	loadparticle ANIM_TAG_TERA_SYMBOL
 	loadparticle ANIM_TAG_WHIP_HIT @green color
@@ -1194,7 +1195,7 @@ ANIM_TERASTALL:
 	loadparticle ANIM_TAG_TERA_CRYSTAL
 	pokespritetoBG bank_attacker
 	setblends 0x80c
-	playsound2 130 SOUND_PAN_ATTACKER
+	playsound2 0xC2 SOUND_PAN_ATTACKER
 	launchtask AnimTask_pal_fade_complex 0x2 0x6 PAL_ATK 0x0 0x6 0x0 0xb 0x76BC
 	call RAINBOW_BUFF
 	call RAINBOW_BUFF
