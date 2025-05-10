@@ -98,6 +98,7 @@ gBattleAnims_General:
 .word ANIM_AI_ITEM_HEAL
 .word ANIM_HOOPA_RING_SPAWN
 .word ANIM_SPLINTER_DAMAGE
+.word ANIM_TERASTALL
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 .pool
@@ -1181,6 +1182,42 @@ ANIM_FROSTBITE:
 	playsound2 0x82 SOUND_PAN_TARGET
 	waitanimation 
 	endanimation
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+.pool
+ANIM_TERASTALL:
+	loadparticle ANIM_TAG_FOCUS_ENERGY @focus energy
+	loadparticle ANIM_TAG_TERA_SYMBOL
+	loadparticle ANIM_TAG_WHIP_HIT @green color
+	loadparticle ANIM_TAG_SWEAT_BEAD @blue color
+	loadparticle ANIM_TAG_PAW_PRINT @yellow color
+	loadparticle ANIM_TAG_TERA_CRYSTAL
+	pokespritetoBG bank_attacker
+	setblends 0x80c
+	playsound2 130 SOUND_PAN_ATTACKER
+	launchtask AnimTask_pal_fade_complex 0x2 0x6 PAL_ATK 0x0 0x6 0x0 0xb 0x76BC
+	call RAINBOW_BUFF
+	call RAINBOW_BUFF
+	call RAINBOW_BUFF
+	waitanimation
+	playsound2 191 0xc0
+	launchtemplate TERA_CRYSTAL 0x29 0x4 0x0 0x0 0x0 0x0
+	pause 0x14
+	launchtask AnimTask_BlendExcept 0x5 0x5 0x5 0x2 0x0 0x10 0x7fff
+	launchtask AnimTask_BlendParticle 0x5 0x5 ANIM_TAG_TERA_CRYSTAL 0x4 0x0 0x10 0x7fff
+	waitanimation @;Wait until screen is white
+	call PRIMAL_REVERSION_FADE_IN
+	resetblends
+	pokespritefromBG side_attacker
+	launchtask AnimTask_FadeOutParticles 0x2 0x1 2
+	launchtemplate TERASYMBOL TEMPLATE_ATTACKER | TEMPLATE_ABOVE, 0x3, 0, 3, bank_attacker
+	call RAINBOW_BUFF
+	call RAINBOW_BUFF
+	waitanimation
+	endanimation
+
+TERASYMBOL: objtemplate ANIM_TAG_TERA_SYMBOL ANIM_TAG_TERA_SYMBOL OAM_DOUBLE_BLEND_32x32 gDummySpriteAnimTable 0x0 gSpriteAffineAnimTable_PrimalSymbol SpriteCB_AnimSpriteOnSelectedMonPos
+TERA_CRYSTAL: objtemplate ANIM_TAG_TERA_CRYSTAL ANIM_TAG_TERA_CRYSTAL OAM_DOUBLE_64x64 gDummySpriteAnimTable 0x0 0x83E7144 0x8075D9D
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 .pool
