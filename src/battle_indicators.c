@@ -1705,8 +1705,10 @@ void LoadMegaGraphics(u8 state)
 		unusedArg bool8 loadedTeraStellarGfx  = IndexOfSpriteTileTag(GFX_TAG_TERA_INDICATOR_STELLAR)  != 0xFF;
 
 		#if (defined MEGA_EVOLUTION_FEATURE || defined DYNAMAX_FEATURE)
-		LoadSpritePalette(&sMegaIndicatorPalette);
-		LoadSpritePalette(&sTeraNormalIndicatorPalette);
+		if (IsTerastallized(gActiveBattler))
+			LoadSpritePalette(&sTeraNormalIndicatorPalette);
+		else
+			LoadSpritePalette(&sMegaIndicatorPalette);
 		#endif
 
 		// Create a Mega Indicator for every bank
@@ -2052,13 +2054,24 @@ void TryLoadMegaTriggers(void)
 // For Terastallization
 void TryLoadTeraTrigger(void)
 {
-	u8 spriteId;
-	if (!FlagGet(FLAG_TERA)) // Prevent trigger if Tera is not available
-		return;
+	u8 spriteId, i;
+
 	if (gBattleTypeFlags & (BATTLE_TYPE_SAFARI | BATTLE_TYPE_POKE_DUDE | BATTLE_TYPE_OLD_MAN))
 		return;
-	LoadSpritePalette(&sTeraTriggerPalette);
-	LoadCompressedSpriteSheetUsingHeap(&sTeraTriggerSpriteSheet);
+
+	if (IndexOfSpritePaletteTag(GFX_TAG_TERA_TRIGGER) == 0xFF)	
+		LoadSpritePalette(&sTeraTriggerPalette);
+	if (IndexOfSpriteTileTag(GFX_TAG_TERA_TRIGGER) == 0xFF)
+		LoadCompressedSpriteSheetUsingHeap(&sTeraTriggerSpriteSheet);
+
+	//See if there's an old trigger that hasn't disappeared yet
+	for (i = 0; i < MAX_SPRITES; ++i)
+	{
+		if (gSprites[i].inUse
+		&& gSprites[i].template->tileTag == GFX_TAG_TERA_TRIGGER
+		&& gSprites[i].data[4] == gActiveBattler)
+			return; //Don't create a new trigger
+	}
 
 	spriteId = CreateSprite(&sTeraTriggerSpriteTemplate, 130, 90, 1);
 	gSprites[spriteId].data[3] = 32;

@@ -156,10 +156,11 @@ u8 *DoTerastallize(u8 bank)
     {
         u8 teraType = GetTeraType(bank);
 
+        gBattleScripting.bank = bank;
         SET_BATTLER_TYPE(bank, teraType);
         PREPARE_TYPE_BUFFER(gBattleTextBuff1, teraType);
-        gNewBS->teraData.done[GetBattlerSide(bank)][gBattlerPartyIndexes[bank]] = TRUE;
-        FlagClear(FLAG_TERA);
+        PREPARE_MON_NICK_BUFFER(gBattleTextBuff2, bank, gBattlerPartyIndexes[bank]);
+        
         return BattleScript_Terastallize;
     }
     return NULL;
