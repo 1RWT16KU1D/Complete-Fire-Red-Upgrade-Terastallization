@@ -1201,7 +1201,7 @@ ANIM_TERASTAL:
 	call RAINBOW_BUFF
 	call RAINBOW_BUFF
 	waitanimation
-	playsound2 191 0xc0
+	playsound2 130 SOUND_PAN_ATTACKER
 	launchtemplate TERA_CRYSTAL 0x29 0x4 0x0 0x0 0x0 0x0
 	pause 0x14
 	launchtask AnimTask_BlendExcept 0x5 0x5 0x5 0x2 0x0 0x10 0x7fff
@@ -1214,6 +1214,7 @@ ANIM_TERASTAL:
 	launchtemplate TERASYMBOL TEMPLATE_ATTACKER | TEMPLATE_ABOVE, 0x3, 0, 3, bank_attacker
 	call RAINBOW_BUFF
 	call RAINBOW_BUFF
+	playsound2 191 0xc0
 	waitanimation
 	endanimation
 
