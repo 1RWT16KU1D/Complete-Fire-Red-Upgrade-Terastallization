@@ -91,7 +91,7 @@ void GetTeraTypeInOW(void)
 // Change the Pokemon's Tera type in OW
 void ChangeTeraTypeInOW(void)
 {
-    u8 partySlot = VarGet(Var8002);   // Get Pokemon’s party index from script
+    u8 partySlot = VarGet(Var8002);   // Get Pokemon's party index from script
     u8 newTeraType = VarGet(Var8001); // Get new Tera Type from script
 
     // Error Checks
@@ -136,4 +136,32 @@ u8 *DoTerastallize(u8 bank)
         return BattleScript_Terastallize;
     }
     return NULL;
+}
+
+// AI Logic for Terastallization
+bool8 ShouldAIDelayTerastallization(u8 bankAtk, u8 bankDef, u16 move, bool8 optimizeAndLookAtTeraPotential, bool8 runDamageCalcs)
+{
+    if (optimizeAndLookAtTeraPotential && !CanTerastallize(bankAtk))
+        return TRUE; // This bank can't Terastallize
+
+    if (IsTerastallized(bankAtk)) // Is already Terastallized
+        return FALSE;
+
+    if (BATTLER_SEMI_INVULNERABLE(bankAtk))
+        return TRUE; // Can't Terastallize this turn
+
+    if (runDamageCalcs)
+    {
+        // Delay Terastallization if we can KO the opponent without it
+        if (MoveWouldHitFirst(move, bankAtk, bankDef) // AI would attack first
+        && CalculateMoveKnocksOutXHitsFresh(move, bankAtk, bankDef, 1)) // AI would KO in its base form
+            return TRUE;
+
+        // Delay Terastallization if opponent can KO us after we Terastallize
+        if (!MoveWouldHitFirst(move, bankAtk, bankDef) // AI wouldn't attack first
+        && MoveKnocksOutXHits(IsValidMovePrediction(bankDef, bankAtk), bankDef, bankAtk, 1)) // And foe would KO AI
+            return TRUE;
+    }
+
+    return FALSE;
 }

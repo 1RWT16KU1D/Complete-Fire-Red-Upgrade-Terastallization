@@ -730,6 +730,11 @@ static void PlayerPartnerHandleChooseMove(void)
 		if (ShouldAIDynamax(gActiveBattler))
 			gNewBS->dynamaxData.toBeUsed[gActiveBattler] = TRUE;
 	}
+	else if (CanTerastallize(gActiveBattler)) // For Terastallization
+	{
+		if (!ShouldAIDelayTerastallization(gActiveBattler, gBankTarget, chosenMove, FALSE, TRUE))
+			gNewBS->teraData.chosen[gActiveBattler] = TRUE;
+	}
 
 	//This is handled again later, but it's only here to help with the case of choosing Helping Hand when the partner is switching out.
 	gBattleStruct->chosenMovePositions[gActiveBattler] = chosenMovePos;
