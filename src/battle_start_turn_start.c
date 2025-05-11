@@ -1231,16 +1231,6 @@ void RunTurnActionsFunctions(void)
 						gNewBS->teraData.chosen[bank] = 0;
 						gNewBS->teraData.teraInProgress = TRUE;
 
-						// Handle partner clearing (prevent partner from using Terastal in single side battles)
-						if (!(gBattleTypeFlags & (BATTLE_TYPE_INGAME_PARTNER | BATTLE_TYPE_MULTI)) && side == B_SIDE_PLAYER)
-						{
-							gNewBS->teraData.chosen[PARTNER(bank)] = 0;
-						}
-						else if (!(gBattleTypeFlags & (BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_MULTI)) && side == B_SIDE_OPPONENT)
-						{
-							gNewBS->teraData.chosen[PARTNER(bank)] = 0;
-						}
-
 						BattleScriptExecute(script);
 						gCurrentActionFuncId = savedActionFuncId;
 						return;

@@ -360,11 +360,7 @@ static bool8 TriggerTerastallization(void)
     struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][4]);
 
     // Return FALSE if can't Tera
-    if (GetTeraType(gActiveBattler) == TYPE_BLANK
-    || CanMegaEvolve(gActiveBattler, FALSE) != NULL
-    || IsMega(gActiveBattler)
-    || !moveInfo->canTera
-	|| moveInfo->canMegaEvolve)
+    if (!moveInfo->canTera || moveInfo->canMegaEvolve)
         return FALSE;
 
     if (gNewBS->teraData.chosen[gActiveBattler])

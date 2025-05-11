@@ -9,14 +9,17 @@
 #include "../include/battle_message.h"
 #include "../include/battle.h"
 #include "../include/event_data.h"
+#include "../include/item.h"
 #include "../include/mgba.h"
 #include "../include/palette.h"
 #include "../include/pokemon.h"
 
+#include "../include/constants/items.h"
 #include "../include/constants/vars.h"
 
 #include "../include/gba/macro.h"
 
+#include "../include/new/ai_util.h"
 #include "../include/new/battle_indicators.h"
 #include "../include/new/battle_script_util.h"
 #include "../include/new/move_battle_scripts.h"
@@ -30,6 +33,11 @@ extern bool8 VarSet(u16 var, u16 value);
 
 // BattleScript(s)
 extern u8 BattleScript_Terastallize[];
+
+// Bag Helper Functions
+extern u8 GetPocketByItemId(u16 itemId);
+extern u8* GetBagItemQuantityPointer(u8 pocket, u8 bagId);
+extern u16* GetBagItemsPointer(u8 pocket, u8 bagId);
 
 const u16 gTeraBlendColors[] =
 {
@@ -66,7 +74,14 @@ bool8 IsTerastallized(u8 bank)
 // Fetch the Pokemon's current Tera Type
 u8 GetTeraType(u8 bank)
 {
-    return gPlayerParty[gBattlerPartyIndexes[bank]].teraType;
+    struct Pokemon *mon;
+    
+    if (GetBattlerSide(bank) == B_SIDE_PLAYER)
+        mon = &gPlayerParty[gBattlerPartyIndexes[bank]];
+    else
+        mon = &gEnemyParty[gBattlerPartyIndexes[bank]];
+
+    return mon->teraType;
 }
 
 // Fetch the Pokemon's Tera Type from OW (scripts)
@@ -107,6 +122,18 @@ void ChangeTeraTypeInOW(void)
 // Check whether Pokemon can Tera
 bool8 CanTerastallize(u8 bank)
 {
+    // Check if the player/opponent has Tera Orb
+    if (SIDE(bank) == B_SIDE_PLAYER)
+    {
+        if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
+            return FALSE;
+    }
+    else if (SIDE(bank) == B_SIDE_OPPONENT)
+    {
+        if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
+            return FALSE;
+    }
+
     return (!IsTerastallized(bank) && (GetTeraType(bank) != TYPE_BLANK));
 }
 

@@ -19,6 +19,8 @@
 #include "../include/new/move_menu.h"
 #include "../include/new/multi.h"
 #include "../include/new/switching.h"
+#include "../include/new/terastallization.h"
+
 /*
 multi.c
 	handles partner battle logic
@@ -730,7 +732,7 @@ static void PlayerPartnerHandleChooseMove(void)
 		if (ShouldAIDynamax(gActiveBattler))
 			gNewBS->dynamaxData.toBeUsed[gActiveBattler] = TRUE;
 	}
-	else if (CanTerastallize(gActiveBattler)) // For Terastallization
+	else if (moveInfo->canTera) // For Terastallization
 	{
 		if (!ShouldAIDelayTerastallization(gActiveBattler, gBankTarget, chosenMove, FALSE, TRUE))
 			gNewBS->teraData.chosen[gActiveBattler] = TRUE;

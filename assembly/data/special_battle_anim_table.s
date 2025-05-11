@@ -1218,6 +1218,7 @@ ANIM_TERASTAL:
 	waitanimation
 	endanimation
 
+.align 2
 TERASYMBOL: objtemplate ANIM_TAG_TERA_SYMBOL ANIM_TAG_TERA_SYMBOL OAM_DOUBLE_BLEND_32x32 gDummySpriteAnimTable 0x0 gSpriteAffineAnimTable_PrimalSymbol SpriteCB_AnimSpriteOnSelectedMonPos
 TERA_CRYSTAL: objtemplate ANIM_TAG_TERA_CRYSTAL ANIM_TAG_TERA_CRYSTAL OAM_DOUBLE_64x64 gDummySpriteAnimTable 0x0 0x83E7144 0x8075D9D
 

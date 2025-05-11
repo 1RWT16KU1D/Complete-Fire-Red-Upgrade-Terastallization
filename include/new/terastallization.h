@@ -17,6 +17,8 @@ extern void ChangeTeraTypeInOW(void);
 extern u8* DoTerastallize(u8 bank);
 extern void GetTeraTypeInOW(void);
 extern bool8 CanTerastallize(u8 bank);
+bool8 ShouldAIDelayTerastallization(u8 bankAtk, u8 bankDef, u16 move, bool8 optimizeAndLookAtTeraPotential, bool8 runDamageCalcs);
+bool8 CalculateMoveKnocksOutXHitsFresh(u16 move, u8 bankAtk, u8 bankDef, u8 numHits);
 
 // Visuals
 extern void FadeBankPaletteForTera(u8 bank, u16 paletteOffset);

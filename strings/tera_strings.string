@@ -1,2 +1,5 @@
 #org @gText_TeraCompletedString
-[SCRIPTING_BANK] terastallized to\n[FD][00] type!
+[ATTACKER] terastallized\nto [FD][00] type!
+
+#org @gText_TeraReactingString
+[ATTACKER] is\nradiating Tera energy!
