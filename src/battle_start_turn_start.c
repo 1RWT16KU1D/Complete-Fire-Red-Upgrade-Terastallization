@@ -1216,15 +1216,27 @@ void RunTurnActionsFunctions(void)
 			for (i = *teraBank; i < gBattlersCount; ++i, ++*teraBank)
 			{
 				u8 bank = gActiveBattler = gBanksByTurnOrder[i];
+				u8 side = GetBattlerSide(bank);
+
+				// Verifica se já existe um Pokémon Terastalizado no mesmo lado
+				bool8 sideHasTerastallized = FALSE;
+				for (u8 j = 0; j < PARTY_SIZE; j++)
+				{
+					if (gNewBS->teraData.done[side][j])
+					{
+						sideHasTerastallized = TRUE;
+						break;
+					}
+				}
 
 				if (gNewBS->teraData.chosen[bank]
 				&& !IsTerastallized(bank)
+				&& !sideHasTerastallized
 				&& gCurrentActionFuncId == ACTION_USE_MOVE)
 				{
 					const u8* script = DoTerastallize(bank);
 					if (script != NULL)
 					{
-						u8 side = GetBattlerSide(bank);
 						u8 partyId = gBattlerPartyIndexes[bank];
 
 						gNewBS->teraData.done[side][partyId] = TRUE;
@@ -1241,6 +1253,7 @@ void RunTurnActionsFunctions(void)
 				++gNewBS->teraData.state;
 			else
 				gNewBS->teraData.state = Tera_End;
+				gNewBS->teraData.teraInProgress = FALSE;
 			return;
 
 		// Adjust turn order after Terastallization

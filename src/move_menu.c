@@ -354,31 +354,26 @@ static bool8 TriggerMegaEvolution(void)
 	#endif
 }
 
-// For Terastallization
 static bool8 TriggerTerastallization(void)
 {
     struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][4]);
-
-    // Return FALSE if can't Tera
+    u8 side = GetBattlerSide(gActiveBattler);
+	
+    // Retorna FALSE se não puder Terastallizar
     if (!moveInfo->canTera || moveInfo->canMegaEvolve)
         return FALSE;
 
-    if (gNewBS->teraData.chosen[gActiveBattler])
-    { 
-        // Turn Off Terastallization
-        PlaySE(3);
-        gNewBS->teraData.chosen[gActiveBattler] = FALSE;
-        return TRUE;
-    }
-    else
-    { 
-        // Turn On Terastallization
-        PlaySE(2);
-        gNewBS->teraData.chosen[gActiveBattler] = TRUE;
-        return TRUE;
+    for (u8 i = 0; i < PARTY_SIZE; i++)
+    {
+        if (gNewBS->teraData.done[side][i])
+            return FALSE;
     }
 
-    return FALSE;
+    // Alterna o estado da Terastalização
+    PlaySE(gNewBS->teraData.chosen[gActiveBattler] ? 3 : SE_PC_LOGON);
+    gNewBS->teraData.chosen[gActiveBattler] ^= TRUE;
+    MoveSelectionDisplayMoveEffectiveness();
+    return TRUE;
 }
 
 //This function sends useful data over Link Cable for the move menu to use
