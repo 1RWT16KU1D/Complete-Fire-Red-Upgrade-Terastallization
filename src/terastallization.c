@@ -26,6 +26,7 @@
 #include "../include/new/ram_locs.h"
 #include "../include/new/terastallization.h"
 #include "../include/field_weather.h"
+#include "../include/random.h"
 
 // Exported Functions
 extern u16 VarGet(u16 var);
@@ -160,7 +161,7 @@ u8 *DoTerastallize(u8 bank)
         SET_BATTLER_TYPE(bank, teraType);
         PREPARE_TYPE_BUFFER(gBattleTextBuff1, teraType);
         PREPARE_MON_NICK_BUFFER(gBattleTextBuff2, bank, gBattlerPartyIndexes[bank]);
-        
+        FlagClear(FLAG_TERA);
         return BattleScript_Terastallize;
     }
     return NULL;
@@ -195,4 +196,21 @@ bool8 ShouldAIDelayTerastallization(u8 bankAtk, u8 bankDef, u16 move, bool8 opti
     }
 
     return FALSE;
+}
+void SetGiftMonTeraType(void)
+{
+    u8 partySlot = VarGet(Var8002); // Slot passed from script
+    if (partySlot >= PARTY_SIZE)
+        return;
+
+    struct Pokemon* mon = &gPlayerParty[partySlot];
+    u16 species = mon->species;
+
+    u8 type1 = gBaseStats[species].type1;
+    u8 type2 = gBaseStats[species].type2;
+
+    if (type1 == type2 || type2 == TYPE_MYSTERY)
+        mon->teraType = type1;
+    else
+        mon->teraType = (Random() & 1 ) ? type1 : type2;
 }

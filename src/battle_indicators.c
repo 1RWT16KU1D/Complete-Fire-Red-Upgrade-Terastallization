@@ -2058,7 +2058,8 @@ void TryLoadTeraTrigger(void)
 
 	if (gBattleTypeFlags & (BATTLE_TYPE_SAFARI | BATTLE_TYPE_POKE_DUDE | BATTLE_TYPE_OLD_MAN))
 		return;
-
+	if (!FlagGet(FLAG_TERA))
+		return;
 	if (IndexOfSpritePaletteTag(GFX_TAG_TERA_TRIGGER) == 0xFF)	
 		LoadSpritePalette(&sTeraTriggerPalette);
 	if (IndexOfSpriteTileTag(GFX_TAG_TERA_TRIGGER) == 0xFF)

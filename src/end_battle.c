@@ -163,9 +163,6 @@ const u16 gEndBattleFlagClearTable[] =
 #ifdef FLAG_DISPLAY_OPPOSING_FOR_WILD
 	FLAG_DISPLAY_OPPOSING_FOR_WILD,
 #endif
-#ifdef FLAG_TERA
-	FLAG_TERA,
-#endif
 #ifdef FLAG_HOOPA_SOS_BATTLE
 	FLAG_HOOPA_SOS_BATTLE,
 #endif
