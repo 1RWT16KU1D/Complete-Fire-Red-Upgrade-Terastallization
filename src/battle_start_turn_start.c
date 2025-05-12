@@ -1252,8 +1252,9 @@ void RunTurnActionsFunctions(void)
 			if (gNewBS->teraData.teraInProgress)
 				++gNewBS->teraData.state;
 			else
-				gNewBS->teraData.state = Tera_End;
+		{		gNewBS->teraData.state = Tera_End;
 				gNewBS->teraData.teraInProgress = FALSE;
+		}
 			return;
 
 		// Adjust turn order after Terastallization

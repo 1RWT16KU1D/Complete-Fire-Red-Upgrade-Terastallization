@@ -1006,8 +1006,10 @@ static u8 CreateNPCTrainerParty(struct Pokemon* const party, const u16 trainerId
 							SET_MOVES(trainer->party.ItemCustomMoves);
 						SetMonData(mon, MON_DATA_HELD_ITEM, &trainer->party.ItemCustomMoves[i].heldItem);
 						
-						if (trainer->partyFlags & PARTY_FLAG_CUSTOM_MOVES) {
+						if (trainer->partyFlags & PARTY_FLAG_CUSTOM_MOVES) 
+						{
     						mon->teraType = trainer->party.ItemCustomMoves[i].teraType;
+						}
 						break;
 				}
 			}
