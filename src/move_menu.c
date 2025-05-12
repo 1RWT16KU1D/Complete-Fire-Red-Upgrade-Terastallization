@@ -6,7 +6,7 @@
 #include "../include/string_util.h"
 #include "../include/window.h"
 #include "../include/constants/songs.h"
-
+#include "../include/constants/items.h"
 #include "../include/new/accuracy_calc.h"
 #include "../include/new/ai_util.h"
 #include "../include/new/battle_indicators.h"

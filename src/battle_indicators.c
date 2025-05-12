@@ -2062,7 +2062,6 @@ void TryLoadTeraTrigger(void)
 
 	if (gBattleTypeFlags & (BATTLE_TYPE_SAFARI | BATTLE_TYPE_POKE_DUDE | BATTLE_TYPE_OLD_MAN))
 		return;
-<<<<<<< HEAD
 
 	if (side == B_SIDE_PLAYER)
     {
@@ -2075,10 +2074,8 @@ void TryLoadTeraTrigger(void)
             return;
     }
 
-=======
 	if (!FlagGet(FLAG_TERA))
 		return;
->>>>>>> cd2180f3b0ebea42ee82440782230afd425abd7c
 	if (IndexOfSpritePaletteTag(GFX_TAG_TERA_TRIGGER) == 0xFF)	
 		LoadSpritePalette(&sTeraTriggerPalette);
 	if (IndexOfSpriteTileTag(GFX_TAG_TERA_TRIGGER) == 0xFF)
