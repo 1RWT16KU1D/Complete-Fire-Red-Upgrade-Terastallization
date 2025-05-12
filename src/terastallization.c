@@ -123,6 +123,9 @@ void ChangeTeraTypeInOW(void)
 // Check whether Pokemon can Tera
 bool8 CanTerastallize(u8 bank)
 {
+    #ifndef TERASTAL_FEATURE
+		return FALSE;
+	#else
     // Check if the player/opponent has Tera Orb
     if (SIDE(bank) == B_SIDE_PLAYER)
     {
@@ -136,6 +139,7 @@ bool8 CanTerastallize(u8 bank)
     }
 
     return (!IsTerastallized(bank) && (GetTeraType(bank) != TYPE_BLANK));
+    #endif
 }
 
 // Fades palette according to teraType
