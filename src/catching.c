@@ -608,8 +608,14 @@ u8 GiveMonToPlayer(struct Pokemon* mon) //Hook in
 	SetMonData(mon, MON_DATA_OT_ID, gSaveBlock2->playerTrainerId);
 
 	// For Terastallization
-	u8 defaultTeraType = TYPE_BLANK;
-	mon->teraType = defaultTeraType;
+	u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+	u8 type1 = gBaseStats[species].type1;
+	u8 type2 = gBaseStats[species].type2;
+
+	if (type1 == type2 || type2 == TYPE_MYSTERY || type2 == TYPE_BLANK)
+		mon->teraType = type1;
+	else
+		mon->teraType = (Random() & 1) ? type1 : type2;
 
 	u8 freeSlot = GetFreeSlotInPartyForMon();
 	if (freeSlot >= PARTY_SIZE) //Can't add mon
