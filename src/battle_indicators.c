@@ -2058,21 +2058,20 @@ void TryLoadTeraTrigger(void)
 		return;
 	#else
 	u8 spriteId, i;
-	u8 side = GetBattlerSide(gActiveBattler);
 
 	if (gBattleTypeFlags & (BATTLE_TYPE_SAFARI | BATTLE_TYPE_POKE_DUDE | BATTLE_TYPE_OLD_MAN))
 		return;
-
-	if (side == B_SIDE_PLAYER)
-    {
-        if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
-            return;
-    }
-    else if (side == B_SIDE_OPPONENT)
-    {
-        if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
-            return;
-    }
+	//u8 side = GetBattlerSide(gActiveBattler);
+	// if (side == B_SIDE_PLAYER)
+    // {
+    //     if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
+    //         return;
+    // }
+    // else if (side == B_SIDE_OPPONENT)
+    // {
+    //     if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
+    //         return;
+    // }
 
 	if (!FlagGet(FLAG_TERA))
 		return;

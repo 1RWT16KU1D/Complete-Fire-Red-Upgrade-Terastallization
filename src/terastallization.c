@@ -126,17 +126,17 @@ bool8 CanTerastallize(u8 bank)
     #ifndef TERASTAL_FEATURE
 		return FALSE;
 	#else
-    // Check if the player/opponent has Tera Orb
-    if (SIDE(bank) == B_SIDE_PLAYER)
-    {
-        if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
-            return FALSE;
-    }
-    else if (SIDE(bank) == B_SIDE_OPPONENT)
-    {
-        if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
-            return FALSE;
-    }
+    // // Check if the player/opponent has Tera Orb
+    // if (SIDE(bank) == B_SIDE_PLAYER)
+    // {
+    //     if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
+    //         return FALSE;
+    // }
+    // else if (SIDE(bank) == B_SIDE_OPPONENT)
+    // {
+    //     if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
+    //         return FALSE;
+    // }
 
     return (!IsTerastallized(bank) && (GetTeraType(bank) != TYPE_BLANK));
     #endif
