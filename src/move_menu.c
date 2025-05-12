@@ -356,8 +356,22 @@ static bool8 TriggerMegaEvolution(void)
 
 static bool8 TriggerTerastallization(void)
 {
+	#ifndef TERASTAL_FEATURE
+		return FALSE;
+	#else
     struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][4]);
     u8 side = GetBattlerSide(gActiveBattler);
+
+	if (side == B_SIDE_PLAYER)
+    {
+        if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
+            return FALSE;
+    }
+    else if (side == B_SIDE_OPPONENT)
+    {
+        if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
+            return FALSE;
+    }
 	
     // Retorna FALSE se não puder Terastallizar
     if (!moveInfo->canTera || moveInfo->canMegaEvolve)
@@ -374,6 +388,7 @@ static bool8 TriggerTerastallization(void)
     gNewBS->teraData.chosen[gActiveBattler] ^= TRUE;
     MoveSelectionDisplayMoveEffectiveness();
     return TRUE;
+	#endif
 }
 
 //This function sends useful data over Link Cable for the move menu to use
