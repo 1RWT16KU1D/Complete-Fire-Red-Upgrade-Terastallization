@@ -75,7 +75,7 @@ bool8 IsTerastallized(u8 bank)
 u8 GetTeraType(u8 bank)
 {
     struct Pokemon *mon;
-    
+
     if (GetBattlerSide(bank) == B_SIDE_PLAYER)
         mon = &gPlayerParty[gBattlerPartyIndexes[bank]];
     else
@@ -174,6 +174,9 @@ bool8 ShouldAIDelayTerastallization(u8 bankAtk, u8 bankDef, u16 move, bool8 opti
 
     if (IsTerastallized(bankAtk)) // Is already Terastallized
         return FALSE;
+
+    if (GetTeraType(bankAtk) == TYPE_BLANK)
+        return TRUE;
 
     if (BATTLER_SEMI_INVULNERABLE(bankAtk))
         return TRUE; // Can't Terastallize this turn

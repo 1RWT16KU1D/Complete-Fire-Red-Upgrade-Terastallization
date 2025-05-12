@@ -4164,3 +4164,7 @@
 @ Instant text
 .equ sTempTextPrinter, 0x2020010
 .equ sTextPrinters, 0x2020034
+
+@ givepokemon constants
+.equ NOT_SHINY, 0
+.equ IS_SHINY, 1
