@@ -40,6 +40,13 @@ extern u8 GetPocketByItemId(u16 itemId);
 extern u8* GetBagItemQuantityPointer(u8 pocket, u8 bagId);
 extern u16* GetBagItemsPointer(u8 pocket, u8 bagId);
 
+#define TRAINER_ITEM_COUNT 4
+
+static const item_t sTeraOrbTable[] =
+{
+	ITEM_TERA_ORB,
+};
+
 const u16 gTeraBlendColors[] =
 {
     [TYPE_NORMAL]   = RGB(25, 25, 25),  // Light Gray
@@ -125,20 +132,107 @@ bool8 CanTerastallize(u8 bank)
     #ifndef TERASTAL_FEATURE
 		return FALSE;
 	#else
-    // // Check if the player/opponent has Tera Orb
-    // if (SIDE(bank) == B_SIDE_PLAYER)
-    // {
-    //     if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
-    //         return FALSE;
-    // }
-    // else if (SIDE(bank) == B_SIDE_OPPONENT)
-    // {
-    //     if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
-    //         return FALSE;
-    // }
 
-    return (!IsTerastallized(bank) && (GetTeraType(bank) != TYPE_BLANK));
+    if (FlagGet(FLAG_TERA_BATTLE) && !gNewBS->teraData.done[bank])
+        return TRUE;
+
+    return FALSE;
     #endif
+}
+
+static bool8 IsItemTeraOrb(u16 item)
+{
+	for (u8 i = 0; i < ARRAY_COUNT(sTeraOrbTable); ++i)
+	{
+		if (item == sTeraOrbTable[i])
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
+static item_t FindTrainerTeraOrb(u16 trainerId)
+{
+	if (gBattleTypeFlags & (BATTLE_TYPE_FRONTIER | BATTLE_TYPE_LINK) || IsFrontierTrainerId(trainerId))
+		return ITEM_TERA_ORB;
+
+	for (u8 i = 0; i < TRAINER_ITEM_COUNT; ++i)
+	{
+		if (IsItemTeraOrb(GET_TRAINER(trainerId).items[i]))
+			return GET_TRAINER(trainerId).items[i];
+	}
+
+	return ITEM_NONE;
+}
+
+static item_t FindPlayerTeraOrb(void)
+{
+	if (gBattleTypeFlags & (BATTLE_TYPE_FRONTIER | BATTLE_TYPE_LINK))
+		return ITEM_TERA_ORB;
+
+	for (u8 i = 0; i < ARRAY_COUNT(sTeraOrbTable); ++i)
+	{
+		if (CheckBagHasItem(sTeraOrbTable[i], 1))
+			return sTeraOrbTable[i];
+	}
+
+	#ifdef DEBUG_TERASTAL
+		return ITEM_TERA_ORB; //Give player Dynamax Band if they have none
+	#endif
+
+	return ITEM_NONE;
+}
+
+static item_t FindBankTeraOrb(u8 bank)
+{
+	#ifdef DEBUG_TERASRAL
+		if (bank + 1)
+			return ITEM_TERA_ORB;
+	#endif
+
+	if (SIDE(bank) == SIDE_OPPONENT)
+	{
+		if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
+		{
+			if (GetBattlerPosition(bank) == B_POSITION_OPPONENT_LEFT)
+				return FindTrainerTeraOrb(gTrainerBattleOpponent_A);
+			else
+				return FindTrainerTeraOrb(SECOND_OPPONENT);
+		}
+		else
+			return FindTrainerTeraOrb(gTrainerBattleOpponent_A);
+	}
+	else //SIDE_PLAYER
+	{
+		if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER)
+		{
+			if (GetBattlerPosition(bank) == B_POSITION_PLAYER_RIGHT)
+				return FindTrainerTeraOrb(VarGet(VAR_PARTNER));
+			else
+				return FindPlayerTeraOrb();
+		}
+		else
+			return FindPlayerTeraOrb();
+	}
+}
+
+bool8 TerastalEnabled(u8 bank)
+{
+	if (FlagGet(FLAG_TERA_BATTLE))
+	{
+		if (FindBankTeraOrb(bank) == ITEM_NONE)
+		{
+			#ifdef DEBUG_TERASTAL
+				return TRUE;
+			#else
+				return FALSE;
+			#endif
+		}
+
+		return TRUE;
+	}
+
+	return FALSE;
 }
 
 // Fades palette according to teraType

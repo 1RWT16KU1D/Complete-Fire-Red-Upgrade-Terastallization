@@ -998,102 +998,79 @@ static void SpriteCB_MegaTrigger(struct Sprite* self)
 
 static void SpriteCB_TeraTrigger(struct Sprite* self)
 {
-    struct ChooseMoveStruct* moveInfo = (struct ChooseMoveStruct*) (&gBattleBufferA[TRIGGER_BANK][4]);
+	if (TAG == GFX_TAG_TERA_TRIGGER)
+	{
+		if (CanTerastallize(TRIGGER_BANK) && TerastalEnabled(TRIGGER_BANK))
+			self->invisible = TRUE;
+		else
+			self->invisible = FALSE;
+	}
 
-    // Determine eligibility
-    bool8 hasTeraType = (GetTeraType(TRIGGER_BANK) != TYPE_BLANK);
-    bool8 hasMegaEvolved = IsMega(TRIGGER_BANK);
-    bool8 hasTerastallized = IsTerastallized(TRIGGER_BANK); // New flag to track if Tera has been used
-    bool8 teraAllowed = moveInfo->canTera;
+	s16 xShift = 0;
+	if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+	{
+		if (GetBattlerPosition(TRIGGER_BANK) == B_POSITION_PLAYER_LEFT)
+			xShift = -48; //X Pos = 16
+		else
+			xShift = 10; //X Pos = 74
+	}
 
-    // The sprite appears if the Pokemon has a Tera Type, hasn’t Mega Evolved, and hasn’t Terastallized
-    bool8 shouldAppear = hasTeraType && !hasMegaEvolved && !hasTerastallized;
+	self->pos1.x = 64 + (32 / 2);
+	self->pos1.y = 80 + (32 / 2);
+	self->pos2.x = xShift;
+	self->pos2.y = self->data[3];
 
-    // The sprite is usable (not grayed out) if Tera is allowed
-    bool8 shouldBeActive = teraAllowed;
+	if (gBattlerControllerFuncs[TRIGGER_BANK] == (void*) (0x0802EA10 | 1) //Old HandleInputChooseMove
+	||  gBattlerControllerFuncs[TRIGGER_BANK] == HandleInputChooseMove
+	|| gBattlerControllerFuncs[TRIGGER_BANK] == HandleMoveSwitching)
+	{
+		if (self->data[3] > 0)
+			self->data[3] -= 2;
+		else
+			self->data[3] = 0;
+	}
 
-    self->invisible = !shouldAppear;
+	//Tera Trigger should recede and destroy itself as long as the game isn't
+	//running one of the two mentioned functions.
+	else if (gBattlerControllerFuncs[TRIGGER_BANK] != (void*) (0x08032C90 | 1)  //PlayerHandleChooseMove
+		  && gBattlerControllerFuncs[TRIGGER_BANK] != (void*) (0x08032C4C | 1)) //HandleChooseMoveAfterDma3
+	{
+		if (self->data[3] < 32)
+			self->data[3] += 2;
+		else
+		{
+			DestroyTeraTrigger(self);
+			return;
+		}
+	}
 
-    // Position handling
-    s16 xShift = 0;
-    if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
-    {
-        if (GetBattlerPosition(TRIGGER_BANK) == B_POSITION_PLAYER_LEFT)
-            xShift = -48;
-        else
-            xShift = 10;
-    }
+	if (gNewBS->teraData.chosen[TRIGGER_BANK])
+		PALETTE_STATE = TriggerLightUp;
+	else
+		PALETTE_STATE = TriggerNormalColour;
 
-    self->pos1.x = 64 + (32 / 2);
-    self->pos1.y = 80 + (32 / 2);
-    self->pos2.x = xShift;
-    self->pos2.y = self->data[3];
+	// Only change the palette if the state has changed
+	if (PALETTE_STATE != self->data[2])
+	{
+		u16* pal = &gPlttBufferFaded2[IndexOfSpritePaletteTag(GFX_TAG_TERA_TRIGGER) * 16];
+		u8 i;
 
-    // Slide in/out animation
-    if (gBattlerControllerFuncs[TRIGGER_BANK] == (void*) (0x0802EA10 | 1) ||  // Old HandleInputChooseMove
-        gBattlerControllerFuncs[TRIGGER_BANK] == HandleInputChooseMove ||
-        gBattlerControllerFuncs[TRIGGER_BANK] == HandleMoveSwitching)
-    {
-        if (hasTerastallized) // Force trigger to slide out after Terastallization
-        {
-            if (self->data[3] < 32)
-                self->data[3] += 2;
-            else
-            {
-                DestroyTeraTrigger();
-                return;
-            }
-        }
-        else if (self->data[3] > 0)
-            self->data[3] -= 2; // Slide in
-        else
-            self->data[3] = 0;
-    }
-    else if (gBattlerControllerFuncs[TRIGGER_BANK] != (void*) (0x08032C90 | 1) && // PlayerHandleChooseMove
-             gBattlerControllerFuncs[TRIGGER_BANK] != (void*) (0x08032C4C | 1)) // HandleChooseMoveAfterDma3
-    {
-        if (self->data[3] < 32)
-            self->data[3] += 2; // Slide out
-        else
-        {
-            DestroyTeraTrigger();
-            return;
-        }
-    }
+		for(i = 1; i < 16; i++)
+		{
+			if (IsIgnoredTriggerColour(Tera_TriggerPal[i])) continue;
 
-    // Palette state handling
-    if (!shouldBeActive || hasTerastallized)
-        PALETTE_STATE = TriggerGrayscale;
-    else if (gNewBS->teraData.chosen[TRIGGER_BANK])
-        PALETTE_STATE = TriggerLightUp;
-    else
-        PALETTE_STATE = TriggerNormalColour;
+			switch(PALETTE_STATE) {
+				case TriggerLightUp:
+					pal[i] = LightUpTriggerSymbol(Tera_TriggerPal[i]);
+					break;
+				case TriggerNormalColour:
+					pal[i] = Tera_TriggerPal[i];
+					break;
+			}
+		}
 
-    if (PALETTE_STATE != self->data[2])
-    {
-        u16* pal = &gPlttBufferFaded2[IndexOfSpritePaletteTag(PAL_TAG) * 16];
-
-        for (u8 i = 1; i < 16; i++)
-        {
-            if (IsIgnoredTriggerColour(Tera_TriggerPal[i]))
-                continue;
-
-            switch (PALETTE_STATE)
-            {
-                case TriggerLightUp:
-                    pal[i] = LightUpTriggerSymbol(Tera_TriggerPal[i]);
-                    break;
-                case TriggerNormalColour:
-                    pal[i] = Tera_TriggerPal[i];
-                    break;
-                case TriggerGrayscale:
-                    pal[i] = ConvertColorToGrayscale(Tera_TriggerPal[i]);
-                    break;
-            }
-        }
-
-        self->data[2] = PALETTE_STATE;
-    }
+		self->data[2] = PALETTE_STATE;
+	}
 }
 
 #define INDICATOR_BANK self->data[0]
