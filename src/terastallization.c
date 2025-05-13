@@ -65,7 +65,6 @@ const u16 gTeraBlendColors[] =
     [TYPE_STELLAR]  = RGB(28, 28, 31),  // Still unsure - Gave it a Silvery Blue Tint
 };
 
-
 // Check if the Pokemon has terastallized or not
 bool8 IsTerastallized(u8 bank)
 {
@@ -154,18 +153,25 @@ void FadeBankPaletteForTera(u8 bank, u16 paletteOffset)
 	}
 }
 
-// Main Function
+// Main Function - Try type changes
 u8 *DoTerastallize(u8 bank)
 {
-    if (!IsTerastallized(bank) && FlagGet(FLAG_TERA))
+    if (!IsTerastallized(bank))
     {
-        u8 teraType = GetTeraType(bank);
+        // Flag check only for Player
+        if (SIDE(bank) == B_SIDE_PLAYER && !FlagGet(FLAG_TERA))
+            return NULL;
 
+        u8 teraType = GetTeraType(bank);
         gBattleScripting.bank = bank;
-        SET_BATTLER_TYPE(bank, teraType);
+        if (teraType != TYPE_STELLAR)
+            SET_BATTLER_TYPE(bank, teraType);
         PREPARE_TYPE_BUFFER(gBattleTextBuff1, teraType);
         PREPARE_MON_NICK_BUFFER(gBattleTextBuff2, bank, gBattlerPartyIndexes[bank]);
-        FlagClear(FLAG_TERA);
+
+        if (SIDE(bank) == B_SIDE_PLAYER)
+            FlagClear(FLAG_TERA); // Clear flag after use
+
         return BattleScript_Terastallize;
     }
     return NULL;
@@ -198,9 +204,10 @@ bool8 ShouldAIDelayTerastallization(u8 bankAtk, u8 bankDef, u16 move, bool8 opti
         && MoveKnocksOutXHits(IsValidMovePrediction(bankDef, bankAtk), bankDef, bankAtk, 1)) // And foe would KO AI
             return TRUE;
     }
-
     return FALSE;
 }
+
+// givepokemon set-up
 void SetGiftMonTeraType(void)
 {
     u8 partySlot = VarGet(Var8002); // Slot passed from script

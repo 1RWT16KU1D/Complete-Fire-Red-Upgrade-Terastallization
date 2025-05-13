@@ -1029,8 +1029,16 @@ void atk52_switchineffects(void)
 		__attribute__ ((fallthrough));
 
 		case SwitchIn_ReactivateTera:
+			// Special Case - If Tera is chosen, and mon is switched, turn off Tera
+			if (gNewBS->teraData.chosen[gActiveBattler])
+				gNewBS->teraData.chosen[gActiveBattler] = FALSE;
+			
+			// If user is already terastallized, bring back the effects
 			if (IsTerastallized(gActiveBattler))
-				SET_BATTLER_TYPE(gActiveBattler, GetTeraType(gActiveBattler));
+			{
+				if (GetTeraType(gActiveBattler) != TYPE_STELLAR)
+					SET_BATTLER_TYPE(gActiveBattler, GetTeraType(gActiveBattler));
+			}
 		__attribute__ ((fallthrough));
 
 		case SwitchIn_End:

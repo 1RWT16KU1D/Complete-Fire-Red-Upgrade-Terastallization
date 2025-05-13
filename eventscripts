@@ -2,5 +2,6 @@
 npc 3 0 0 EventScriptP_PalletTown_YoungLady
 npc 3 0 1 EventScript_Pallet_FatGuy
 
-##npc 3 1 5 EventScriptP_ViridianCity_Youngster
-##npc 3 1 6 EventScriptP_ViridianCity_YoungMan
+npc 3 1 4 EventScript_Pallet_FatGuy
+npc 3 1 5 EventScriptP_ViridianCity_Youngster
+npc 3 1 6 EventScriptP_ViridianCity_YoungMan

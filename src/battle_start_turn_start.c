@@ -1218,7 +1218,7 @@ void RunTurnActionsFunctions(void)
 				u8 bank = gActiveBattler = gBanksByTurnOrder[i];
 				u8 side = GetBattlerSide(bank);
 
-				// Verifica se já existe um Pokémon Terastalizado no mesmo lado
+				// Check if there is already a Terastallized Pokémon on the same side
 				bool8 sideHasTerastallized = FALSE;
 				for (u8 j = 0; j < PARTY_SIZE; j++)
 				{
@@ -1252,9 +1252,10 @@ void RunTurnActionsFunctions(void)
 			if (gNewBS->teraData.teraInProgress)
 				++gNewBS->teraData.state;
 			else
-		{		gNewBS->teraData.state = Tera_End;
+			{	
+				gNewBS->teraData.state = Tera_End;
 				gNewBS->teraData.teraInProgress = FALSE;
-		}
+			}
 			return;
 
 		// Adjust turn order after Terastallization
@@ -1271,6 +1272,7 @@ void RunTurnActionsFunctions(void)
 			}
 			*teraBank = 0;
 			++gNewBS->teraData.state;
+
 			return;
 
 		case Tera_End:

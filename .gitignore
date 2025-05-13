@@ -49,3 +49,5 @@ src/Tables/trainer_data.c
 src/Tables/trainer_parties.h
 src/Tables/trainer_defines.h
 strings/story_strings/viridian_city.string
+src/Tables/party_data.h
+eventscripts
