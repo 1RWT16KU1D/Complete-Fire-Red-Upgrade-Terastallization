@@ -252,19 +252,17 @@ u8 *DoTerastallize(u8 bank)
 {
     if (!IsTerastallized(bank))
     {
-        // Flag check only for Player
-        if (SIDE(bank) == B_SIDE_PLAYER && !FlagGet(FLAG_TERA))
-            return NULL;
-
         u8 teraType = GetTeraType(bank);
+        u8 side = GetBattlerSide(bank);
+        u8 partyIndex = gBattlerPartyIndexes[bank];
+
+        gNewBS->teraData.done[side][partyIndex] = TRUE;
+
         gBattleScripting.bank = bank;
         if (teraType != TYPE_STELLAR)
             SET_BATTLER_TYPE(bank, teraType);
         PREPARE_TYPE_BUFFER(gBattleTextBuff1, teraType);
         PREPARE_MON_NICK_BUFFER(gBattleTextBuff2, bank, gBattlerPartyIndexes[bank]);
-
-        if (SIDE(bank) == B_SIDE_PLAYER)
-            FlagClear(FLAG_TERA); // Clear flag after use
 
         return BattleScript_Terastallize;
     }

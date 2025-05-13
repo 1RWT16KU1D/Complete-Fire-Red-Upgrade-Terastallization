@@ -1915,28 +1915,12 @@ void TryLoadMegaTriggers(void)
 // For Terastallization
 void TryLoadTeraTrigger(void)
 {
-	#ifndef TERASTAL_FEATURE
-		return;
-	#else
 	u8 spriteId, i;
 
 	if (gBattleTypeFlags & (BATTLE_TYPE_SAFARI | BATTLE_TYPE_POKE_DUDE | BATTLE_TYPE_OLD_MAN))
 		return;
-	//u8 side = GetBattlerSide(gActiveBattler);
-	// if (side == B_SIDE_PLAYER)
-    // {
-    //     if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
-    //         return;
-    // }
-    // else if (side == B_SIDE_OPPONENT)
-    // {
-    //     if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
-    //         return;
-    // }
 
-	if (!FlagGet(FLAG_TERA))
-		return;
-	if (IndexOfSpritePaletteTag(GFX_TAG_TERA_TRIGGER) == 0xFF)	
+	if (IndexOfSpritePaletteTag(GFX_TAG_TERA_TRIGGER) == 0xFF)
 		LoadSpritePalette(&sTeraTriggerPalette);
 	if (IndexOfSpriteTileTag(GFX_TAG_TERA_TRIGGER) == 0xFF)
 		LoadCompressedSpriteSheetUsingHeap(&sTeraTriggerSpriteSheet);
@@ -1954,7 +1938,6 @@ void TryLoadTeraTrigger(void)
 	gSprites[spriteId].data[3] = 32;
 	gSprites[spriteId].pos1.y = -32;
 	gSprites[spriteId].data[4] = gActiveBattler;
-	#endif
 }
 
 static void DestroyMegaTriggers(struct Sprite* sprite)
