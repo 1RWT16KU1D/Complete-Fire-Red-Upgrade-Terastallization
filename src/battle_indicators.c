@@ -226,7 +226,6 @@ static const struct CompressedSpriteSheet sOmegaIndicatorSpriteSheet = {Omega_In
 static const struct CompressedSpriteSheet sUltraIndicatorSpriteSheet = {Ultra_IndicatorTiles, (8 * 8) / 2, GFX_TAG_ULTRA_INDICATOR};
 
 static const struct SpritePalette sMegaIndicatorPalette = {Mega_IndicatorPal, GFX_TAG_MEGA_INDICATOR};
-static const struct SpritePalette sTeraNormalIndicatorPalette = {Tera_IndicatorNormalPal, GFX_TAG_TERA_INDICATOR_NORMAL};
 
 static const struct CompressedSpriteSheet sMegaTriggerSpriteSheet = {Mega_TriggerTiles, (32 * 32) / 2, GFX_TAG_MEGA_TRIGGER};
 static const struct SpritePalette sMegaTriggerPalette = {Mega_TriggerPal, GFX_TAG_MEGA_TRIGGER};
