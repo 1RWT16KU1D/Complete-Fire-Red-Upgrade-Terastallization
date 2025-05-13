@@ -921,6 +921,7 @@ struct NewBattleStruct
 	item_t SavedConsumedItems[PARTY_SIZE];
 	u8 expHelper[MAX_BATTLERS_COUNT];
 	u8 megaIndicatorObjIds[MAX_BATTLERS_COUNT];
+	u8 teraIndicatorObjIds[MAX_BATTLERS_COUNT];
 	u8 abilityPopUpIds[MAX_BATTLERS_COUNT][2];
 	u8 backupSynchronizeBanks[2];
 	u16 failedThrownPokeBall;
