@@ -783,7 +783,7 @@ enum
 #define ITEM_BLACK_AUGURITE 0x2D6
 #define ITEM_PEAT_BLOCK 0x2D7
 #define ITEM_HISUI_ROCK 0x2D8
-#define ITEM_TERA_ORB 0x2D9
+#define ITEM_TERA_ORB ITEM_MASTER_BALL //Index temporary until create a new item Tera Orb
 
 //New Key Items
 #define ITEM_GRACIDEA 0x217
@@ -865,7 +865,7 @@ enum
 #define ITEM_RUSTED_SWORD 0x2C6
 #define ITEM_RUSTED_SHIELD 0x2C7
 
-#define ITEMS_COUNT (ITEM_TERA_ORB + 1)
+#define ITEMS_COUNT (ITEM_RUSTED_SHIELD + 1)
 
 //For Pokemon Unbound
 #ifdef UNBOUND

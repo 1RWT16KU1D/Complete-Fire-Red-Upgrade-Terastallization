@@ -362,16 +362,8 @@ static bool8 TriggerTerastallization(void)
     struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][4]);
     u8 side = GetBattlerSide(gActiveBattler);
 
-	// if (side == B_SIDE_PLAYER)
-    // {
-    //     if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
-    //         return FALSE;
-    // }
-    // else if (side == B_SIDE_OPPONENT)
-    // {
-    //     if (!CheckBagHasItem(ITEM_TERA_ORB, 1))
-    //         return FALSE;
-    // }
+	if (!CanTerastallize(side) && !TerastalEnabled(side))
+		return FALSE;
 	
     // Retorna FALSE se não puder Terastallizar
     if (!moveInfo->canTera || moveInfo->canMegaEvolve)
@@ -558,7 +550,7 @@ void EmitChooseMove(u8 bufferId, bool8 isDoubleBattle, bool8 NoPpNumber, struct 
 	tempMoveStruct->teraDone = IsTerastallized(gActiveBattler);
 
 	// Return TRUE if Terastallization NOT USED
-	if (!IsTerastallized(gActiveBattler))
+	if (!IsTerastallized(gActiveBattler) && TerastalEnabled(gActiveBattler))
 		tempMoveStruct->canTera = TRUE;
 
 	gBattleBuffersTransferData[0] = CONTROLLER_CHOOSEMOVE;
