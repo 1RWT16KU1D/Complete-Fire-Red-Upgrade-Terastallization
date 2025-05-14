@@ -3,7 +3,7 @@
 */
 
 // For Terastallization
-
+#include "defines.h"
 #include "defines_battle.h"
 
 #include "../include/battle_message.h"
@@ -133,10 +133,16 @@ bool8 CanTerastallize(u8 bank)
 		return FALSE;
 	#else
 
-    if (FlagGet(FLAG_TERA_BATTLE) && !gNewBS->teraData.done[bank])
+    if (GetBattlerSide(bank) == B_SIDE_OPPONENT)
+	{
+        return TRUE;
+    }
+    else {
+    if (FlagGet(FLAG_TERA_BATTLE) && !IsTerastallized(bank))
         return TRUE;
 
     return FALSE;
+    }
     #endif
 }
 
@@ -218,21 +224,27 @@ static item_t FindBankTeraOrb(u8 bank)
 
 bool8 TerastalEnabled(u8 bank)
 {
-	if (FlagGet(FLAG_TERA_BATTLE))
+	if (GetBattlerSide(bank) == B_SIDE_OPPONENT)
 	{
-		if (FindBankTeraOrb(bank) == ITEM_NONE)
-		{
-			#ifdef DEBUG_TERASTAL
-				return TRUE;
-			#else
-				return FALSE;
-			#endif
-		}
-
-		return TRUE;
+		if (FindBankTeraOrb(bank) != ITEM_NONE)
+			return TRUE;
+		else
+			return FALSE;
 	}
+	else
+	{
+		if (!FlagGet(FLAG_TERA_BATTLE))
+			return FALSE;
 
-	return FALSE;
+		if (FindBankTeraOrb(bank) != ITEM_NONE)
+			return TRUE;
+
+		#ifdef DEBUG_TERASTAL
+			return TRUE;
+		#else
+			return FALSE;
+		#endif
+	}
 }
 
 // Fades palette according to teraType
