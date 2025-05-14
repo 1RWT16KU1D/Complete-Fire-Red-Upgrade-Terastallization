@@ -22,6 +22,7 @@
 #include "../include/new/ai_util.h"
 #include "../include/new/battle_indicators.h"
 #include "../include/new/battle_script_util.h"
+#include "../include/new/frontier.h"
 #include "../include/new/move_battle_scripts.h"
 #include "../include/new/ram_locs.h"
 #include "../include/new/terastallization.h"
@@ -164,8 +165,8 @@ static item_t FindTrainerTeraOrb(u16 trainerId)
 
 	for (u8 i = 0; i < TRAINER_ITEM_COUNT; ++i)
 	{
-		if (IsItemTeraOrb(GET_TRAINER(trainerId).items[i]))
-			return GET_TRAINER(trainerId).items[i];
+		if (IsItemTeraOrb(gTrainers[trainerId].items[i]))
+			return gTrainers[trainerId].items[i];
 	}
 
 	return ITEM_NONE;
@@ -271,10 +272,9 @@ u8 *DoTerastallize(u8 bank)
         gNewBS->teraData.done[side][partyIndex] = TRUE;
 
         gBattleScripting.bank = bank;
-        if (teraType != TYPE_STELLAR)
-            SET_BATTLER_TYPE(bank, teraType);
+        SET_BATTLER_TYPE(bank, teraType);
         PREPARE_TYPE_BUFFER(gBattleTextBuff1, teraType);
-        PREPARE_MON_NICK_BUFFER(gBattleTextBuff2, bank, gBattlerPartyIndexes[bank]);
+        PREPARE_MON_NICK_BUFFER(gBattleTextBuff2, bank, partyIndex);
 
         return BattleScript_Terastallize;
     }

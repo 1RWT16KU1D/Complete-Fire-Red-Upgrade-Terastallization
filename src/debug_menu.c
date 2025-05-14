@@ -120,7 +120,7 @@ void DebugMenu_ProcessGiveItem(void)
 			break;
 		case 4: //TMs & HMs
 			#ifdef UNBOUND //Remove if you want this, enums can't be #ifdefed
-			for (i = ITEM_TM01_FOCUS_PUNCH; i <= ITEM_TM50_OVERHEAT; ++i)
+			for (i = ITEM_TM01; i <= ITEM_TM50; ++i)
 				AddBagItem(i, 1);
 
 			for (i = ITEM_TM51_ROOST; i <= ITEM_TM58_ENDURE; ++i)

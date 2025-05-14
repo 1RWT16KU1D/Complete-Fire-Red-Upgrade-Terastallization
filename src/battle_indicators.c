@@ -94,7 +94,7 @@ static void DestroyTypeIcon(struct Sprite* sprite);
 
 // For Terastallization - Custom functions in this file
 static void SpriteCB_TeraTrigger(struct Sprite* self);
-static void DestroyTeraTrigger(void);
+static void DestroyTeraTrigger(struct Sprite* sprite);
 
 // Exported functions
 extern u8 GetTeraType(u8 bank);
@@ -1962,18 +1962,19 @@ static void DestroyMegaTriggers(struct Sprite* sprite)
 }
 
 // For Terastallization
-static void DestroyTeraTrigger(void)
+static void DestroyTeraTrigger(struct Sprite* sprite)
 {
-    // Free palette and tiles
-    FreeSpritePaletteByTag(GFX_TAG_TERA_TRIGGER);
-    FreeSpriteTilesByTag(GFX_TAG_TERA_TRIGGER);
-    
-    // Destroy all Tera Trigger sprites
-    for (int i = 0; i < MAX_SPRITES; ++i)
-    {
-        if (gSprites[i].inUse && gSprites[i].template->tileTag == GFX_TAG_TERA_TRIGGER)
-            DestroySprite(&gSprites[i]);
-    }
+	u32 i;
+	DestroySprite(sprite);
+
+	for (i = 0; i < MAX_SPRITES; ++i)
+	{
+		if (gSprites[i].inUse && gSprites[i].template->tileTag == GFX_TAG_TERA_TRIGGER)
+			return; //Tiles and palette are still in use
+	}
+
+	FreeSpritePaletteByTag(GFX_TAG_TERA_TRIGGER);
+	FreeSpriteTilesByTag(GFX_TAG_TERA_TRIGGER);
 }
 
 void TryLoadZTrigger(void)
