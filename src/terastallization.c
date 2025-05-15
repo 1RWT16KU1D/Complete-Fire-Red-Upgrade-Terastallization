@@ -260,21 +260,49 @@ void FadeBankPaletteForTera(u8 bank, u16 paletteOffset)
 	}
 }
 
-// Main Function - Try type changes
+static const u8 *const sTypeNames[NUMBER_OF_MON_TYPES] =
+{
+    [TYPE_NORMAL]   = sText_Normal,
+    [TYPE_FIRE]     = sText_Fire,
+    [TYPE_WATER]    = sText_Water,
+    [TYPE_ELECTRIC] = sText_Electric,
+    [TYPE_GRASS]    = sText_Grass,
+    [TYPE_ICE]      = sText_Ice,
+    [TYPE_FIGHTING] = sText_Fighting,
+    [TYPE_POISON]   = sText_Poison,
+    [TYPE_GROUND]   = sText_Ground,
+    [TYPE_FLYING]   = sText_Flying,
+    [TYPE_PSYCHIC]  = sText_Psychic,
+    [TYPE_BUG]      = sText_Bug,
+    [TYPE_ROCK]     = sText_Rock,
+    [TYPE_GHOST]    = sText_Ghost,
+    [TYPE_DRAGON]   = sText_Dragon,
+    [TYPE_DARK]     = sText_Dark,
+    [TYPE_STEEL]    = sText_Steel,
+    [TYPE_FAIRY]    = sText_Fairy,
+    [TYPE_STELLAR]   = sText_Stellar,
+};
+
+// Main Function
 u8 *DoTerastallize(u8 bank)
 {
     if (!IsTerastallized(bank))
     {
         u8 teraType = GetTeraType(bank);
-        u8 side = GetBattlerSide(bank);
         u8 partyIndex = gBattlerPartyIndexes[bank];
+        struct Pokemon *mon;
 
-        gNewBS->teraData.done[side][partyIndex] = TRUE;
+        if (GetBattlerSide(bank) == B_SIDE_PLAYER)
+            mon = &gPlayerParty[partyIndex];
+        else
+            mon = &gEnemyParty[partyIndex];
+
+        u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
 
         gBattleScripting.bank = bank;
         SET_BATTLER_TYPE(bank, teraType);
-        PREPARE_TYPE_BUFFER(gBattleTextBuff1, teraType);
-        PREPARE_MON_NICK_BUFFER(gBattleTextBuff2, bank, partyIndex);
+        GetSpeciesName(gStringVar1, species);
+        StringCopy(gStringVar2, sTypeNames[teraType]);
 
         return BattleScript_Terastallize;
     }
