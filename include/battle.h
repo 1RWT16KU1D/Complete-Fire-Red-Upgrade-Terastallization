@@ -1000,13 +1000,14 @@ struct NewBattleStruct
 	// For Terastallization
 	struct TeraData
 	{
-		u8 done[2][PARTY_SIZE];                  // To check if the Pokemon on field used it
-		u8 activeBank;						  // Pokemon in turn order
-		u8 teraSpriteID[MAX_BATTLERS_COUNT];  // Adds Tera Crown (TO BE IMPLEMENTED LATER)
-		u8 state;							  // For looping
-		u8 chosen[MAX_BATTLERS_COUNT];		  // Whether the user chooses to Terastallize or not
-		bool8 teraInProgress : 1;             // A needed flag
-		bool8 viewing : 1;                    // For Pokemon Summary Screen menu
+		u8 done[NUM_BATTLE_SIDES][PARTY_SIZE];               						// To check if the Pokemon on field used it
+		u8 activeBank;						                 						// Pokemon in turn order
+		bool8 stellarBoostUsed[NUM_BATTLE_SIDES][PARTY_SIZE][NUMBER_OF_MON_TYPES];	// Stellar Type's unique Damage Boost Mechanics
+		u8 teraSpriteID[MAX_BATTLERS_COUNT];  										// Adds Tera Crown (TO BE IMPLEMENTED LATER)
+		u8 state;							  										// For looping
+		u8 chosen[MAX_BATTLERS_COUNT];		  										// Whether the user chooses to Terastallize or not
+		bool8 teraInProgress : 1;             										// A needed flag
+		bool8 viewing : 1;                    										// For Pokemon Summary Screen menu
 	} teraData;
 
 	struct 

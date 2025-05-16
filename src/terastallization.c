@@ -272,7 +272,10 @@ u8 *DoTerastallize(u8 bank)
         gNewBS->teraData.done[side][partyIndex] = TRUE;
 
         gBattleScripting.bank = bank;
-        SET_BATTLER_TYPE(bank, teraType);
+
+        // Because Stellar Tera Defensive Typing remains same
+        if (teraType != TYPE_STELLAR)
+            SET_BATTLER_TYPE(bank, teraType);
         PREPARE_TYPE_BUFFER(gBattleTextBuff1, teraType);
         PREPARE_MON_NICK_BUFFER(gBattleTextBuff2, bank, partyIndex);
 

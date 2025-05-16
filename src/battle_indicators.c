@@ -1000,7 +1000,7 @@ static void SpriteCB_TeraTrigger(struct Sprite* self)
 {
 	if (TAG == GFX_TAG_TERA_TRIGGER)
 	{
-		if (!CanTerastallize(TRIGGER_BANK) && !TerastalEnabled(TRIGGER_BANK))
+		if (!CanTerastallize(TRIGGER_BANK) || !TerastalEnabled(TRIGGER_BANK))
 			self->invisible = TRUE;
 		else
 			self->invisible = FALSE;
