@@ -223,7 +223,7 @@ void PrintInfoPage(void)
 				AddTextPrinterParameterized3(
 					sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE],
 					FONT_SMALL,
-					45, 84,  // Adjust X, Y as needed to fit below Item
+					40, 84,  // Adjust X, Y as needed to fit below Item
 					sLevelNickTextColors[0],
 					TEXT_SKIP_DRAW,
 					gText_TeraType);
@@ -231,7 +231,7 @@ void PrintInfoPage(void)
 				AddTextPrinterParameterized3(
 					sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE],
 					FONT_SMALL,
-					100, 84, // right of label
+					90, 84, // right of label
 					sLevelNickTextColors[0],
 					TEXT_SKIP_DRAW,
 					gTypeNames[teraType]);
