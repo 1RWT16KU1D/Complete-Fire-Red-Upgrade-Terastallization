@@ -724,6 +724,7 @@ TextPrinterWaitWithDownArrow 08005634 1
 TextPrinterWait 8005680 1
 AutoScrollBattleLevelUpBoxHook1 8026330 0 
 AutoScrollBattleLevelUpBoxHook2 8026350 0
+PrintInfoPage 08136fb0 1
 
 #ifdef UNBOUND
 GetCurrentLevelCap 801D79C 0

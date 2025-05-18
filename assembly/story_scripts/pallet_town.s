@@ -293,6 +293,7 @@ EventScript_Pallet_FatGuy:
         setvar 0x800B 16
         givepokemon SPECIES_PIKACHU 2 ITEM_LEFTOVERS 0 1 10
         setflag 0xA07
+        setflag 0x828
         msgbox gText_TestScript MSG_NORMAL
         release
         end

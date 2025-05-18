@@ -28,6 +28,7 @@
 #include "../include/new/terastallization.h"
 #include "../include/field_weather.h"
 #include "../include/random.h"
+#include "../include/string_util.h"
 
 // Exported Functions
 extern u16 VarGet(u16 var);
