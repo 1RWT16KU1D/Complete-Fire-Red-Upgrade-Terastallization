@@ -49,6 +49,9 @@ gTypeNames 080D8510
 gTypeNames 0811972C
 gTypeNames 0811977C
 
+##Trainer Data
+gTrainers 0800FC00
+
 ##Scripts
 BattleScript_RainDishActivates 0801A4A0
 BattleScript_AIUseFullRestoreOrHpHeal 081D99E8

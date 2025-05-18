@@ -1,8 +1,12 @@
 #org @gText_TeraCompletedString
-[BUFFER1] terastallized\nto [BUFFER2]-type!
+[BUFFER][01] terastallized\nto [FD][00] type!
 
 #org @gText_TeraReactingString
+<<<<<<< HEAD
 [BUFFER1] is\nradiating Tera energy!
 
 #org @gText_TeraType
 Tera Type:
+=======
+[BUFFER][01] is\nradiating Tera energy!
+>>>>>>> 22f208d7b64f617e2dc2a42806c7dfc2584a3889

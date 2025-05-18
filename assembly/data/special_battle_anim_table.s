@@ -1184,7 +1184,7 @@ ANIM_FROSTBITE:
 	endanimation
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ Credits to grilokapu
+@ Credits to grilokapu (André Freitas)
 .pool
 ANIM_TERASTAL:
 	loadparticle ANIM_TAG_FOCUS_ENERGY @focus energy
