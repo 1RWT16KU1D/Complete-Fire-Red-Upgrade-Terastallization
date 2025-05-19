@@ -998,8 +998,10 @@ static void SpriteCB_MegaTrigger(struct Sprite* self)
 
 static void SpriteCB_TeraTrigger(struct Sprite* self)
 {
-	u8 side = GetBattlerSide(TRIGGER_BANK);
-	bool8 hasTerastallized = FALSE;
+	if (TAG == GFX_TAG_TERA_TRIGGER)
+	{
+		u8 side = GetBattlerSide(TRIGGER_BANK);
+		bool8 hasTerastallized = FALSE;
 
 		for (u8 i = 0; i < PARTY_SIZE; ++i)
 		{

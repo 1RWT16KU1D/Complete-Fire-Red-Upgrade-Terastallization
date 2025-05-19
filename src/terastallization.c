@@ -13,6 +13,7 @@
 #include "../include/mgba.h"
 #include "../include/palette.h"
 #include "../include/pokemon.h"
+#include "../include/pokemon_summary_screen.h"
 
 #include "../include/constants/items.h"
 #include "../include/constants/vars.h"
@@ -290,7 +291,6 @@ u8 *DoTerastallize(u8 bank)
     if (!IsTerastallized(bank))
     {
         u8 teraType = GetTeraType(bank);
-        u8 side = GetBattlerSide(bank);
         u8 partyIndex = gBattlerPartyIndexes[bank];
         struct Pokemon *mon;
 
