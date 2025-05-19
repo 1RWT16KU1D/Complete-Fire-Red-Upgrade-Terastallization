@@ -305,6 +305,7 @@ u8 *DoTerastallize(u8 bank)
         // Because Stellar Tera Defensive Typing remains same
         if (teraType != TYPE_STELLAR)
             SET_BATTLER_TYPE(bank, teraType);
+        FlagClear(FLAG_TERA_BATTLE);
         GetSpeciesName(gStringVar1, species);
         StringCopy(gStringVar2, sTypeNames[teraType]);
 
