@@ -1,8 +1,8 @@
 #org @gText_TeraCompletedString
-[BUFFER][01] terastallized\nto [FD][00] type!
+[BUFFER1] terastallized\nto [BUFFER2] type!
 
 #org @gText_TeraReactingString
-[BUFFER][01] is\nradiating Tera energy!
+[BUFFER1] is\nradiating Tera energy!
 
 #org @gText_TeraType
 Tera Type:

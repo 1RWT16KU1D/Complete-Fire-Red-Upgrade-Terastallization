@@ -724,7 +724,10 @@ TextPrinterWaitWithDownArrow 08005634 1
 TextPrinterWait 8005680 1
 AutoScrollBattleLevelUpBoxHook1 8026330 0 
 AutoScrollBattleLevelUpBoxHook2 8026350 0
+
+#ifndef SHOW_TERA_TYPE_ICON_ON_SUMMARY_SCREEN
 PrintInfoPage 08136fb0 1
+#endif
 
 #ifdef UNBOUND
 GetCurrentLevelCap 801D79C 0

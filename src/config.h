@@ -337,5 +337,6 @@ enum //These vars need to be one after the other (hence the enum)
 //#define QUICK_CLAW_PROCING_ALWAYS_ALLOWS_FLEEING //Fleeing from wild battles will never fail the turn a Quick Claw activates
 //#define FROSTBITE //Replaces the Freeze status condition with the Frostbite status condition from PLA
 #define FLAG_TERA_BATTLE 0xA07
+#define SHOW_TERA_TYPE_ICON_ON_SUMMARY_SCREEN
 /* DexNav Options */
 //See "include/new/dexnav_config.h"

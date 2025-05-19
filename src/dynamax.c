@@ -26,6 +26,7 @@
 #include "../include/new/move_tables.h"
 #include "../include/new/set_z_effect.h"
 #include "../include/new/stat_buffs.h"
+#include "../include/new/terastallization.h"
 #include "../include/new/util.h"
 
 /*
@@ -1562,6 +1563,7 @@ void CreateSummaryScreenGigantamaxIcon(void)
 	else
 		ballSprite->data[1] = MAX_SPRITES; //No icon
 	#endif
+	TeraIconSummaryScreen();
 }
 
 void SummaryScreen_ChangeCaughtBallSpriteVisibility(u8 invisible)

@@ -51,6 +51,7 @@
 #include "../include/new/Vanilla_functions_battle.h"
 #include "../include/new/wild_encounter.h"
 
+#ifndef SHOW_TERA_TYPE_ICON_ON_SUMMARY_SCREEN
 // Summary screen printing tera types!
 extern const u8 gText_TeraType[];
 #define POKESUM_WIN_RIGHT_PANE 3
@@ -261,3 +262,4 @@ void PrintInfoPage(void)
         AddTextPrinterParameterized3(sMonSummaryScreen->windowIds[POKESUM_WIN_RIGHT_PANE], FONT_NORMAL, 7, 45, sLevelNickTextColors[0], TEXT_SKIP_DRAW, sEggHatchTimeTexts[hatchMsgIndex]);
     }
 }
+#endif

@@ -261,6 +261,29 @@ void FadeBankPaletteForTera(u8 bank, u16 paletteOffset)
 	}
 }
 
+static const u8 *const sTypeNames[NUMBER_OF_MON_TYPES] =
+{
+    [TYPE_NORMAL]   = sText_Normal,
+    [TYPE_FIRE]     = sText_Fire,
+    [TYPE_WATER]    = sText_Water,
+    [TYPE_ELECTRIC] = sText_Electric,
+    [TYPE_GRASS]    = sText_Grass,
+    [TYPE_ICE]      = sText_Ice,
+    [TYPE_FIGHTING] = sText_Fighting,
+    [TYPE_POISON]   = sText_Poison,
+    [TYPE_GROUND]   = sText_Ground,
+    [TYPE_FLYING]   = sText_Flying,
+    [TYPE_PSYCHIC]  = sText_Psychic,
+    [TYPE_BUG]      = sText_Bug,
+    [TYPE_ROCK]     = sText_Rock,
+    [TYPE_GHOST]    = sText_Ghost,
+    [TYPE_DRAGON]   = sText_Dragon,
+    [TYPE_DARK]     = sText_Dark,
+    [TYPE_STEEL]    = sText_Steel,
+    [TYPE_FAIRY]    = sText_Fairy,
+    [TYPE_STELLAR]   = sText_Stellar,
+};
+
 // Main Function - Try type changes
 u8 *DoTerastallize(u8 bank)
 {
@@ -269,16 +292,21 @@ u8 *DoTerastallize(u8 bank)
         u8 teraType = GetTeraType(bank);
         u8 side = GetBattlerSide(bank);
         u8 partyIndex = gBattlerPartyIndexes[bank];
+        struct Pokemon *mon;
 
-        gNewBS->teraData.done[side][partyIndex] = TRUE;
+        if (GetBattlerSide(bank) == B_SIDE_PLAYER)
+            mon = &gPlayerParty[partyIndex];
+        else
+            mon = &gEnemyParty[partyIndex];
+
+        u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
 
         gBattleScripting.bank = bank;
-
         // Because Stellar Tera Defensive Typing remains same
         if (teraType != TYPE_STELLAR)
             SET_BATTLER_TYPE(bank, teraType);
-        PREPARE_TYPE_BUFFER(gBattleTextBuff1, teraType);
-        PREPARE_MON_NICK_BUFFER(gBattleTextBuff2, bank, partyIndex);
+        GetSpeciesName(gStringVar1, species);
+        StringCopy(gStringVar2, sTypeNames[teraType]);
 
         return BattleScript_Terastallize;
     }
@@ -333,3 +361,355 @@ void SetGiftMonTeraType(void)
     else
         mon->teraType = (Random() & 1 ) ? type1 : type2;
 }
+
+#ifdef SHOW_TERA_TYPE_ICON_ON_SUMMARY_SCREEN
+enum {
+    TAG_TERA_TYPE_ICON_NORMAL = 0x3000,
+    TAG_TERA_TYPE_ICON_FIGHTING,
+    TAG_TERA_TYPE_ICON_FLYING,
+    TAG_TERA_TYPE_ICON_POISON,
+    TAG_TERA_TYPE_ICON_GROUND,
+    TAG_TERA_TYPE_ICON_ROCK,
+    TAG_TERA_TYPE_ICON_BUG,
+    TAG_TERA_TYPE_ICON_GHOST,
+    TAG_TERA_TYPE_ICON_STEEL,
+    TAG_TERA_TYPE_ICON_FIRE,
+    TAG_TERA_TYPE_ICON_WATER,
+    TAG_TERA_TYPE_ICON_GRASS,
+    TAG_TERA_TYPE_ICON_ELECTRIC,
+    TAG_TERA_TYPE_ICON_PSYCHIC,
+    TAG_TERA_TYPE_ICON_ICE,
+    TAG_TERA_TYPE_ICON_DRAGON,
+    TAG_TERA_TYPE_ICON_DARK,
+    TAG_TERA_TYPE_ICON_FAIRY,
+    TAG_TERA_TYPE_ICON_STELLAR,
+};
+
+extern const u8 gTeraTypeIcon_NormalTiles[];
+extern const u16 gTeraTypeIcon_NormalPal[];
+extern const u8 gTeraTypeIcon_FightingTiles[];
+extern const u8 gTeraTypeIcon_FlyingTiles[];
+extern const u8 gTeraTypeIcon_PoisonTiles[];
+extern const u8 gTeraTypeIcon_GroundTiles[];
+extern const u8 gTeraTypeIcon_RockTiles[];
+extern const u8 gTeraTypeIcon_BugTiles[];
+extern const u8 gTeraTypeIcon_GhostTiles[];
+extern const u8 gTeraTypeIcon_SteelTiles[];
+extern const u8 gTeraTypeIcon_FireTiles[];
+extern const u8 gTeraTypeIcon_WaterTiles[];
+extern const u8 gTeraTypeIcon_GrassTiles[];
+extern const u8 gTeraTypeIcon_ElectricTiles[];
+extern const u8 gTeraTypeIcon_PsychicTiles[];
+extern const u8 gTeraTypeIcon_IceTiles[];
+extern const u8 gTeraTypeIcon_DragonTiles[];
+extern const u8 gTeraTypeIcon_DarkTiles[];
+extern const u8 gTeraTypeIcon_FairyTiles[];
+extern const u8 gTeraTypeIcon_StellarTiles[];
+
+static const struct SpriteSheet gTeraTypeIcon_NormalSummarySpriteSheet = {gTeraTypeIcon_NormalTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_NORMAL};
+static const struct SpriteSheet gTeraTypeIcon_FightingSummarySpriteSheet = {gTeraTypeIcon_FightingTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_FIGHTING};
+static const struct SpriteSheet gTeraTypeIcon_FlyingSummarySpriteSheet = {gTeraTypeIcon_FlyingTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_FLYING};
+static const struct SpriteSheet gTeraTypeIcon_PoisonSummarySpriteSheet = {gTeraTypeIcon_PoisonTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_POISON};
+static const struct SpriteSheet gTeraTypeIcon_GroundSummarySpriteSheet = {gTeraTypeIcon_GroundTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_GROUND};
+static const struct SpriteSheet gTeraTypeIcon_RockSummarySpriteSheet = {gTeraTypeIcon_RockTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_ROCK};
+static const struct SpriteSheet gTeraTypeIcon_BugSummarySpriteSheet = {gTeraTypeIcon_BugTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_BUG};
+static const struct SpriteSheet gTeraTypeIcon_GhostSummarySpriteSheet = {gTeraTypeIcon_GhostTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_GHOST};
+static const struct SpriteSheet gTeraTypeIcon_SteelSummarySpriteSheet = {gTeraTypeIcon_SteelTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_STEEL};
+static const struct SpriteSheet gTeraTypeIcon_FireSummarySpriteSheet = {gTeraTypeIcon_FireTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_FIRE};
+static const struct SpriteSheet gTeraTypeIcon_WaterSummarySpriteSheet = {gTeraTypeIcon_WaterTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_WATER};
+static const struct SpriteSheet gTeraTypeIcon_GrassSummarySpriteSheet = {gTeraTypeIcon_GrassTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_GRASS};
+static const struct SpriteSheet gTeraTypeIcon_ElectricSummarySpriteSheet = {gTeraTypeIcon_ElectricTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_ELECTRIC};
+static const struct SpriteSheet gTeraTypeIcon_PsychicSummarySpriteSheet = {gTeraTypeIcon_PsychicTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_PSYCHIC};
+static const struct SpriteSheet gTeraTypeIcon_IceSummarySpriteSheet = {gTeraTypeIcon_IceTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_ICE};
+static const struct SpriteSheet gTeraTypeIcon_DragonSummarySpriteSheet = {gTeraTypeIcon_DragonTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_DRAGON};
+static const struct SpriteSheet gTeraTypeIcon_DarkSummarySpriteSheet = {gTeraTypeIcon_DarkTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_DARK};
+static const struct SpriteSheet gTeraTypeIcon_FairySummarySpriteSheet = {gTeraTypeIcon_FairyTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_FAIRY};
+static const struct SpriteSheet gTeraTypeIcon_StellarSummarySpriteSheet = {gTeraTypeIcon_StellarTiles, 4 * 2 * 32 * NUMBER_OF_MON_TYPES, TAG_TERA_TYPE_ICON_STELLAR};
+
+static const struct SpriteSheet *const sTeraTypeIconSheets[NUMBER_OF_MON_TYPES] = {    
+    [TYPE_NORMAL]   = &gTeraTypeIcon_NormalSummarySpriteSheet,
+    [TYPE_FIGHTING] = &gTeraTypeIcon_FightingSummarySpriteSheet,
+    [TYPE_FLYING]   = &gTeraTypeIcon_FlyingSummarySpriteSheet,
+    [TYPE_POISON]   = &gTeraTypeIcon_PoisonSummarySpriteSheet,
+    [TYPE_GROUND]   = &gTeraTypeIcon_GroundSummarySpriteSheet,
+    [TYPE_ROCK]     = &gTeraTypeIcon_RockSummarySpriteSheet,
+    [TYPE_BUG]      = &gTeraTypeIcon_BugSummarySpriteSheet,
+    [TYPE_GHOST]    = &gTeraTypeIcon_GhostSummarySpriteSheet,
+    [TYPE_STEEL]    = &gTeraTypeIcon_SteelSummarySpriteSheet,
+    [TYPE_FIRE]     = &gTeraTypeIcon_FireSummarySpriteSheet,
+    [TYPE_WATER]    = &gTeraTypeIcon_WaterSummarySpriteSheet,
+    [TYPE_GRASS]    = &gTeraTypeIcon_GrassSummarySpriteSheet,
+    [TYPE_ELECTRIC] = &gTeraTypeIcon_ElectricSummarySpriteSheet,
+    [TYPE_PSYCHIC]  = &gTeraTypeIcon_PsychicSummarySpriteSheet,
+    [TYPE_ICE]      = &gTeraTypeIcon_IceSummarySpriteSheet,
+    [TYPE_DRAGON]   = &gTeraTypeIcon_DragonSummarySpriteSheet,
+    [TYPE_DARK]     = &gTeraTypeIcon_DarkSummarySpriteSheet,
+    [TYPE_FAIRY]    = &gTeraTypeIcon_FairySummarySpriteSheet,
+    [TYPE_STELLAR]  = &gTeraTypeIcon_StellarSummarySpriteSheet,
+};
+
+static const struct SpritePalette sTeraTypeIconPalTemplate =
+{
+    gTeraTypeIcon_NormalPal,
+    TAG_TERA_TYPE_ICON_NORMAL
+};
+
+static const struct OamData sTeraTypeIconOAM =
+{
+	.affineMode = ST_OAM_AFFINE_OFF,
+	.objMode = ST_OAM_OBJ_NORMAL,
+	.shape = SPRITE_SHAPE(32x16),
+	.size = SPRITE_SIZE(32x16),
+	.priority = 1,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Normal =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Fighting =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_FIGHTING,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Flying =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_FLYING,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Poison =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_POISON,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Ground =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_GROUND,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Rock =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_ROCK,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Bug =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_BUG,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Ghost =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_GHOST,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Steel =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_STEEL,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Fire =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_FIRE,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Water =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_WATER,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Grass =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_GRASS,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Electric =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_ELECTRIC,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Psychic =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_PSYCHIC,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Ice =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_ICE,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Dragon =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_DRAGON,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Dark =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_DARK,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Fairy =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_FAIRY,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+const struct SpriteTemplate gTeraTypeIconSpriteTemplate_Stellar =
+{
+    .tileTag = TAG_TERA_TYPE_ICON_STELLAR,
+    .paletteTag = TAG_TERA_TYPE_ICON_NORMAL,
+    .oam = &sTeraTypeIconOAM,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+static const struct SpriteTemplate *const gTeraTypeIconSpriteTemplates[NUMBER_OF_MON_TYPES] =
+{
+    [TYPE_NORMAL]   = &gTeraTypeIconSpriteTemplate_Normal,
+    [TYPE_FIGHTING] = &gTeraTypeIconSpriteTemplate_Fighting,
+    [TYPE_FLYING]   = &gTeraTypeIconSpriteTemplate_Flying,
+    [TYPE_POISON]   = &gTeraTypeIconSpriteTemplate_Poison,
+    [TYPE_GROUND]   = &gTeraTypeIconSpriteTemplate_Ground,
+    [TYPE_ROCK]     = &gTeraTypeIconSpriteTemplate_Rock,
+    [TYPE_BUG]      = &gTeraTypeIconSpriteTemplate_Bug,
+    [TYPE_GHOST]    = &gTeraTypeIconSpriteTemplate_Ghost,
+    [TYPE_STEEL]    = &gTeraTypeIconSpriteTemplate_Steel,
+    [TYPE_FIRE]     = &gTeraTypeIconSpriteTemplate_Fire,
+    [TYPE_WATER]    = &gTeraTypeIconSpriteTemplate_Water,
+    [TYPE_GRASS]    = &gTeraTypeIconSpriteTemplate_Grass,
+    [TYPE_ELECTRIC] = &gTeraTypeIconSpriteTemplate_Electric,
+    [TYPE_PSYCHIC]  = &gTeraTypeIconSpriteTemplate_Psychic,
+    [TYPE_ICE]      = &gTeraTypeIconSpriteTemplate_Ice,
+    [TYPE_DRAGON]   = &gTeraTypeIconSpriteTemplate_Dragon,
+    [TYPE_DARK]     = &gTeraTypeIconSpriteTemplate_Dark,
+    [TYPE_FAIRY]    = &gTeraTypeIconSpriteTemplate_Fairy,
+    [TYPE_STELLAR]  = &gTeraTypeIconSpriteTemplate_Stellar, // Supondo que esse seja o 19º tipo
+};
+
+void TeraIconSummaryScreen(void)
+{
+    struct Sprite* ballSprite = &gSprites[sMonSummaryScreen->ballIconSpriteId];
+	u8 teraType = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_TERA_TYPE, NULL);
+	if (teraType < NUMBER_OF_MON_TYPES)
+	{
+		LoadSpriteSheet(sTeraTypeIconSheets[teraType]);
+        LoadSpritePalette(&sTeraTypeIconPalTemplate);
+
+		s16 x = ballSprite->pos1.x - 6;
+		s16 y = ballSprite->pos1.y -46;
+
+		ballSprite->data[1] = CreateSprite(gTeraTypeIconSpriteTemplates[teraType], x, y, 0);
+	}
+	else
+		ballSprite->data[1] = MAX_SPRITES; //No icon
+};
+#endif

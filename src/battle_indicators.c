@@ -998,9 +998,19 @@ static void SpriteCB_MegaTrigger(struct Sprite* self)
 
 static void SpriteCB_TeraTrigger(struct Sprite* self)
 {
-	if (TAG == GFX_TAG_TERA_TRIGGER)
-	{
-		if (!CanTerastallize(TRIGGER_BANK) || !TerastalEnabled(TRIGGER_BANK))
+	u8 side = GetBattlerSide(TRIGGER_BANK);
+	bool8 hasTerastallized = FALSE;
+
+		for (u8 i = 0; i < PARTY_SIZE; ++i)
+		{
+			if (gNewBS->teraData.done[side][i])
+			{
+				hasTerastallized = TRUE;
+				break;
+			}
+		}
+
+		if (hasTerastallized || !CanTerastallize(TRIGGER_BANK) || !TerastalEnabled(TRIGGER_BANK))
 			self->invisible = TRUE;
 		else
 			self->invisible = FALSE;
