@@ -1563,7 +1563,9 @@ void CreateSummaryScreenGigantamaxIcon(void)
 	else
 		ballSprite->data[1] = MAX_SPRITES; //No icon
 	#endif
+	#ifdef SHOW_TERA_TYPE_ICON_ON_SUMMARY_SCREEN
 	TeraIconSummaryScreen();
+	#endif
 }
 
 void SummaryScreen_ChangeCaughtBallSpriteVisibility(u8 invisible)
