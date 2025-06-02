@@ -21,6 +21,7 @@
 #include "../include/new/build_pokemon.h"
 #include "../include/new/frontier.h"
 #include "../include/new/mega.h"
+#include "../include/new/terastallization.h"
 
 extern const u8 RaidBattleIntroBGTiles[];
 extern const u8 RaidBattleIntroBGPal[];
@@ -585,6 +586,25 @@ static void ShowRaidPokemonTypes(void)
 		blit_move_info_icon(WIN_TYPE_2, type2 + 1, 0, 2);
 }
 
+// For Terastallization - Show Tera Type instead of normal types
+static void ShowRaidPokemonTeraType(void)
+{
+	u8 teraType = VarGet(Var8005);
+
+	blit_move_info_icon(WIN_TYPE_1, teraType + 1, 0, 2);
+	FillWindowPixelBuffer(WIN_TYPE_2, PIXEL_FILL(0)); //Clear second type
+}
+
+// For Terastallization - Set the Raid Boss' Tera Type
+extern void SetRaidBossTeraType(void)
+{
+    if (IsTeraRaidBattle())
+    {
+        u8 teraType = VarGet(Var8001);
+        gEnemyParty[0].teraType = teraType; // Because the Boss is always first in the party
+    }
+}
+
 static void ShowPartnerTeams(void)
 {
 	u8 i, j;
@@ -639,6 +659,7 @@ static void CleanWindows(void)
 	for (int i = 0; i < WINDOW_COUNT; ++i)
 		FillWindowPixelBuffer(i, PIXEL_FILL(0));
 }
+
 //Display commited windows
 static void CommitWindows(void)
 {
@@ -657,7 +678,13 @@ static void InitRaidBattleIntro(void)
 	ShowStars();
 	PrintInstructions();
 	ShowRaidPokemonSprite();
-	ShowRaidPokemonTypes();
+
+	// Display Raid Pokemon types
+	if (IsTeraRaidBattle())
+		ShowRaidPokemonTeraType();
+	else
+		ShowRaidPokemonTypes();
+
 	ShowPartnerTeams();
 	ShowSelectionArrow();
 

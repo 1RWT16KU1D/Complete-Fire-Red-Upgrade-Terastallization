@@ -227,6 +227,7 @@ struct BattleTowerSpread
 	u8 modifyMovesDoubles : 1;
 	u8 ability : 2;
 	u8 gigantamax : 1;
+	u8 teraType; // For Terastallization - Allows trainers to have a Tera Type
 };
 
 extern const struct BattleTowerSpread gFrontierSpreads[];

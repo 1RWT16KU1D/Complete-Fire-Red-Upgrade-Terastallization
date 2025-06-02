@@ -3,6 +3,7 @@
 #include "../include/battle_transition.h"
 #include "../include/battle_setup.h"
 #include "../include/event_data.h"
+#include "../include/field_weather.h"
 #include "../include/gpu_regs.h"
 #include "../include/load_save.h"
 #include "../include/random.h"
@@ -123,12 +124,20 @@ void HandleNewBattleRamClearBeforeBattle(void)
 	Memset(gBattleMons, 0x0, sizeof(gBattleMons)); //Clear battle data - can be filled from last double battle and interfere with battle engine
 	//Memset((u8*) 0x203C020, 0x0, 0xE0);
 
-	if (IsRaidBattle())
+	if (IsRaidBattle() && (!IsTeraRaidBattle()))
 	{
 		gBattleTypeFlags |= BATTLE_TYPE_DYNAMAX;
 		if (!IsBannedDynamaxBaseSpecies(GetMonData(&gEnemyParty[0], MON_DATA_SPECIES, NULL)))
 			gNewBS->dynamaxData.timer[B_POSITION_OPPONENT_LEFT] = -2; //Don't revert
 		gNewBS->dynamaxData.backupRaidMonItem = GetMonData(&gEnemyParty[0], MON_DATA_HELD_ITEM, NULL); //For Frontier
+	}
+
+	// For Terastallization - Make the opposing Pokemon Terastallized if it is a Tera Raid Battle
+	if (IsTeraRaidBattle())
+	{
+		gNewBS->teraData.activeBank = BANK_RAID_BOSS;
+		gNewBS->teraData.done[B_SIDE_OPPONENT][0] = TRUE; //Raid Boss is already Terastallized
+		gNewBS->teraData.chosen[BANK_RAID_BOSS] = TRUE; //Raid Boss has chosen to Terastallize
 	}
 
 	if (gBattleTypeFlags & BATTLE_TYPE_RING_CHALLENGE)
@@ -352,7 +361,7 @@ void BattleBeginFirstTurn(void)
 				break;
 
 			case BTSTART_RAID_BATTLE_REVEAL:
-				if (ShouldStartWithRaidShieldsUp() && !gNewBS->dynamaxData.raidShieldsUp) //Can be done outside of Raid Battles now
+				if (ShouldStartWithRaidShieldsUp() && (!gNewBS->dynamaxData.raidShieldsUp || !gNewBS->teraData.raidShieldsUp)) //Can be done outside of Raid Battles now
 				{
 					//Start with shields for harder Raids
 					gNewBS->dynamaxData.raidShieldsUp = TRUE;
@@ -361,7 +370,28 @@ void BattleBeginFirstTurn(void)
 					BattleScriptPushCursorAndCallback(BattleScript_RaidShieldsBattleStart);
 				}
 
-				if (IsRaidBattle())
+				// For Terastallization - Check Tera Raid First
+				if (IsTeraRaidBattle())
+				{
+					gAbsentBattlerFlags |= gBitTable[B_POSITION_OPPONENT_RIGHT]; //Because it's not there - causes bugs without
+
+					#ifdef FLAG_RAID_BATTLE_NO_FORCE_END
+					if (FlagGet(FLAG_RAID_BATTLE_NO_FORCE_END))
+					{
+						//Don't play the storm animation in a Raid Battle that isn't 10 turns long
+					}
+					else
+					#endif
+					{
+						gBattleScripting.bank = BANK_RAID_BOSS;
+						gBattleStringLoader = gText_TeraRaidBattleReveal;
+
+						// Make the Boss appear Terastallized
+						SET_BATTLER_TYPE(BANK_RAID_BOSS, GetTeraType(BANK_RAID_BOSS));
+						BattleScriptPushCursorAndCallback(BattleScript_TeraRaidBattleStart);
+					}
+				}
+				else if (IsRaidBattle())
 				{
 					gAbsentBattlerFlags |= gBitTable[B_POSITION_OPPONENT_RIGHT]; //Because it's not there - causes bugs without
 
@@ -380,6 +410,7 @@ void BattleBeginFirstTurn(void)
 						else
 							BattleScriptPushCursorAndCallback(BattleScript_RaidBattleStart);
 					}
+					SetRaidBossTeraType(); // Set the Tera Type of the Raid Boss
 				}
 
 				++*state;
@@ -1440,6 +1471,11 @@ void HandleAction_UseMove(void)
 	gNewBS->batonPassing = FALSE;
 	gNewBS->dynamaxData.nullifiedStats = FALSE;
 	gNewBS->dynamaxData.attackAgain = FALSE;
+	
+	// For Terastallization - Include Tera Raids
+	gNewBS->teraData.nullifiedStats = FALSE;
+	gNewBS->teraData.attackAgain = FALSE;
+
 	gBattleCommunication[MOVE_EFFECT_BYTE] = 0; //Remove secondary effects
 	gBattleCommunication[6] = 0;
 	gCurrMovePos = gChosenMovePos = gBattleStruct->chosenMovePositions[gBankAttacker];

@@ -6,3 +6,9 @@
 
 #org @gText_TeraType
 Tera Type:
+
+#org @gText_TeraAttackCancel
+[ATTACKER] shook its\nhead.\pIt seems like it can't use\nthis move[.]
+
+#org @gText_TeraRaidBattleReveal
+[SCRIPTING_BANK] appears to be\nterastallized!

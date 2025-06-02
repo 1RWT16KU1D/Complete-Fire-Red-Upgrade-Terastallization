@@ -31,6 +31,7 @@ extern const u8 BattleScript_CamomonsTypeRevealEnd3[];
 extern const u8 BattleScript_CamomonsTypeRevealRet[];
 extern const u8 BattleScript_RaidBattleStart[];
 extern const u8 BattleScript_RaidBattleStart_NoDynamax[];
+extern const u8 BattleScript_TeraRaidBattleStart[]; // For Terastallization
 extern const u8 BattleScript_RaidShieldsBattleStart[];
 extern const u8 BattleScript_RaidBattleStorm[];
 extern const u8 BattleScript_DynamaxEnergySwirl[];
@@ -38,6 +39,7 @@ extern const u8 BattleScript_DynamaxEnergySwirl[];
 extern const u8 gText_CamomonsTypeReveal[];
 extern const u8 gText_CamomonsTypeRevealDualType[];
 extern const u8 gText_RaidBattleReveal[];
+extern const u8 gText_TeraRaidBattleReveal[]; // For Terastallization
 extern const u8 gText_DynamaxUsable[];
 extern const u8 gText_BadThoughtsBattleStart[];
 extern const u8 gText_TailwindBattleStart[];

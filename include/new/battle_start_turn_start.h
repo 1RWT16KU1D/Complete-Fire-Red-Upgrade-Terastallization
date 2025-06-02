@@ -41,3 +41,6 @@ enum TotemBoostType
 	TOTEM_MULTI_BOOST,
 	TOTEM_OMNIBOOST,
 };
+
+// For Terastallization
+extern void SetRaidBossTeraType(void);

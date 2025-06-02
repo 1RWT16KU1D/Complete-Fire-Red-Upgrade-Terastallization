@@ -194,7 +194,7 @@ static item_t FindPlayerTeraOrb(void)
 
 static item_t FindBankTeraOrb(u8 bank)
 {
-	#ifdef DEBUG_TERASRAL
+	#ifdef DEBUG_TERASTAL
 		if (bank + 1)
 			return ITEM_TERA_ORB;
 	#endif
@@ -255,7 +255,7 @@ void FadeBankPaletteForTera(u8 bank, u16 paletteOffset)
 {
     u8 teraType = GetTeraType(bank);
 
-	if (IsTerastallized(bank))
+	if (IsTerastallized(bank) || (IsTeraRaidBattle() && bank == BANK_RAID_BOSS))
 	{
 		BlendPalette(paletteOffset, 16, 6, gTeraBlendColors[teraType]);
 		CpuCopy32(gPlttBufferFaded + paletteOffset, gPlttBufferUnfaded + paletteOffset, 32);
@@ -361,6 +361,16 @@ void SetGiftMonTeraType(void)
         mon->teraType = type1;
     else
         mon->teraType = (Random() & 1 ) ? type1 : type2;
+}
+
+// For Terastallization - Tera Raid Battles
+bool8 IsTeraRaidBattle(void)
+{
+	#ifdef FLAG_TERA_RAID_BATTLE
+	return FlagGet(FLAG_TERA_RAID_BATTLE) && !(gBattleTypeFlags & BATTLE_TYPE_TRAINER);
+	#else
+	return FALSE;
+	#endif
 }
 
 #ifdef SHOW_TERA_TYPE_ICON_ON_SUMMARY_SCREEN
@@ -693,8 +703,17 @@ static const struct SpriteTemplate *const gTeraTypeIconSpriteTemplates[NUMBER_OF
     [TYPE_DRAGON]   = &gTeraTypeIconSpriteTemplate_Dragon,
     [TYPE_DARK]     = &gTeraTypeIconSpriteTemplate_Dark,
     [TYPE_FAIRY]    = &gTeraTypeIconSpriteTemplate_Fairy,
-    [TYPE_STELLAR]  = &gTeraTypeIconSpriteTemplate_Stellar, // Supondo que esse seja o 19º tipo
+    [TYPE_STELLAR]  = &gTeraTypeIconSpriteTemplate_Stellar,
 };
+#endif
+
+#if defined(SHOW_TERA_TYPE_ICON_ON_SUMMARY_SCREEN) && defined(GEN4_PLUS_SELECTION_SCREEN)
+#define TERA_ICON_X_POS 84
+#define TERA_ICON_Y_POS 46
+#else
+#define TERA_ICON_X_POS 84
+#define TERA_ICON_Y_POS 46
+#endif
 
 void TeraIconSummaryScreen(void)
 {
@@ -705,12 +724,11 @@ void TeraIconSummaryScreen(void)
 		LoadSpriteSheet(sTeraTypeIconSheets[teraType]);
         LoadSpritePalette(&sTeraTypeIconPalTemplate);
 
-		s16 x = ballSprite->pos1.x - 6;
-		s16 y = ballSprite->pos1.y -46;
+		s16 x = ballSprite->pos1.x - TERA_ICON_X_POS;
+		s16 y = ballSprite->pos1.y - TERA_ICON_Y_POS;
 
 		ballSprite->data[1] = CreateSprite(gTeraTypeIconSpriteTemplates[teraType], x, y, 0);
 	}
 	else
 		ballSprite->data[1] = MAX_SPRITES; //No icon
 };
-#endif

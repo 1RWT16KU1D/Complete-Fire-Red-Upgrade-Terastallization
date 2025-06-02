@@ -2028,6 +2028,9 @@ void AdjustDamage(bool8 checkFalseSwipe)
 	bool8 calcSpreadMove = checkFalseSwipe && IS_DOUBLE_BATTLE && moveTarget & (MOVE_TARGET_BOTH | MOVE_TARGET_ALL);
 	gStringBank = gBankTarget;
 
+	struct DamageCalc *data;
+	u8 moveType = data->moveType;
+
 	for (u32 bankDef = 0; bankDef < gBattlersCount; ++bankDef)
 	{
 		if (!calcSpreadMove) //Single target move
@@ -2060,7 +2063,7 @@ void AdjustDamage(bool8 checkFalseSwipe)
 
 		if (bankDef == BANK_RAID_BOSS)
 		{
-			if (gNewBS->dynamaxData.raidShieldsUp) //Shields heavily reduce damage
+			if (gNewBS->dynamaxData.raidShieldsUp || gNewBS->teraData.raidShieldsUp) //Shields heavily reduce damage
 			{
 				u16 divisor = gBattleMons[bankDef].hp / 8;
 				damage /= divisor; //1 hp of damage for every 8th of hp that would have been done
@@ -2077,6 +2080,24 @@ void AdjustDamage(bool8 checkFalseSwipe)
 					damage = gBattleMons[bankDef].hp - cutOff; //Limit damage before Raid shields go up
 					goto END;
 				}
+			}
+			else if (IsTeraRaidBattle()) // For Terastallization - Boss Damage Reduction
+			{
+				// Use 50 instead of 100 to avoid u8 overflow
+				u8 damageMitigation;
+
+				if (IsTerastallized(gBankAttacker))
+				{
+					if (moveType == TYPE_STELLAR)
+						damageMitigation = 143;
+					else
+						damageMitigation = 66;
+				}
+				else
+					damageMitigation = 250;
+
+				damage = MathMax(50, damageMitigation);
+				goto END;
 			}
 		}
 
@@ -2508,7 +2529,7 @@ static s32 CalculateBaseDamage(struct DamageCalc* data)
 		}
 
 		data->moveSplit = CalcMoveSplitFromParty(move, monAtk);
-		data->moveType = GetMonMoveTypeSpecial(monAtk, move);
+		data->moveType = (monAtk, move);
 
 		/*if (useMonDef) //CAN'T AND SHOULD NOT HAPPEN
 			data->resultFlags = AI_TypeCalc(move, monAtk, bankDef, monDef);
@@ -4632,7 +4653,7 @@ static void ApplySTABMultipliers(void)
 
             // Mark Stellar Boost as used
             if (isStellarTera && isStellarBoostActive)
-                gNewBS->teraData.stellarBoostUsed[side][partyId][moveType] = TRUE; // **Fixed index**
+                gNewBS->teraData.stellarBoostUsed[side][partyId][moveType] = TRUE;
         }
         else if (hasStellarTeraLesserStab && isStellarBoostActive)
         {   
@@ -4641,7 +4662,7 @@ static void ApplySTABMultipliers(void)
                 ? (gBattleMoveDamage * 13) / 10                  // 1.3×
                 : (gBattleMoveDamage * 12) / 10;          	     // 1.2×
 
-            gNewBS->teraData.stellarBoostUsed[side][partyId][moveType] = TRUE; // **Fixed index**
+            gNewBS->teraData.stellarBoostUsed[side][partyId][moveType] = TRUE;
         }
         else
         {   

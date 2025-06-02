@@ -369,6 +369,17 @@ void CreateWildMon(u16 species, u8 level, u8 monHeaderIndex, bool8 purgeParty)
 	}
 	#endif
 
+
+	// For Terastallization - Tera Raid Battles
+	#ifdef FLAG_TERA_RAID_BATTLE
+	if (FlagGet(FLAG_TERA_RAID_BATTLE))
+	{
+		gEnemyParty[enemyMonIndex].teraType = VarGet(Var8005);
+		gEnemyParty[enemyMonIndex].gigantamax = FALSE; //Raid mons can't be Gigantamaxed
+	}
+	#endif
+
+	else
 	//Prevent Uncatchable Shinies (they're mean)
 	if (CantCatchBecauseFlag())
 	{

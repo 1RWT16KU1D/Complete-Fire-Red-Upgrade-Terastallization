@@ -845,7 +845,7 @@ void LoadAndCreateEnemyShadowSprites(void)
 
 		//The game is insistent that there must be two shadow sprites in Doubles, otherwise things break
 		//So overlap the two shadow sprites in a Raid Battle
-		if (IsRaidBattle())
+		if (IsRaidBattle() || IsTeraRaidBattle())
 			gSprites[gBattleSpritesDataPtr->healthBoxesData[battlerId].shadowSpriteId].data[0] = BANK_RAID_BOSS;
 	}
 }

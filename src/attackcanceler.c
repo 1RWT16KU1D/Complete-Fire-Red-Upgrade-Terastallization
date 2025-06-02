@@ -22,6 +22,7 @@
 #include "../include/new/general_bs_commands.h"
 #include "../include/new/item.h"
 #include "../include/new/move_tables.h"
+#include "../include/new/terastallization.h"
 #include "../include/new/util.h"
 /*
 attackcanceler.c
@@ -326,7 +327,7 @@ static u8 AtkCanceller_UnableToUseMove(void)
 			break;
 
 		case CANCELLER_RAID_BATTLE_NULLIFICATION:
-			if (IsRaidBattle()
+			if ((IsRaidBattle() || IsTeraRaidBattle()) // For Terastallization - Include Tera Raids
 			&& gBankAttacker == BANK_RAID_BOSS
 			&& Random() % 100 < GetRaidBattleStatNullificationChance(gBankAttacker))
 			{
@@ -338,8 +339,12 @@ static u8 AtkCanceller_UnableToUseMove(void)
 					for (j = STAT_STAGE_ATK; j < BATTLE_STATS_NO; ++j)
 						STAT_STAGE(i, j) = 6;
 				}
-
-				gNewBS->dynamaxData.nullifiedStats = TRUE;
+				
+				if (IsTeraRaidBattle())
+					gNewBS->teraData.nullifiedStats = TRUE;
+				else if (IsRaidBattle())
+					gNewBS->dynamaxData.nullifiedStats = TRUE;
+				
 				gSpecialStatuses[gBankTarget].lightningRodRedirected = 0; //The target will still be changed, but this is the best I can do
 
 				gActiveBattler = gBankAttacker;
@@ -369,7 +374,7 @@ static u8 AtkCanceller_UnableToUseMove(void)
 
 		case CANCELLER_RAID_BATTLES_FAILED_MOVES:
 		case CANCELLER_RAID_BATTLES_FAILED_MOVES_2:
-			if ((IsRaidBattle() 
+			if (((IsRaidBattle() || IsTeraRaidBattle()) // For Terastallization - Include Tera Raids
 			&& gSpecialMoveFlags[gCurrentMove].gRaidBattleBannedMoves
 			&& !gNewBS->zMoveData.active)) //Raid Battles stop status Z-Moves, so there will be a second check later on
 			{
@@ -396,11 +401,12 @@ static u8 AtkCanceller_UnableToUseMove(void)
 			if ((IsDynamaxed(gBankTarget)
 			 && gSpecialMoveFlags[gCurrentMove].gDynamaxBannedMoves
 			 && !gNewBS->zMoveData.active) //Dynamax Pokemon stop status Z-Moves, so there will be a second check later on
-			|| (IsRaidBattle() && GetBattlerPosition(gBankAttacker) == B_POSITION_OPPONENT_LEFT && gSpecialMoveFlags[gCurrentMove].gRaidBattleBannedRaidMonMoves))
+			|| ((IsRaidBattle() || IsTeraRaidBattle()) && GetBattlerPosition(gBankAttacker) == B_POSITION_OPPONENT_LEFT && gSpecialMoveFlags[gCurrentMove].gRaidBattleBannedRaidMonMoves))
+			// For Terastallization - Include Tera Raids
 			{
 				gBattleScripting.bank = gBankAttacker;
 				CancelMultiTurnMoves(gBankAttacker);
-				gBattlescriptCurrInstr = BattleScript_MoveUsedDynamaxPrevents;
+				gBattlescriptCurrInstr = IsTeraRaidBattle() ? BattleScript_MoveUsedTeraPrevents: BattleScript_MoveUsedDynamaxPrevents;
 				gHitMarker |= HITMARKER_UNABLE_TO_USE_MOVE;
 				effect = 1;
 			}

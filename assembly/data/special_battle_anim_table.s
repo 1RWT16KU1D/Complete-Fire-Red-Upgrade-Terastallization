@@ -99,6 +99,7 @@ gBattleAnims_General:
 .word ANIM_HOOPA_RING_SPAWN
 .word ANIM_SPLINTER_DAMAGE
 .word ANIM_TERASTAL
+.word ANIM_SHAKEMONINPLACE
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 .pool
@@ -1221,6 +1222,15 @@ ANIM_TERASTAL:
 .align 2
 TERASYMBOL: objtemplate ANIM_TAG_TERA_SYMBOL ANIM_TAG_TERA_SYMBOL OAM_DOUBLE_BLEND_32x32 gDummySpriteAnimTable 0x0 gSpriteAffineAnimTable_PrimalSymbol SpriteCB_AnimSpriteOnSelectedMonPos
 TERA_CRYSTAL: objtemplate ANIM_TAG_TERA_CRYSTAL ANIM_TAG_TERA_CRYSTAL OAM_DOUBLE_64x64 gDummySpriteAnimTable 0x0 0x83E7144 0x8075D9D
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+.pool
+.align 2
+ANIM_SHAKEMONINPLACE:
+	launchtask AnimTask_screen_shake 0x5 0x3 0x1 0x5 0xe
+	playsound2 191 0xc0
+	waitanimation
+	endanimation
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 .pool

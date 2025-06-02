@@ -1008,6 +1008,14 @@ struct NewBattleStruct
 		u8 chosen[MAX_BATTLERS_COUNT];		  										// Whether the user chooses to Terastallize or not
 		bool8 teraInProgress : 1;             										// A needed flag
 		bool8 viewing : 1;                    										// For Pokemon Summary Screen menu
+	
+		// For raids specifically
+		u8 shieldSpriteIds[MAX_NUM_RAID_SHIELDS]; // Shields for raid battles
+		u8 shieldCount;					          // The amount of shields created in a Raid Battle
+		u8 shieldsDestroyed;					  // The amount of shields destroyed in a Raid Battle
+		bool8 raidShieldsUp : 1;
+		bool8 attackAgain : 1;
+		bool8 nullifiedStats : 1;
 	} teraData;
 
 	struct 

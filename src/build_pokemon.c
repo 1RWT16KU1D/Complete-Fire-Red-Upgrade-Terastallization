@@ -37,6 +37,7 @@
 #include "../include/new/multi.h"
 #include "../include/new/pokemon_storage_system.h"
 #include "../include/new/species_tables.h"
+#include "../include/new/terastallization.h"
 #include "../include/new/util.h"
 
 #include "Tables/battle_tower_spreads.h"
@@ -290,8 +291,8 @@ void BuildTrainerPartySetup(void)
 		else if (!(gBattleTypeFlags & (BATTLE_TYPE_POKE_DUDE | BATTLE_TYPE_SCRIPTED_WILD_1)))
 			SetWildMonHeldItem();
 
-		if (IsRaidBattle())
-		{
+		if (IsRaidBattle() || IsTeraRaidBattle()) // For Terastallization - Add Tera Raid
+		{										  // Battle HP Boost
 			SetWildMonHeldItem();
 
 			if (GetMonData(&gEnemyParty[0], MON_DATA_SPECIES, NULL) != SPECIES_SHEDINJA)
@@ -2357,6 +2358,11 @@ static void CreateFrontierMon(struct Pokemon* mon, const u8 level, const struct 
 
 	if (spread->gigantamax)
 		mon->gigantamax = TRUE;
+
+	// For Terastallization - Include Tera Types as well
+	u8 teraType = spread->teraType;
+	if (teraType != TYPE_BLANK) // To allow trainer mons without a tera type
+		SetMonData(mon, MON_DATA_TERA_TYPE, &teraType);
 
 	TryFormRevert(mon); //To fix Minior forms
 	CalculateMonStatsNew(mon);

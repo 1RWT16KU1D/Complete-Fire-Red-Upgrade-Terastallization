@@ -32,6 +32,7 @@ attackcanceler_battle_scripts.s
 .global BattleScript_CantUseSignatureMove
 .global BattleScript_HoopaCantUseHyperspaceFury
 .global BattleScript_MoveUsedDynamaxPrevents
+.global BattleScript_MoveUsedTeraPrevents
 .global BattleScript_MoveUsedRaidBattlePrevents
 .global BattleScript_MoveUsedRaidShieldPrevents
 .global BattleScript_RaidBattleStatNullification
@@ -312,6 +313,18 @@ BattleScript_MoveUsedDynamaxPrevents:
 	pause DELAY_HALFSECOND
 	orbyte OUTCOME OUTCOME_FAILED
 	setword BATTLE_STRING_LOADER gText_DynamaxAttackCancel
+	printstring 0x184
+	waitmessage DELAY_1SECOND
+	goto BS_MOVE_END
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+BattleScript_MoveUsedTeraPrevents:
+	attackstring
+	ppreduce
+	pause DELAY_HALFSECOND
+	orbyte OUTCOME OUTCOME_FAILED
+	setword BATTLE_STRING_LOADER gText_TeraAttackCancel
 	printstring 0x184
 	waitmessage DELAY_1SECOND
 	goto BS_MOVE_END

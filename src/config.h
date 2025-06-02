@@ -336,7 +336,8 @@ enum //These vars need to be one after the other (hence the enum)
 //#define PAYDAY_MONEY_CAP //Pay Day and G-Max Gold Rush should cap at $99999 per battle
 //#define QUICK_CLAW_PROCING_ALWAYS_ALLOWS_FLEEING //Fleeing from wild battles will never fail the turn a Quick Claw activates
 //#define FROSTBITE //Replaces the Freeze status condition with the Frostbite status condition from PLA
-#define FLAG_TERA_BATTLE 0xA07
+#define FLAG_TERA_BATTLE 0xA07 // When set, Pokemon can Terastallize in Battle
+#define FLAG_TERA_RAID_BATTLE 0xA08 // When Set, triggers Tera Raid Mode
 #define SHOW_TERA_TYPE_ICON_ON_SUMMARY_SCREEN
 /* DexNav Options */
 //See "include/new/dexnav_config.h"

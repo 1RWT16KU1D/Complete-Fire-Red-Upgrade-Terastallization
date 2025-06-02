@@ -36,6 +36,7 @@ battle_start_turn_start_battle_scripts.s
 .global BattleScript_DynamaxEnergySwirl
 .global BattleScript_RaidBattleStart
 .global BattleScript_RaidBattleStart_NoDynamax
+.global BattleScript_TeraRaidBattleStart
 .global BattleScript_RaidBattleStorm
 .global BattleScript_RaidShieldsBattleStart
 
@@ -295,6 +296,12 @@ BattleScript_RaidShieldsBattleStart:
 	callasm CreateRaidShieldSprites
 	pause 0x10
 	setword BATTLE_STRING_LOADER gText_RaidShield
+	printstring 0x184
+	waitmessage DELAY_1SECOND
+	end3
+
+BattleScript_TeraRaidBattleStart:
+	playanimation BANK_SCRIPTING ANIM_SHAKEMONINPLACE 0x0
 	printstring 0x184
 	waitmessage DELAY_1SECOND
 	end3

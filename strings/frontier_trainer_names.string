@@ -600,8 +600,6 @@ Mackenzie
 #org @sTrainerName_Madeline
 Madeline
 
-#ifdef UNBOUND
-
 //Special Trainers
 #org @sTrainerName_Palmer
 Palmer
@@ -632,6 +630,15 @@ Cynthia
 
 #org @sTrainerName_Red
 Red
+
+#org @sTrainerName_Leaf
+Leaf
+
+#org @sTrainerName_Blue
+Blue
+
+#org @sTrainerName_Steven
+Steven
 
 #org @sTrainerName_Vega
 V\ega
@@ -679,5 +686,3 @@ Mahina
 
 #org @sTrainerName_Alford
 Alford
-
-#endif

@@ -22,6 +22,7 @@
 #include "../include/new/util.h"
 #include "../include/new/mega.h"
 #include "../include/new/pokemon_storage_system.h"
+#include "../include/new/terastallization.h"
 
 /*
 catching.c
@@ -171,7 +172,7 @@ void atkEF_handleballthrow(void)
 		#endif
 
 		//Raid Modifier
-		if (IsRaidBattle()) //Dynamax Raid Pokemon can be caught easier
+		if (IsRaidBattle()) //Dynamax or Tera Raid Pokemon can be caught easier
 			odds *= 4;
 
 		if (ballType != BALL_TYPE_SAFARI_BALL)
@@ -534,7 +535,7 @@ static const struct CriticalCaptureOdds sCriticalCaptureSpeciesCounts[] =
 
 static bool8 CriticalCapture(unusedArg u32 odds)
 {
-	if (IsRaidBattle())
+	if (IsRaidBattle() || IsTeraRaidBattle()) // For Terastallization - Include Tera Raids
 		return FALSE; //Critical Captures can't happen in Raids
 
 	#ifdef CRITICAL_CAPTURE

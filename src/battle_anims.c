@@ -6511,7 +6511,7 @@ HIDE_OR_SHOW_BOXES:
 
 		if (priority > 0) //Restore Hidden Healthboxes
 		{
-			if (IsRaidBattle()
+			if ((IsRaidBattle() || IsTeraRaidBattle()) // For Terastallization - Include Tera Raids
 			&& i == BANK_RAID_BOSS
 			&& GetBankPartyData(BANK_RAID_BOSS)->hp == 0)
 			{

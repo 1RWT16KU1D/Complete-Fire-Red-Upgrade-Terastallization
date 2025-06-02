@@ -133,6 +133,10 @@ const u16 gEndBattleFlagClearTable[] =
 #ifdef FLAG_RAID_BATTLE
 	FLAG_RAID_BATTLE,
 #endif
+// For Terastallization
+#ifdef FLAG_TERA_RAID_BATTLE
+	FLAG_TERA_RAID_BATTLE,
+#endif
 #ifdef FLAG_RAID_BATTLE_NO_FORCE_END
 	FLAG_RAID_BATTLE_NO_FORCE_END,
 #endif

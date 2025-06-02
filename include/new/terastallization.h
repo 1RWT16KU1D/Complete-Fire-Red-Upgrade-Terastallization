@@ -24,6 +24,9 @@ bool8 TerastalEnabled(u8 bank);
 void TeraIconSummaryScreen(void);
 #endif
 
+// Tera Raid Battles
+bool8 IsTeraRaidBattle(void);
+
 // Visuals
 extern void FadeBankPaletteForTera(u8 bank, u16 paletteOffset);
 extern const u16 gTeraBlendColors[];
@@ -52,3 +55,6 @@ extern const u8 sText_Dragon[];
 extern const u8 sText_Dark[];
 extern const u8 sText_Fairy[];
 extern const u8 sText_Stellar[];
+
+
+// SPRITE DATA
