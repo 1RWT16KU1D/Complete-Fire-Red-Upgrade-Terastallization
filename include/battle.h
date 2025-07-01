@@ -294,9 +294,10 @@ struct Trainer
 #define PARTY_FLAG_CUSTOM_MOVES     0x1
 #define PARTY_FLAG_HAS_ITEM         0x2
 
-/*
+#ifdef EXPAND_TRAINERS
 extern const struct Trainer gTrainers[];
-*/
+#endif
+
 #define TRAINER_ENCOUNTER_MUSIC(trainer)((gTrainers[trainer].encounterMusic_gender & 0x7F))
 
 struct UnknownFlags

@@ -340,3 +340,6 @@ enum //These vars need to be one after the other (hence the enum)
 #define SHOW_TERA_TYPE_ICON_ON_SUMMARY_SCREEN
 /* DexNav Options */
 //See "include/new/dexnav_config.h"
+
+/* Trainer Data Expansion */
+#define EXPAND_TRAINERS

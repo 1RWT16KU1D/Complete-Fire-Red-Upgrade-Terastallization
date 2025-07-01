@@ -50,7 +50,9 @@ gTypeNames 0811972C
 gTypeNames 0811977C
 
 ##Trainer Data
+#ifdef EXPAND_TRAINERS
 gTrainers 0800FC00
+#endif
 
 ##Scripts
 BattleScript_RainDishActivates 0801A4A0
