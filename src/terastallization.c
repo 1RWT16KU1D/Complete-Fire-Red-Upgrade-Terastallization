@@ -53,7 +53,7 @@ static const item_t sTeraOrbTable[] =
 const u16 gTeraBlendColors[] =
 {
     [TYPE_NORMAL]   = RGB(25, 25, 25),  // Light Gray
-    [TYPE_FIGHTING] = RGB(27, 6, 4),    // Crimson Red
+    [TYPE_FIGHTING] = RGB(31, 0, 12),    // Crimson Red
     [TYPE_FLYING]   = RGB(18, 22, 31),  // Sky Blue
     [TYPE_POISON]   = RGB(22, 2, 28),   // Deep Violet
     [TYPE_GROUND]   = RGB(16, 7, 1),    // Deep Brown
@@ -134,11 +134,8 @@ void FadeBankPaletteForTera(u8 bank, u16 paletteOffset)
 {
     u8 teraType = GetTeraType(bank);
 
-	if (IsTerastallized(bank))
-	{
-		BlendPalette(paletteOffset, 16, 6, gTeraBlendColors[teraType]);
-		CpuCopy32(gPlttBufferFaded + paletteOffset, gPlttBufferUnfaded + paletteOffset, 32);
-	}
+	BlendPalette(paletteOffset, 16, 4, gTeraBlendColors[teraType]);
+	CpuCopy32(gPlttBufferFaded + paletteOffset, gPlttBufferUnfaded + paletteOffset, 32);
 }
 
 static const u8 *const sTypeNames[NUMBER_OF_MON_TYPES] =

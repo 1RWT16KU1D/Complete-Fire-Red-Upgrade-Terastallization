@@ -796,18 +796,25 @@ bool8 IsGMaxMove(u16 move)
 
 void TryFadeBankPaletteForDynamax(u8 bank, u16 paletteOffset)
 {
-	if (IsDynamaxed(bank)
-	|| (IsRaidBattle() && bank == BANK_RAID_BOSS && !IsBannedDynamaxBaseSpecies(SPECIES(BANK_RAID_BOSS)))) //So it stays lit up when you try to catch it
-	{
-		#ifdef NATIONAL_DEX_CALYREX
-		if (SpeciesToNationalPokedexNum(SPECIES(bank)) == NATIONAL_DEX_CALYREX)
-			BlendPalette(paletteOffset, 16, 4, RGB(0, 5, 31)); //Dynamax Blue
-		else
-		#endif
-			BlendPalette(paletteOffset, 16, 4, RGB(31, 0, 12)); //Dynamax Pinkish-Red
+	// Add Tera check here
+    if (IsTerastallized(bank))
+    {
+        FadeBankPaletteForTera(bank, paletteOffset);
+        return;
+    }
+
+    if (IsDynamaxed(bank)
+    || (IsRaidBattle() && bank == BANK_RAID_BOSS && !IsBannedDynamaxBaseSpecies(SPECIES(BANK_RAID_BOSS)))) //So it stays lit up when you try to catch it
+    {
+        #ifdef NATIONAL_DEX_CALYREX
+        if (SpeciesToNationalPokedexNum(SPECIES(bank)) == NATIONAL_DEX_CALYREX)
+            BlendPalette(paletteOffset, 16, 4, RGB(0, 5, 31)); //Dynamax Blue
+        else
+        #endif
+		     BlendPalette(paletteOffset, 16, 4, RGB(31, 0, 12)); //Dynamax Pinkish-Red
 
 		CpuCopy32(gPlttBufferFaded + paletteOffset, gPlttBufferUnfaded + paletteOffset, 32);
-	}
+    }
 }
 
 extern const struct UCoords8 sBattlerCoords[][4];
