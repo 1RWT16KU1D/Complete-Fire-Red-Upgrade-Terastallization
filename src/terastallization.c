@@ -317,6 +317,9 @@ u8 *DoTerastallize(u8 bank)
 // AI Logic for Terastallization
 bool8 ShouldAIDelayTerastallization(u8 bankAtk, u8 bankDef, u16 move, bool8 optimizeAndLookAtTeraPotential, bool8 runDamageCalcs)
 {
+    if (GetTeraType(bankAtk) == TYPE_GRASS)
+        return FALSE;
+
     if (optimizeAndLookAtTeraPotential && !CanTerastallize(bankAtk))
         return TRUE; // This bank can't Terastallize
 

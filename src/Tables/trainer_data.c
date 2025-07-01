@@ -5602,7 +5602,7 @@ const struct Trainer gTrainers[] = {
         .party =  { .NoItemDefaultMoves = sParty_RivalOaksLabCharmander },
     },
         [TRAINER_RIVAL_ROUTE22_EARLY_SQUIRTLE] = {
-        .partyFlags = PARTY_FLAG_CUSTOM_MOVES,
+        .partyFlags = PARTY_FLAG_CUSTOM_MOVES | PARTY_FLAG_HAS_ITEM,
         .trainerClass = CLASS_RIVAL,
         .encounterMusic = TRAINER_ENCOUNTER_MUSIC_MALE,
         .gender = GENDER_MALE,
@@ -5612,11 +5612,11 @@ const struct Trainer gTrainers[] = {
         #else
         .trainerName = { _T, _E, _R, _R, _Y, _END },
         #endif
-        .items = {ITEM_NONE, ITEM_NONE, ITEM_NONE, ITEM_NONE},
+        .items = {ITEM_FULL_RESTORE, ITEM_NONE, ITEM_NONE, ITEM_NONE},
         .doubleBattle = FALSE,
         .partySize = 2,
-        .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_CHECK_GOOD_MOVE | AI_SCRIPT_SEMI_SMART,
-        .party = { .NoItemCustomMoves = sParty_RivalRoute22EarlySquirtle },
+        .aiFlags = AI_SCRIPT_SEMI_SMART,
+        .party = { .ItemCustomMoves = sParty_RivalRoute22EarlySquirtle },
     },
         [TRAINER_RIVAL_ROUTE22_EARLY_BULBASAUR] = {
         .partyFlags = PARTY_FLAG_CUSTOM_MOVES,
