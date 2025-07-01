@@ -350,6 +350,20 @@ bool8 TerastalEnabled(u8 bank)
     #endif
 }
 
+// Get a random teraType
+u8 GetRandomTeraType(void)
+{
+    u8 randomType;
+
+    // Reroll if invalid type
+    do
+        randomType = Random() % NUMBER_OF_MON_TYPES;
+    while ((randomType == TYPE_BLANK) || (randomType == TYPE_MYSTERY) || (randomType == TYPE_BLANK)
+            || (randomType == 0x12) || (randomType == 0x16) || (randomType == TYPE_ROOSTLESS));
+
+    return randomType;
+}
+
 // givepokemon set-up
 void SetGiftMonTeraType(void)
 {

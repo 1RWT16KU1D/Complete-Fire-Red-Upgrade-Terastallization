@@ -21,6 +21,8 @@
 #include "../include/new/item.h"
 #include "../include/new/pokemon_storage_system.h"
 #include "../include/new/util.h"
+#include "../include/new/terastallization.h"
+
 /*
 daycare.c
 	functions that handle all daycare functions, including attribute inheritance and step counts
@@ -679,9 +681,23 @@ static void SetInitialEggData(struct Pokemon* mon, u16 species, u32 personality)
 	SetMonData(mon, MON_DATA_LANGUAGE, &language);
 	mon->hiddenAbility = hiddenAbility;
 
-	// For Terastallization
-	u8 defaultTeraType = TYPE_BLANK;
-	mon->teraType = defaultTeraType;
+	// Set Tera Type of egg
+	u8 type1 = gBaseStats[species].type1;
+	u8 type2 = gBaseStats[species].type2;
+	u8 randomValue = Random() % 100;
+
+	// 2% chance to get a random teraType
+	if (randomValue < 2)
+		mon->teraType = GetRandomTeraType();
+
+	// Otherwise, get a random one from the original typing
+	else
+	{
+		if (type1 == type2 || type2 == TYPE_MYSTERY || type2 == TYPE_BLANK)
+			mon->teraType = type1;
+		else
+			mon->teraType = (Random() & 1) ? type1 : type2;				
+	}
 }
 
 void CreateEgg(struct Pokemon *mon, u16 species) //The function used by the giveegg scripting command
@@ -700,6 +716,24 @@ void CreateEgg(struct Pokemon *mon, u16 species) //The function used by the give
 	SetMonData(mon, MON_DATA_MET_LOCATION, &metLocation);
 	SetMonData(mon, MON_DATA_LANGUAGE, &language);
 	SetMonData(mon, MON_DATA_IS_EGG, &isEgg);
+
+	// Set Tera Type of egg
+	u8 type1 = gBaseStats[species].type1;
+	u8 type2 = gBaseStats[species].type2;
+	u8 randomValue = Random() % 100;
+
+	// 2% chance to get a random teraType
+	if (randomValue < 2)
+		mon->teraType = GetRandomTeraType();
+
+	// Otherwise, get a random one from the original typing
+	else
+	{
+		if (type1 == type2 || type2 == TYPE_MYSTERY || type2 == TYPE_BLANK)
+			mon->teraType = type1;
+		else
+			mon->teraType = (Random() & 1) ? type1 : type2;				
+	}
 	HealMon(mon);
 }
 
@@ -818,13 +852,31 @@ void CreateHatchedMon(struct Pokemon *egg, struct Pokemon *temp)
 
 	*egg = *temp;
 	CalculateMonStats(egg);
+
+	// Set Tera Type of egg
+	u8 type1 = gBaseStats[species].type1;
+	u8 type2 = gBaseStats[species].type2;
+	u8 randomValue = Random() % 100;
+
+	// 2% chance to get a random teraType
+	if (randomValue < 2)
+		egg->teraType = GetRandomTeraType();
+
+	// Otherwise, get a random one from the original typing
+	else
+	{
+		if (type1 == type2 || type2 == TYPE_MYSTERY || type2 == TYPE_BLANK)
+			egg->teraType = type1;
+		else
+			egg->teraType = (Random() & 1) ? type1 : type2;				
+	}
 	HealMon(egg); //Fixes a bug where new Pokemon could hatch with more HP
 }
 
 static u8 GetEggStepsToSubtract(void)
 {
 	u32 i;
-	u8 steps = 1;
+	u8 steps = 255;
 
 	//If any party mons have Magma Armor or Flame Body, subtract 2 steps from hatch counter instead of 1
 	for (i = 0; i < PARTY_SIZE; ++i)
