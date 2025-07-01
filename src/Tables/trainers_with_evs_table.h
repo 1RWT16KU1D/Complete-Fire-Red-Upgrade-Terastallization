@@ -5,7 +5,7 @@ trainers_with_evs_table.h
 */
 
 #define TERA_TYPE_RANDOM_ALL 0xFE
-#define TERA_TYPE_RANDOM     0xFE
+#define TERA_TYPE_RANDOM     0xFF
 #define DONT_TERA            TYPE_BLANK
 
 const struct TrainersWithEvs gTrainersWithEvsSpreads[] =

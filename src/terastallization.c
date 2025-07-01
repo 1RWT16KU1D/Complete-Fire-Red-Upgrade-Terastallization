@@ -227,27 +227,20 @@ static item_t FindBankTeraOrb(u8 bank)
 
 bool8 TerastalEnabled(u8 bank)
 {
-	if (GetBattlerSide(bank) == B_SIDE_OPPONENT)
-	{
-		if (FindBankTeraOrb(bank) != ITEM_NONE)
-			return TRUE;
-		else
-			return FALSE;
-	}
-	else
-	{
-		if (!FlagGet(FLAG_TERA_BATTLE))
-			return FALSE;
+    if (GetBattlerSide(bank) == B_SIDE_OPPONENT)
+        return TRUE; // Opponents don't rely on held Tera Orbs
 
-		if (FindBankTeraOrb(bank) != ITEM_NONE)
-			return TRUE;
+    if (!FlagGet(FLAG_TERA_BATTLE))
+        return FALSE;
 
-		#ifdef DEBUG_TERASTAL
-			return TRUE;
-		#else
-			return FALSE;
-		#endif
-	}
+    if (FindBankTeraOrb(bank) != ITEM_NONE)
+        return TRUE;
+
+    #ifdef DEBUG_TERASTAL
+        return TRUE;
+    #else
+        return FALSE;
+    #endif
 }
 
 // Fades palette according to teraType
