@@ -129,6 +129,101 @@ void ChangeTeraTypeInOW(void)
     gPlayerParty[partySlot].teraType = newTeraType;
 }
 
+// Fades palette according to teraType
+void FadeBankPaletteForTera(u8 bank, u16 paletteOffset)
+{
+    u8 teraType = GetTeraType(bank);
+
+	if (IsTerastallized(bank))
+	{
+		BlendPalette(paletteOffset, 16, 6, gTeraBlendColors[teraType]);
+		CpuCopy32(gPlttBufferFaded + paletteOffset, gPlttBufferUnfaded + paletteOffset, 32);
+	}
+}
+
+static const u8 *const sTypeNames[NUMBER_OF_MON_TYPES] =
+{
+    [TYPE_NORMAL]   = sText_Normal,
+    [TYPE_FIRE]     = sText_Fire,
+    [TYPE_WATER]    = sText_Water,
+    [TYPE_ELECTRIC] = sText_Electric,
+    [TYPE_GRASS]    = sText_Grass,
+    [TYPE_ICE]      = sText_Ice,
+    [TYPE_FIGHTING] = sText_Fighting,
+    [TYPE_POISON]   = sText_Poison,
+    [TYPE_GROUND]   = sText_Ground,
+    [TYPE_FLYING]   = sText_Flying,
+    [TYPE_PSYCHIC]  = sText_Psychic,
+    [TYPE_BUG]      = sText_Bug,
+    [TYPE_ROCK]     = sText_Rock,
+    [TYPE_GHOST]    = sText_Ghost,
+    [TYPE_DRAGON]   = sText_Dragon,
+    [TYPE_DARK]     = sText_Dark,
+    [TYPE_STEEL]    = sText_Steel,
+    [TYPE_FAIRY]    = sText_Fairy,
+    [TYPE_STELLAR]   = sText_Stellar,
+};
+
+// Main Function - Try type changes
+u8 *DoTerastallize(u8 bank)
+{
+    if (!IsTerastallized(bank))
+    {
+        u8 teraType = GetTeraType(bank);
+        u8 partyIndex = gBattlerPartyIndexes[bank];
+        struct Pokemon *mon;
+
+        if (GetBattlerSide(bank) == B_SIDE_PLAYER)
+            mon = &gPlayerParty[partyIndex];
+        else
+            mon = &gEnemyParty[partyIndex];
+
+        u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+
+        gBattleScripting.bank = bank;
+
+        // Because Stellar Tera Defensive Typing remains same
+        if (teraType != TYPE_STELLAR)
+            SET_BATTLER_TYPE(bank, teraType);
+        FlagClear(FLAG_TERA_BATTLE);
+        GetSpeciesName(gStringVar1, species);
+        StringCopy(gStringVar2, sTypeNames[teraType]);
+
+        return BattleScript_Terastallize;
+    }
+    return NULL;
+}
+
+// AI Logic for Terastallization
+bool8 ShouldAIDelayTerastallization(u8 bankAtk, u8 bankDef, u16 move, bool8 optimizeAndLookAtTeraPotential, bool8 runDamageCalcs)
+{
+    if (optimizeAndLookAtTeraPotential && !CanTerastallize(bankAtk))
+        return TRUE;
+
+    if (IsTerastallized(bankAtk)) // Is already Terastallized
+        return FALSE;
+
+    if (GetTeraType(bankAtk) == TYPE_BLANK)
+        return TRUE;
+
+    if (BATTLER_SEMI_INVULNERABLE(bankAtk))
+        return TRUE; // Can't Terastallize this turn
+
+    if (runDamageCalcs)
+    {
+        // Delay Terastallization if we can KO the opponent without it
+        if (MoveWouldHitFirst(move, bankAtk, bankDef) // AI would attack first
+        && CalculateMoveKnocksOutXHitsFresh(move, bankAtk, bankDef, 1)) // AI would KO in its base form
+            return TRUE;
+
+        // Delay Terastallization if opponent can KO us after we Terastallize
+        if (!MoveWouldHitFirst(move, bankAtk, bankDef) // AI wouldn't attack first
+        && MoveKnocksOutXHits(IsValidMovePrediction(bankDef, bankAtk), bankDef, bankAtk, 1)) // And foe would KO AI
+            return TRUE;
+    }
+    return FALSE;
+}
+
 // Check whether Pokemon can Tera
 bool8 CanTerastallize(u8 bank)
 {
@@ -137,14 +232,13 @@ bool8 CanTerastallize(u8 bank)
 	#else
 
     if (GetBattlerSide(bank) == B_SIDE_OPPONENT)
-	{
         return TRUE;
-    }
-    else {
-    if (FlagGet(FLAG_TERA_BATTLE) && !IsTerastallized(bank))
-        return TRUE;
+    else
+    {
+        if (FlagGet(FLAG_TERA_BATTLE) && !IsTerastallized(bank))
+            return TRUE;
 
-    return FALSE;
+        return FALSE;
     }
     #endif
 }
@@ -227,124 +321,22 @@ static item_t FindBankTeraOrb(u8 bank)
 
 bool8 TerastalEnabled(u8 bank)
 {
-	if (GetBattlerSide(bank) == B_SIDE_OPPONENT)
-	{
-		if (FindBankTeraOrb(bank) != ITEM_NONE)
-			return TRUE;
-		else
-			return FALSE;
-	}
-	else
-	{
-		if (!FlagGet(FLAG_TERA_BATTLE))
-			return FALSE;
-
-		if (FindBankTeraOrb(bank) != ITEM_NONE)
-			return TRUE;
-
-		#ifdef DEBUG_TERASTAL
-			return TRUE;
-		#else
-			return FALSE;
-		#endif
-	}
-}
-
-// Fades palette according to teraType
-void FadeBankPaletteForTera(u8 bank, u16 paletteOffset)
-{
-    u8 teraType = GetTeraType(bank);
-
-	if (IsTerastallized(bank))
-	{
-		BlendPalette(paletteOffset, 16, 6, gTeraBlendColors[teraType]);
-		CpuCopy32(gPlttBufferFaded + paletteOffset, gPlttBufferUnfaded + paletteOffset, 32);
-	}
-}
-
-static const u8 *const sTypeNames[NUMBER_OF_MON_TYPES] =
-{
-    [TYPE_NORMAL]   = sText_Normal,
-    [TYPE_FIRE]     = sText_Fire,
-    [TYPE_WATER]    = sText_Water,
-    [TYPE_ELECTRIC] = sText_Electric,
-    [TYPE_GRASS]    = sText_Grass,
-    [TYPE_ICE]      = sText_Ice,
-    [TYPE_FIGHTING] = sText_Fighting,
-    [TYPE_POISON]   = sText_Poison,
-    [TYPE_GROUND]   = sText_Ground,
-    [TYPE_FLYING]   = sText_Flying,
-    [TYPE_PSYCHIC]  = sText_Psychic,
-    [TYPE_BUG]      = sText_Bug,
-    [TYPE_ROCK]     = sText_Rock,
-    [TYPE_GHOST]    = sText_Ghost,
-    [TYPE_DRAGON]   = sText_Dragon,
-    [TYPE_DARK]     = sText_Dark,
-    [TYPE_STEEL]    = sText_Steel,
-    [TYPE_FAIRY]    = sText_Fairy,
-    [TYPE_STELLAR]   = sText_Stellar,
-};
-
-// Main Function - Try type changes
-u8 *DoTerastallize(u8 bank)
-{
-    if (!IsTerastallized(bank))
-    {
-        u8 teraType = GetTeraType(bank);
-        u8 partyIndex = gBattlerPartyIndexes[bank];
-        struct Pokemon *mon;
-
-        if (GetBattlerSide(bank) == B_SIDE_PLAYER)
-            mon = &gPlayerParty[partyIndex];
-        else
-            mon = &gEnemyParty[partyIndex];
-
-        u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
-
-        gBattleScripting.bank = bank;
-        // Because Stellar Tera Defensive Typing remains same
-        if (teraType != TYPE_STELLAR)
-            SET_BATTLER_TYPE(bank, teraType);
-        FlagClear(FLAG_TERA_BATTLE);
-        GetSpeciesName(gStringVar1, species);
-        StringCopy(gStringVar2, sTypeNames[teraType]);
-
-        return BattleScript_Terastallize;
-    }
-    return NULL;
-}
-
-// AI Logic for Terastallization
-bool8 ShouldAIDelayTerastallization(u8 bankAtk, u8 bankDef, u16 move, bool8 optimizeAndLookAtTeraPotential, bool8 runDamageCalcs)
-{
-    if (GetTeraType(bankAtk) == TYPE_GRASS)
-        return FALSE;
-
-    if (optimizeAndLookAtTeraPotential && !CanTerastallize(bankAtk))
-        return TRUE; // This bank can't Terastallize
-
-    if (IsTerastallized(bankAtk)) // Is already Terastallized
-        return FALSE;
-
-    if (GetTeraType(bankAtk) == TYPE_BLANK)
+    // Opponents don't rely on held Tera Orbs
+    if (GetBattlerSide(bank) == B_SIDE_OPPONENT)
         return TRUE;
 
-    if (BATTLER_SEMI_INVULNERABLE(bankAtk))
-        return TRUE; // Can't Terastallize this turn
+    // The rest of the code assumes it's the player
+    if (!FlagGet(FLAG_TERA_BATTLE))
+        return FALSE;
 
-    if (runDamageCalcs)
-    {
-        // Delay Terastallization if we can KO the opponent without it
-        if (MoveWouldHitFirst(move, bankAtk, bankDef) // AI would attack first
-        && CalculateMoveKnocksOutXHitsFresh(move, bankAtk, bankDef, 1)) // AI would KO in its base form
-            return TRUE;
+    if (FindBankTeraOrb(bank) != ITEM_NONE)
+        return TRUE;
 
-        // Delay Terastallization if opponent can KO us after we Terastallize
-        if (!MoveWouldHitFirst(move, bankAtk, bankDef) // AI wouldn't attack first
-        && MoveKnocksOutXHits(IsValidMovePrediction(bankDef, bankAtk), bankDef, bankAtk, 1)) // And foe would KO AI
-            return TRUE;
-    }
-    return FALSE;
+    #ifdef DEBUG_TERASTAL
+        return TRUE;
+    #else
+        return FALSE;
+    #endif
 }
 
 // givepokemon set-up

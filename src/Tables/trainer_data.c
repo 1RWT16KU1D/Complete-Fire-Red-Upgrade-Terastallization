@@ -5613,7 +5613,7 @@ const struct Trainer gTrainers[] = {
         .trainerName = { _T, _E, _R, _R, _Y, _END },
         #endif
         .items = {ITEM_FULL_RESTORE, ITEM_NONE, ITEM_NONE, ITEM_NONE},
-        .doubleBattle = FALSE,
+        .doubleBattle = TRUE,
         .partySize = 2,
         .aiFlags = AI_SCRIPT_SEMI_SMART,
         .party = { .ItemCustomMoves = sParty_RivalRoute22EarlySquirtle },
