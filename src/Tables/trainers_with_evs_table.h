@@ -5,8 +5,7 @@ trainers_with_evs_table.h
 */
 
 #define TERA_TYPE_RANDOM_ALL 0xFE
-#define TERA_TYPE_RANDOM     0xFE
-#define DONT_TERA            TYPE_BLANK
+#define TERA_TYPE_RANDOM     0xFF
 
 const struct TrainersWithEvs gTrainersWithEvsSpreads[] =
 {
@@ -1332,16 +1331,16 @@ const struct TrainersWithEvs gTrainersWithEvsSpreads[] =
 		.teraType = TERA_TYPE_RANDOM,
 	},
 	[121] =
-	{
+	{ // Testing Tera AI Logic
 		.ball = BALL_TYPE_DUSK_BALL,
 		.ability = Ability_2,
 		.teraType = TYPE_GRASS,
 	},
 	[122] =
-	{
+	{ // Testing Tera AI Logic
 		.ball = TRAINER_EV_CLASS_BALL,
 		.ability = Ability_2,
-		.teraType = DONT_TERA,
+		.teraType = TYPE_BLANK,
 	},
 	[123] =
 	{

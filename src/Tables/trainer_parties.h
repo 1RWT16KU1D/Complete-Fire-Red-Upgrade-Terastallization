@@ -3763,7 +3763,7 @@ struct TrainerMonItemCustomMoves sParty_RivalRoute22EarlySquirtle[] = {
         .lvl = 9,
         .species = SPECIES_GIGALITH,
         .moves = {MOVE_TACKLE, MOVE_TAILWHIP, MOVE_NONE, MOVE_NONE},
-        .heldItem = ITEM_MYSTIC_WATER,
+        .heldItem = ITEM_HARD_STONE,
     },
 };
 

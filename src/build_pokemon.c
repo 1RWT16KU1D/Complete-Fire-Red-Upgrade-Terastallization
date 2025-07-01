@@ -1008,6 +1008,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon* const party, const u16 trainerId
 						
 						break;
 				}
+
 				// Assign random teraType based on original types
 				u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
 				u8 type1 = gBaseStats[species].type1;
