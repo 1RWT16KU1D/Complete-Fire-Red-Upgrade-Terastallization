@@ -42,5 +42,9 @@ BPRE0.toml
 test.ss5
 test.ss6
 assembly/story_scripts/viridian_city.s
+src/Tables/new_text.h
+src/Tables/trainer_data.c
+src/Tables/trainer_parties.h
+src/Tables/trainer_defines.h
 strings/story_strings/viridian_city.string
 src/Tables/party_data.h

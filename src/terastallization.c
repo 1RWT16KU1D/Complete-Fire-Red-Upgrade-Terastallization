@@ -243,6 +243,7 @@ bool8 CanTerastallize(u8 bank)
     #endif
 }
 
+// For NPC trainers
 static bool8 IsItemTeraOrb(u16 item)
 {
 	for (u8 i = 0; i < ARRAY_COUNT(sTeraOrbTable); ++i)
@@ -254,25 +255,32 @@ static bool8 IsItemTeraOrb(u16 item)
 	return FALSE;
 }
 
+// Check if NPC has Tera Orb in item slot
 static item_t FindTrainerTeraOrb(u16 trainerId)
 {
+    // Don't require Tera Orb for these battles
 	if (gBattleTypeFlags & (BATTLE_TYPE_FRONTIER | BATTLE_TYPE_LINK) || IsFrontierTrainerId(trainerId))
 		return ITEM_TERA_ORB;
 
+    // Normal Battles
 	for (u8 i = 0; i < TRAINER_ITEM_COUNT; ++i)
 	{
 		if (IsItemTeraOrb(gTrainers[trainerId].items[i]))
 			return gTrainers[trainerId].items[i];
 	}
 
+    // Fallback
 	return ITEM_NONE;
 }
 
+// Check if player has Tera Orb in bag
 static item_t FindPlayerTeraOrb(void)
 {
+    // Don't require Tera Orb for these battles
 	if (gBattleTypeFlags & (BATTLE_TYPE_FRONTIER | BATTLE_TYPE_LINK))
 		return ITEM_TERA_ORB;
 
+    // Normal battles
 	for (u8 i = 0; i < ARRAY_COUNT(sTeraOrbTable); ++i)
 	{
 		if (CheckBagHasItem(sTeraOrbTable[i], 1))
@@ -280,15 +288,17 @@ static item_t FindPlayerTeraOrb(void)
 	}
 
 	#ifdef DEBUG_TERASTAL
-		return ITEM_TERA_ORB; //Give player Dynamax Band if they have none
+		return ITEM_TERA_ORB;
 	#endif
 
+    // Fallback
 	return ITEM_NONE;
 }
 
+// Used for AI
 static item_t FindBankTeraOrb(u8 bank)
 {
-	#ifdef DEBUG_TERASRAL
+	#ifdef DEBUG_TERASTAL
 		if (bank + 1)
 			return ITEM_TERA_ORB;
 	#endif
@@ -319,13 +329,14 @@ static item_t FindBankTeraOrb(u8 bank)
 	}
 }
 
+// Check for both
 bool8 TerastalEnabled(u8 bank)
 {
     // Opponents don't rely on held Tera Orbs
     if (GetBattlerSide(bank) == B_SIDE_OPPONENT)
-        return TRUE;
+        return TRUE; // Allow tera
 
-    // The rest of the code assumes it's the player
+    // The rest of the code assumes B_SIDE_PLAYER
     if (!FlagGet(FLAG_TERA_BATTLE))
         return FALSE;
 

@@ -1137,7 +1137,14 @@ static u8 CreateNPCTrainerParty(struct Pokemon* const party, const u16 trainerId
 				// Try assigning teraType
 				if (spread->teraType == TERA_TYPE_RANDOM_ALL)
 				{
-					u8 random = Random() % NUMBER_OF_MON_TYPES;
+					u8 random;
+
+					// Reroll if invalid type
+					do
+						random = Random() % NUMBER_OF_MON_TYPES;
+					while ((random == TYPE_BLANK) || (random == TYPE_MYSTERY)
+						|| (random == 0x12) || (random == TYPE_ROOSTLESS) || (random == 0x16));
+					
 					mon->teraType = random;
 				}
 				else if (spread->teraType != 0xFF) // We skip 0xFF because it has already been assigned prior

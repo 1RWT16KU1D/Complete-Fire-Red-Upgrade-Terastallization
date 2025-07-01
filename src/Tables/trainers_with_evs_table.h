@@ -1334,7 +1334,7 @@ const struct TrainersWithEvs gTrainersWithEvsSpreads[] =
 	{ // Testing Tera AI Logic
 		.ball = BALL_TYPE_DUSK_BALL,
 		.ability = Ability_2,
-		.teraType = TYPE_GRASS,
+		.teraType = TERA_TYPE_RANDOM_ALL,
 	},
 	[122] =
 	{ // Testing Tera AI Logic
