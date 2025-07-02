@@ -365,8 +365,11 @@ static bool8 TriggerTerastallization(void)
        if (!CanTerastallize(side) || !TerastalEnabled(side))
                return FALSE;
 	
-   // Retorna FALSE se não puder Terastallizar
-   if (!moveInfo->canTera)
+    // Return FALSE if can't Tera
+    if (!moveInfo->canTera)
+        return FALSE;
+
+    if (IS_DOUBLE_BATTLE && gNewBS->teraData.chosen[PARTNER(gActiveBattler)])
         return FALSE;
 
     for (u8 i = 0; i < PARTY_SIZE; i++)
@@ -549,9 +552,10 @@ void EmitChooseMove(u8 bufferId, bool8 isDoubleBattle, bool8 NoPpNumber, struct 
 	// For Terastallization
 	tempMoveStruct->teraDone = IsTerastallized(gActiveBattler);
 
-	// Return TRUE if Terastallization NOT USED
-	if (!IsTerastallized(gActiveBattler) && TerastalEnabled(gActiveBattler))
-		tempMoveStruct->canTera = TRUE;
+    if (!IsTerastallized(gActiveBattler)
+    && TerastalEnabled(gActiveBattler)
+    && !(IS_DOUBLE_BATTLE && BATTLER_ALIVE(PARTNER(gActiveBattler)) && gNewBS->teraData.chosen[PARTNER(gActiveBattler)]))
+       tempMoveStruct->canTera = TRUE;
 
 	gBattleBuffersTransferData[0] = CONTROLLER_CHOOSEMOVE;
 	gBattleBuffersTransferData[1] = isDoubleBattle;
