@@ -3753,16 +3753,16 @@ struct TrainerMonNoItemDefaultMoves sParty_RivalOaksLabCharmander[] = {
 struct TrainerMonItemCustomMoves sParty_RivalRoute22EarlySquirtle[] = {
     {
         .iv = 122,
-        .lvl = 9,
-        .species = SPECIES_PIDGEY,
-        .moves = {MOVE_TACKLE, MOVE_SANDATTACK, MOVE_NONE, MOVE_NONE},
-        .heldItem = ITEM_BERRY_JUICE,
+        .lvl = 35,
+        .species = SPECIES_AGGRON,
+        .moves = {MOVE_IRONHEAD, MOVE_STONEEDGE, MOVE_CRUNCH, MOVE_PROTECT},
+        .heldItem = ITEM_LEFTOVERS,
     },
     {
         .iv = 121,
-        .lvl = 9,
+        .lvl = 36,
         .species = SPECIES_GIGALITH,
-        .moves = {MOVE_TACKLE, MOVE_TAILWHIP, MOVE_NONE, MOVE_NONE},
+        .moves = {MOVE_ROCKSLIDE, MOVE_BODYPRESS, MOVE_HEAVYSLAM, MOVE_EARTHQUAKE},
         .heldItem = ITEM_HARD_STONE,
     },
 };
