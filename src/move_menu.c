@@ -362,11 +362,11 @@ static bool8 TriggerTerastallization(void)
     struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][4]);
     u8 side = GetBattlerSide(gActiveBattler);
 
-	if (!CanTerastallize(side) && !TerastalEnabled(side))
-		return FALSE;
+       if (!CanTerastallize(side) || !TerastalEnabled(side))
+               return FALSE;
 	
-    // Retorna FALSE se não puder Terastallizar
-    if (!moveInfo->canTera || moveInfo->canMegaEvolve)
+   // Retorna FALSE se não puder Terastallizar
+   if (!moveInfo->canTera)
         return FALSE;
 
     for (u8 i = 0; i < PARTY_SIZE; i++)

@@ -10,6 +10,7 @@
 #include "../include/battle.h"
 #include "../include/event_data.h"
 #include "../include/item.h"
+#include "../include/new/item.h"
 #include "../include/mgba.h"
 #include "../include/palette.h"
 #include "../include/pokemon.h"
@@ -24,6 +25,7 @@
 #include "../include/new/battle_indicators.h"
 #include "../include/new/battle_script_util.h"
 #include "../include/new/frontier.h"
+#include "../include/new/mega.h"
 #include "../include/new/move_battle_scripts.h"
 #include "../include/new/ram_locs.h"
 #include "../include/new/terastallization.h"
@@ -335,6 +337,16 @@ bool8 TerastalEnabled(u8 bank)
 
     // The rest of the code assumes B_SIDE_PLAYER
     if (!FlagGet(FLAG_TERA_BATTLE))
+        return FALSE;
+
+    // Only one gimmick allowed - Mega and Z take precedence
+    if (CanMegaEvolve(bank, FALSE) || CanMegaEvolve(bank, TRUE) || HasMegaSymbol(bank))
+        return FALSE;
+
+    if (IsZCrystal(ITEM(bank)))
+        return FALSE;
+
+    if (gBattleTypeFlags & BATTLE_TYPE_DYNAMAX)
         return FALSE;
 
     if (FindBankTeraOrb(bank) != ITEM_NONE)

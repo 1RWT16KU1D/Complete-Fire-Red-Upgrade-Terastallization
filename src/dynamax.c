@@ -509,21 +509,30 @@ static item_t FindBankDynamaxBand(u8 bank)
 
 bool8 DynamaxEnabled(u8 bank)
 {
-	if (gBattleTypeFlags & BATTLE_TYPE_DYNAMAX)
-	{
-		if (FindBankDynamaxBand(bank) == ITEM_NONE)
-		{
-			#ifdef DEBUG_DYNAMAX
-				return TRUE;
-			#else
-				return FALSE;
+        if (gBattleTypeFlags & BATTLE_TYPE_DYNAMAX)
+        {
+                if (GetBattlerSide(bank) == B_SIDE_PLAYER)
+                {
+                        if (CanMegaEvolve(bank, FALSE) || CanMegaEvolve(bank, TRUE) || HasMegaSymbol(bank))
+                                return FALSE;
+
+                        if (IsZCrystal(ITEM(bank)))
+                                return FALSE;
+                }
+
+                if (FindBankDynamaxBand(bank) == ITEM_NONE)
+                {
+                        #ifdef DEBUG_DYNAMAX
+                                return TRUE;
+                        #else
+                                return FALSE;
 			#endif
 		}
 
-		return TRUE;
-	}
+                return TRUE;
+        }
 
-	return FALSE;
+        return FALSE;
 }
 
 bool8 HasBankDynamaxedAlready(u8 bank)

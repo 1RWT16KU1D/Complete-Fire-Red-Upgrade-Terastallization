@@ -1927,10 +1927,13 @@ void TryLoadMegaTriggers(void)
 // For Terastallization
 void TryLoadTeraTrigger(void)
 {
-	u8 spriteId, i;
+        u8 spriteId, i;
 
-	if (gBattleTypeFlags & (BATTLE_TYPE_SAFARI | BATTLE_TYPE_POKE_DUDE | BATTLE_TYPE_OLD_MAN))
-		return;
+        if (gBattleTypeFlags & (BATTLE_TYPE_SAFARI | BATTLE_TYPE_POKE_DUDE | BATTLE_TYPE_OLD_MAN))
+                return;
+
+        if (!TerastalEnabled(gActiveBattler))
+                return;
 
 	if (IndexOfSpritePaletteTag(GFX_TAG_TERA_TRIGGER) == 0xFF)
 		LoadSpritePalette(&sTeraTriggerPalette);
@@ -2033,13 +2036,16 @@ static void DestroyZTrigger(struct Sprite* sprite)
 
 void TryLoadDynamaxTrigger(void)
 {
-	u8 spriteId, i;
+        u8 spriteId, i;
 
-	if (gBattleTypeFlags & (BATTLE_TYPE_SAFARI | BATTLE_TYPE_POKE_DUDE | BATTLE_TYPE_OLD_MAN))
-		return;
+        if (gBattleTypeFlags & (BATTLE_TYPE_SAFARI | BATTLE_TYPE_POKE_DUDE | BATTLE_TYPE_OLD_MAN))
+                return;
 
-	if (!(gBattleTypeFlags & BATTLE_TYPE_DYNAMAX))
-		return;
+        if (!(gBattleTypeFlags & BATTLE_TYPE_DYNAMAX))
+                return;
+
+        if (!DynamaxEnabled(gActiveBattler))
+                return;
 
 	if (IndexOfSpritePaletteTag(GFX_TAG_DYNAMAX_TRIGGER) == 0xFF)
 		LoadSpritePalette(&sDynamaxTriggerPalette);
