@@ -24,6 +24,7 @@
 #include "../include/new/ai_util.h"
 #include "../include/new/battle_indicators.h"
 #include "../include/new/battle_script_util.h"
+#include "../include/new/dynamax.h"
 #include "../include/new/frontier.h"
 #include "../include/new/mega.h"
 #include "../include/new/move_battle_scripts.h"
@@ -331,9 +332,16 @@ static item_t FindBankTeraOrb(u8 bank)
 // Check for both
 bool8 TerastalEnabled(u8 bank)
 {
+    
     // Opponents don't rely on held Tera Orbs
     if (GetBattlerSide(bank) == B_SIDE_OPPONENT)
+    {
+        // Wild Battle check
+        if (!((gBattleTypeFlags & (BATTLE_TYPE_TRAINER | BATTLE_TYPE_EREADER_TRAINER | BATTLE_TYPE_TRAINER_TOWER)) == BATTLE_TYPE_TRAINER)
+        ||   (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER))
+            return FALSE;
         return TRUE; // Allow tera
+    }
 
     // The rest of the code assumes B_SIDE_PLAYER
     if (!FlagGet(FLAG_TERA_BATTLE))
@@ -346,7 +354,10 @@ bool8 TerastalEnabled(u8 bank)
     if (IsZCrystal(ITEM(bank)))
         return FALSE;
 
-    if (gBattleTypeFlags & BATTLE_TYPE_DYNAMAX)
+    // Can't Terastallize if this mon is Dynamaxing
+    if (IsDynamaxed(bank)
+    || gNewBS->dynamaxData.used[bank]
+    || gNewBS->dynamaxData.toBeUsed[bank])
         return FALSE;
 
     if (FindBankTeraOrb(bank) != ITEM_NONE)

@@ -1353,10 +1353,12 @@ static void SpriteCB_DynamaxTrigger(struct Sprite* self)
 		}
 	}
 
-	if (gNewBS->dynamaxData.viewing)
-		PALETTE_STATE = TriggerLightUp;
-	else
-		PALETTE_STATE = TriggerNormalColour;
+    if (!DynamaxEnabled(TRIGGER_BANK))
+    	PALETTE_STATE = TriggerGrayscale;
+    else if (gNewBS->dynamaxData.viewing)
+    	PALETTE_STATE = TriggerLightUp;
+    else
+        PALETTE_STATE = TriggerNormalColour;
 
 	// Only change the palette if the state has changed
 	if (PALETTE_STATE != self->data[2])

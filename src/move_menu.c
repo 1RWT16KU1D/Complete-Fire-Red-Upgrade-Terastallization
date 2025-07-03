@@ -294,14 +294,22 @@ void HandleInputChooseMove(void)
 			gBattlerControllerFuncs[gActiveBattler] = HandleMoveSwitching; //0x802EF58
 		}
 	}
-	else if (gMain.newKeys & (START_BUTTON | R_BUTTON))
-	{
-		if (!MoveSelectionDisplayZMove()) // Only one special mechanic is allowed at a time
-		{
-			if (!TriggerTerastallization() && (!TriggerMegaEvolution() && (gBattleTypeFlags & BATTLE_TYPE_DYNAMAX)))
-				MoveSelectionDisplayMaxMove();
-		}
-	}
+    else if (gMain.newKeys & (START_BUTTON | R_BUTTON))
+    {
+        if (!MoveSelectionDisplayZMove()) // Only one special mechanic is allowed at a time
+        {
+            if (gNewBS->teraData.chosen[gActiveBattler])
+            {
+                gNewBS->teraData.chosen[gActiveBattler] = FALSE; // Cancel Tera and show Dynamax menu
+                MoveSelectionDisplayMoveEffectiveness();
+
+                if (!TriggerMegaEvolution() && (gBattleTypeFlags & BATTLE_TYPE_DYNAMAX))
+                    MoveSelectionDisplayMaxMove();
+            }
+            else if (!TriggerTerastallization() && (!TriggerMegaEvolution() && (gBattleTypeFlags & BATTLE_TYPE_DYNAMAX)))
+                MoveSelectionDisplayMaxMove();
+        }
+    }
 	else if (gMain.newKeys & L_BUTTON)
 	{
 		if (!gNewBS->zMoveData.viewing && !gNewBS->dynamaxData.viewing)
@@ -381,6 +389,11 @@ static bool8 TriggerTerastallization(void)
     // Alterna o estado da Terastalização
     PlaySE(gNewBS->teraData.chosen[gActiveBattler] ? 3 : SE_PC_LOGON);
     gNewBS->teraData.chosen[gActiveBattler] ^= TRUE;
+
+	// Cancel Dynamax choice
+    if (gNewBS->teraData.chosen[gActiveBattler])
+        gNewBS->dynamaxData.toBeUsed[gActiveBattler] = FALSE; 
+
     MoveSelectionDisplayMoveEffectiveness();
     return TRUE;
 	#endif
@@ -1302,13 +1315,14 @@ static void CloseMaxMoveDetails(void)
 {
 	struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][4]);
 
-	if (gNewBS->dynamaxData.viewing)
-	{
-		if (!moveInfo->dynamaxed)
-			gNewBS->dynamaxData.toBeUsed[gActiveBattler] = TRUE; //Only set if not already dynamaxed
+    if (gNewBS->dynamaxData.viewing)
+    {
+        if (!moveInfo->dynamaxed)
+            gNewBS->dynamaxData.toBeUsed[gActiveBattler] = TRUE; //Only set if not already dynamaxed
 
-		gNewBS->dynamaxData.viewing = FALSE;
-	}
+        gNewBS->dynamaxData.viewing = FALSE;
+        gNewBS->teraData.chosen[gActiveBattler] = FALSE; // Cancel any Tera selection
+    }
 }
 
 void HandleMoveSwitchingUpdate(void)

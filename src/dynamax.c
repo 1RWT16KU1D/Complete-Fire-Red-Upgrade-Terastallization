@@ -520,6 +520,11 @@ bool8 DynamaxEnabled(u8 bank)
                                 return FALSE;
                 }
 
+                if (IsTerastallized(bank)
+                || gNewBS->teraData.chosen[bank]
+                || gNewBS->teraData.done[SIDE(bank)][gBattlerPartyIndexes[bank]])
+                        return FALSE;
+
                 if (FindBankDynamaxBand(bank) == ITEM_NONE)
                 {
                         #ifdef DEBUG_DYNAMAX
