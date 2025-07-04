@@ -1012,7 +1012,7 @@ static void SpriteCB_TeraTrigger(struct Sprite* self)
 			}
 		}
 
-		if (hasTerastallized || !CanTerastallize(TRIGGER_BANK) || !TerastalEnabled(TRIGGER_BANK))
+		if (hasTerastallized || !CanTerastallize(TRIGGER_BANK) || !TerastalEnabled(TRIGGER_BANK) || DynamaxEnabled(TRIGGER_BANK))
 			self->invisible = TRUE;
 		else
 			self->invisible = FALSE;
@@ -1353,12 +1353,10 @@ static void SpriteCB_DynamaxTrigger(struct Sprite* self)
 		}
 	}
 
-    if (!DynamaxEnabled(TRIGGER_BANK))
-    	PALETTE_STATE = TriggerGrayscale;
-    else if (gNewBS->dynamaxData.viewing)
-    	PALETTE_STATE = TriggerLightUp;
-    else
-        PALETTE_STATE = TriggerNormalColour;
+	if (gNewBS->dynamaxData.viewing)
+		PALETTE_STATE = TriggerLightUp;
+	else
+		PALETTE_STATE = TriggerNormalColour;
 
 	// Only change the palette if the state has changed
 	if (PALETTE_STATE != self->data[2])
