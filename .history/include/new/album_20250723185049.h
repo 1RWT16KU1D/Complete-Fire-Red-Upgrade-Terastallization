@@ -1,6 +1,0 @@
-enum
-{
-    WIN_ALBUM_HEADER,
-    WIN_ALBUM_TEXT,
-    WIN_ALBUM_DESC,
-};

@@ -50,9 +50,6 @@
 #include "../include/new/battle_strings.h"
 #include "../include/new/build_pokemon.h"
 #include "../include/new/daycare.h"
-#include "../include/new/dexnav.h"
-#include "../include/new/dexnav_config.h"
-#include "../include/new/dexnav_data.h"
 #include "../include/new/dns.h"
 #include "../include/new/item.h"
 #include "../include/new/learn_move.h"
@@ -66,6 +63,14 @@ struct AlbumData
 };
 
 #define sAlbumPtr (*((struct AlbumData**) 0x203E038))
+#define BG_SCREEN_SIZE 0x800  // 32*32*2
+
+static const struct TextColor sWhiteText =
+{
+	.bgColor = TEXT_COLOR_TRANSPARENT,
+	.fgColor = TEXT_COLOR_WHITE,
+	.shadowColor = TEXT_COLOR_DARK_GREY,
+};
 
 enum
 {
@@ -125,7 +130,7 @@ static const struct WindowTemplate sAlbumWinTemplates[WIN_MAX_COUNT + 1] =
     {
         .bg = BG_TEXT,
         .tilemapLeft = 1,
-        .tilemapTop = 0,
+        .tilemapTop = 1,
         .width = 28,
         .height = 2,
         .paletteNum = 15,
@@ -159,7 +164,7 @@ static void CleanWindow(u8 windowId)
 	FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
 }
 
-static void CleanWindows(void)
+static void __attribute__((unused)) CleanWindows(void)
 {
 	for (u32 i = 0; i < WIN_MAX_COUNT; ++i)
 		CleanWindow(i);
@@ -167,21 +172,18 @@ static void CleanWindows(void)
 
 static void DisplayAlbumBG(void)
 {
-        const u8 *tiles, *map;
-        const u16 *palette, *altPalette = NULL;
+    // Tiles -> VRAM
+    decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, AlbumBGTiles, 0, 0, 0);
 
-	tiles = AlbumBGTiles;
-	map = AlbumBGMap;
-	palette = AlbumBGPal;
+    // Map -> WRAM buffer (0x800 bytes) and then to VRAM
+    LZDecompressWram(AlbumBGMap, sAlbumPtr->tilemapPtr);   // expects 32×32
+    CopyToBgTilemapBuffer(BG_BACKGROUND, sAlbumPtr->tilemapPtr, BG_SCREEN_SIZE, 0);
+    CopyBgTilemapBufferToVram(BG_BACKGROUND);
 
-        decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, tiles, 0, 0, 0);
-        LZDecompressWram(map, sAlbumPtr->tilemapPtr);
-
-	LoadPalette(palette, 0, 0x20); //Pal 0
-	if (altPalette != NULL)
-		LoadPalette(altPalette + 1, 1, 0x2 * 6); //Pal 0 - copy first 6 real colours
-	LoadMenuElementsPalette(12 * 0x10, 1); //Pal 12
-	Menu_LoadStdPalAt(15 * 0x10); //Pal 15
+    // Palettes
+    LoadPalette(AlbumBGPal, 0, 0x200);   // 256 colors = 0x200 bytes
+    LoadMenuElementsPalette(12 * 0x10, 1);
+    Menu_LoadStdPalAt(15 * 0x10);
 }
 
 static void PrintAlbumHeader(void)
@@ -189,7 +191,7 @@ static void PrintAlbumHeader(void)
     const u8* text = gText_AlbumHeader;
 
     CleanWindow(WIN_ALBUM_HEADER);
-    WindowPrint(WIN_ALBUM_HEADER, 1, 50, 3, &sWhiteText, 0, text);
+    WindowPrint(WIN_ALBUM_HEADER, 1, 175, 0, &sWhiteText, 0, text);
     CopyWindowToVram(WIN_ALBUM_HEADER, COPYWIN_BOTH);
     PutWindowTilemap(WIN_ALBUM_HEADER);
 }
@@ -218,19 +220,16 @@ static void ClearVramOamPlttRegs(void)
     DmaFill16(3, 0, VRAM, VRAM_SIZE);
     DmaFill32(3, 0, OAM, OAM_SIZE);
     DmaFill16(3, 0, PLTT, PLTT_SIZE);
+
     SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_OBJ_1D_MAP);
-    SetGpuReg(REG_OFFSET_BG3CNT, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG2CNT, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG1CNT, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG0CNT, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG3HOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG3VOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG2HOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG2VOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG1HOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG1VOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG0HOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG0VOFS, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG0HOFS, 0);
+    SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+    SetGpuReg(REG_OFFSET_BG1HOFS, 0);
+    SetGpuReg(REG_OFFSET_BG1VOFS, 0);
+    SetGpuReg(REG_OFFSET_BG2HOFS, 0);
+    SetGpuReg(REG_OFFSET_BG2VOFS, 0);
+    SetGpuReg(REG_OFFSET_BG3HOFS, 0);
+    SetGpuReg(REG_OFFSET_BG3VOFS, 0);
 }
 
 static void VBlankCB_Album(void)
@@ -296,7 +295,7 @@ static void CB2_Album(void)
         gMain.state++;
         break;
     case 2:
-        sAlbumPtr->tilemapPtr = Malloc(0x1000);
+        sAlbumPtr->tilemapPtr = Calloc(BG_SCREEN_SIZE);
         ResetBgsAndClearDma3BusyFlags(0);
         InitBgsFromTemplates(0, sAlbumBgTemplates, NELEMS(sAlbumBgTemplates));
         SetBgTilemapBuffer(BG_BACKGROUND, sAlbumPtr->tilemapPtr);
@@ -355,6 +354,7 @@ bool8 AlbumCallback(void)
 {
     if (!gPaletteFade->active)
     {
+        CleanWindows();
         PlayRainStoppingSoundEffect();
         DestroySafariZoneStatsWindow();
         CleanupOverworldWindowsAndTilemaps();
