@@ -176,12 +176,12 @@ static void DisplayAlbumBG(void)
     decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, AlbumBGTiles, 0, 0, 0);
 
     // Map -> WRAM buffer (0x800 bytes) and then to VRAM
-    LZDecompressWram(AlbumBGMap, sAlbumPtr->tilemapPtr);   // expects 32×32
+    LZDecompressWram(AlbumBGMap, sAlbumPtr->tilemapPtr); // expects 32×32
     CopyToBgTilemapBuffer(BG_BACKGROUND, sAlbumPtr->tilemapPtr, BG_SCREEN_SIZE, 0);
     CopyBgTilemapBufferToVram(BG_BACKGROUND);
 
     // Palettes
-    LoadPalette(AlbumBGPal, 0, 0x200);   // 256 colors = 0x200 bytes
+    LoadPalette(AlbumBGPal, 0, 0x20);   // 16 colors = 0x20 bytes
     LoadMenuElementsPalette(12 * 0x10, 1);
     Menu_LoadStdPalAt(15 * 0x10);
 }
