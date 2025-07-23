@@ -60,6 +60,100 @@
 #include "../include/new/wild_encounter.h"
 #include "../include/new/util.h"
 
+struct AlbumData
+{
+    u8* tilemapPtr;
+};
+
+#define sAlbumPtr (*((struct AlbumData**) 0x203E038))
+
+enum
+{
+    BG_TEXTBOX,
+    BG_TEXT_2,
+    BG_TEXT,
+    BG_BACKGROUND,
+};
+
+static const struct BgTemplate sAlbumBgTemplates[] =
+{
+    [BG_TEXTBOX] =
+    {
+        .bg = BG_TEXTBOX,
+        .charBaseIndex = 0,
+        .mapBaseIndex = 31,
+        .screenSize = 0,
+        .paletteMode = 0,
+        .priority = 0,
+        .baseTile = 0,
+    },
+    [BG_TEXT_2] =
+    {
+        .bg = BG_TEXT_2,
+        .charBaseIndex = 1,
+        .mapBaseIndex = 30,
+        .screenSize = 0,
+        .paletteMode = 0,
+        .priority = 1,
+        .baseTile = 0,
+    },
+    [BG_TEXT] =
+    {
+        .bg = BG_TEXT,
+        .charBaseIndex = 2,
+        .mapBaseIndex = 29,
+        .screenSize = 0,
+        .paletteMode = 0,
+        .priority = 2,
+        .baseTile = 0,
+    },
+    [BG_BACKGROUND] =
+    {
+        .bg = BG_BACKGROUND,
+        .charBaseIndex = 3,
+        .mapBaseIndex = 28,
+        .screenSize = 0,
+        .paletteMode = 0,
+        .priority = 3,
+        .baseTile = 0,
+    },
+};
+
+static const struct WindowTemplate sAlbumWinTemplates[WIN_MAX_COUNT + 1] =
+{
+    [WIN_ALBUM_HEADER] =
+    {
+        .bg = BG_TEXT,
+        .tilemapLeft = 1,
+        .tilemapTop = 0,
+        .width = 28,
+        .height = 2,
+        .paletteNum = 15,
+        .baseBlock = 1,
+    },
+    [WIN_ALBUM_TEXT] =
+    {
+        .bg = BG_TEXT,
+        .tilemapLeft = 1,
+        .tilemapTop = 3,
+        .width = 28,
+        .height = 2,
+        .paletteNum = 15,
+        .baseBlock = 57,
+    },
+    [WIN_ALBUM_DESC] =
+    {
+        .bg = BG_TEXT,
+        .tilemapLeft = 1,
+        .tilemapTop = 6,
+        .width = 28,
+        .height = 4,
+        .paletteNum = 15,
+        .baseBlock = 113,
+    },
+    DUMMY_WIN_TEMPLATE,
+};
+
 static void CleanWindow(u8 windowId)
 {
 	FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
@@ -73,15 +167,15 @@ static void CleanWindows(void)
 
 static void DisplayAlbumBG(void)
 {
-	const u8 *tiles, *map;
-	const u16 *palette, *altPalette;
+        const u8 *tiles, *map;
+        const u16 *palette, *altPalette = NULL;
 
 	tiles = AlbumBGTiles;
 	map = AlbumBGMap;
 	palette = AlbumBGPal;
 
-	decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, tiles, 0, 0, 0);
-	LZDecompressWram(map, sDexNavGUIPtr->tilemapPtr);
+        decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, tiles, 0, 0, 0);
+        LZDecompressWram(map, sAlbumPtr->tilemapPtr);
 
 	LoadPalette(palette, 0, 0x20); //Pal 0
 	if (altPalette != NULL)
@@ -93,36 +187,181 @@ static void DisplayAlbumBG(void)
 static void PrintAlbumHeader(void)
 {
     const u8* text = gText_AlbumHeader;
-    u8 fontSize = 1;
-    CleanWindow(WIN_ALBUM_HEADER);
 
-    s16 x = 50;
-    WindowPrint(WIN_ALBUM_HEADER, 1, x, 3, &sWhiteText, 0, text);
+    CleanWindow(WIN_ALBUM_HEADER);
+    WindowPrint(WIN_ALBUM_HEADER, 1, 50, 3, &sWhiteText, 0, text);
+    CopyWindowToVram(WIN_ALBUM_HEADER, COPYWIN_BOTH);
+    PutWindowTilemap(WIN_ALBUM_HEADER);
+}
+
+static void CommitWindows(void)
+{
+    for (u32 i = 0; i < WIN_MAX_COUNT; ++i)
+    {
+        CopyWindowToVram(i, COPYWIN_BOTH);
+        PutWindowTilemap(i);
+    }
+}
+
+static void ClearTasksAndGraphicalStructs(void)
+{
+    ScanlineEffect_Stop();
+    ResetTasks();
+    ResetSpriteData();
+    ResetTempTileDataBuffers();
+    ResetPaletteFade();
+    FreeAllSpritePalettes();
+}
+
+static void ClearVramOamPlttRegs(void)
+{
+    DmaFill16(3, 0, VRAM, VRAM_SIZE);
+    DmaFill32(3, 0, OAM, OAM_SIZE);
+    DmaFill16(3, 0, PLTT, PLTT_SIZE);
+    SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_OBJ_1D_MAP);
+    SetGpuReg(REG_OFFSET_BG3CNT, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG2CNT, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG1CNT, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG0CNT, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG3HOFS, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG3VOFS, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG2HOFS, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG2VOFS, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG1HOFS, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG1VOFS, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG0HOFS, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG0VOFS, DISPCNT_MODE_0);
+}
+
+static void VBlankCB_Album(void)
+{
+    LoadOam();
+    ProcessSpriteCopyRequests();
+    TransferPlttBuffer();
+}
+
+static void MainCB2_Album(void)
+{
+    RunTasks();
+    AnimateSprites();
+    BuildOamBuffer();
+    UpdatePaletteFade();
+}
+
+static void Task_AlbumFadeOut(u8 taskId)
+{
+    if (!gPaletteFade->active)
+    {
+        SetMainCallback2(CB2_ReturnToFieldContinueScript);
+        Free(sAlbumPtr->tilemapPtr);
+        Free(sAlbumPtr);
+        FreeAllWindowBuffers();
+        DestroyTask(taskId);
+    }
+}
+
+static void Task_AlbumWaitForKeyPress(u8 taskId)
+{
+    if (gMain.newKeys & (A_BUTTON | B_BUTTON))
+    {
+        PlaySE(SE_PC_OFF);
+        BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
+        gTasks[taskId].func = Task_AlbumFadeOut;
+    }
+}
+
+static void Task_AlbumFadeIn(u8 taskId)
+{
+    if (!gPaletteFade->active)
+        gTasks[taskId].func = Task_AlbumWaitForKeyPress;
+}
+
+static void InitAlbum(void)
+{
+    PrintAlbumHeader();
+    CommitWindows();
+}
+
+static void CB2_Album(void)
+{
+    switch (gMain.state)
+    {
+    case 0:
+        SetVBlankCallback(NULL);
+        ClearVramOamPlttRegs();
+        gMain.state++;
+        break;
+    case 1:
+        ClearTasksAndGraphicalStructs();
+        gMain.state++;
+        break;
+    case 2:
+        sAlbumPtr->tilemapPtr = Malloc(0x1000);
+        ResetBgsAndClearDma3BusyFlags(0);
+        InitBgsFromTemplates(0, sAlbumBgTemplates, NELEMS(sAlbumBgTemplates));
+        SetBgTilemapBuffer(BG_BACKGROUND, sAlbumPtr->tilemapPtr);
+        gMain.state++;
+        break;
+    case 3:
+        DisplayAlbumBG();
+        gMain.state++;
+        break;
+    case 4:
+        if (!free_temp_tile_data_buffers_if_possible())
+        {
+            ShowBg(BG_TEXT);
+            ShowBg(BG_BACKGROUND);
+            CopyBgTilemapBufferToVram(BG_BACKGROUND);
+            gMain.state++;
+        }
+        break;
+    case 5:
+        InitWindows(sAlbumWinTemplates);
+        DeactivateAllTextPrinters();
+        gMain.state++;
+        break;
+    case 6:
+        BeginNormalPaletteFade(0xFFFFFFFF, 0, 16, 0, RGB_BLACK);
+        gMain.state++;
+        break;
+    case 7:
+        SetVBlankCallback(VBlankCB_Album);
+        InitAlbum();
+        CreateTask(Task_AlbumFadeIn, 0);
+        SetMainCallback2(MainCB2_Album);
+        gMain.state = 0;
+        break;
+    }
+}
+
+static void Task_InitAlbum(u8 taskId)
+{
+    if (!gPaletteFade->active)
+    {
+        sAlbumPtr = Calloc(sizeof(struct AlbumData));
+        PlayRainStoppingSoundEffect();
+        SetMainCallback2(CB2_Album);
+        DestroyTask(taskId);
+    }
 }
 
 void ShowAlbum_Init(void)
 {
-    // RAM Clear
-    CleanWindows();
-
-    // Show the BG
-
-    
-    // Print text
-    PrintAlbumHeader();
+    FadeScreen(FADE_TO_BLACK, 0);
+    CreateTask(Task_InitAlbum, 0);
 }
 
 bool8 AlbumCallback(void)
 {
-	if (!gPaletteFade->active)
-	{
-		PlayRainStoppingSoundEffect();
-		DestroySafariZoneStatsWindow();
-		CleanupOverworldWindowsAndTilemaps();
-		sDexNavGUIPtr = Calloc(sizeof(struct DexNavGUIData));
-		SetMainCallback2(CB2_DexNav);
-		return TRUE;
-	}
+    if (!gPaletteFade->active)
+    {
+        PlayRainStoppingSoundEffect();
+        DestroySafariZoneStatsWindow();
+        CleanupOverworldWindowsAndTilemaps();
+        sAlbumPtr = Calloc(sizeof(struct AlbumData));
+        SetMainCallback2(CB2_Album);
+        return TRUE;
+    }
 
-	return FALSE;
+    return FALSE;
 }
