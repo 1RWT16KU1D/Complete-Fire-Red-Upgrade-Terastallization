@@ -59,11 +59,13 @@
 
 struct AlbumData
 {
-    u8* tilemapPtr;
+    u16* bg3Map;
+    u16* bgTextMap;
 };
 
 #define sAlbumPtr (*((struct AlbumData**) 0x203E038))
 #define BG_SCREEN_SIZE 0x800  // 32*32*2
+#define BG_MAP_BYTES 0x800
 
 static const struct TextColor sWhiteText =
 {
@@ -72,19 +74,19 @@ static const struct TextColor sWhiteText =
 	.shadowColor = TEXT_COLOR_DARK_GREY,
 };
 
-enum
+enum 
 {
-    BG_TEXTBOX,
-    BG_TEXT,
+    BG_TEXT = 0,
+    BG_UNUSED,
+    BG_UNUSED2,
     BG_BACKGROUND,
-    BG_TEXT_2,
 };
 
 static const struct BgTemplate sAlbumBgTemplates[] =
 {
-    [BG_TEXTBOX] =
+    [BG_TEXT] =
     {
-        .bg = BG_TEXTBOX,
+        .bg = BG_TEXT,
         .charBaseIndex = 0,
         .mapBaseIndex = 31,
         .screenSize = 0,
@@ -92,9 +94,9 @@ static const struct BgTemplate sAlbumBgTemplates[] =
         .priority = 0,
         .baseTile = 0,
     },
-    [BG_TEXT_2] =
+    [BG_UNUSED] =
     {
-        .bg = BG_TEXT_2,
+        .bg = BG_UNUSED,
         .charBaseIndex = 1,
         .mapBaseIndex = 30,
         .screenSize = 0,
@@ -102,9 +104,9 @@ static const struct BgTemplate sAlbumBgTemplates[] =
         .priority = 1,
         .baseTile = 0,
     },
-    [BG_TEXT] =
+    [BG_UNUSED2] =
     {
-        .bg = BG_TEXT,
+        .bg = BG_UNUSED2,
         .charBaseIndex = 2,
         .mapBaseIndex = 29,
         .screenSize = 0,
@@ -172,14 +174,19 @@ static void __attribute__((unused)) CleanWindows(void)
 
 static void DisplayAlbumBG(void)
 {
-    // Tiles -> VRAM
-    decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, &AlbumBGTiles, 0, 0, 0);
-    LZDecompressWram(AlbumBGMap, sAlbumPtr->tilemapPtr); // expects 32×32
-    LoadPalette(AlbumBGPal, 0, 0x20);   // 16 colors = 0x20 bytes
+    // Tiles
+    decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, AlbumBGTiles, 0, 0, 0);
 
-    // Palettes
-	LoadMenuElementsPalette(0xC0, 1);
-	Menu_LoadStdPalAt(0xF0);
+    // BGMap
+    LZDecompressWram(AlbumBGMap, sAlbumPtr->bg3Map);
+    for (int i = 0; i < BG_MAP_BYTES / 2; i++)
+        sAlbumPtr->bg3Map[i] &= 0x0FFF;
+    CopyBgTilemapBufferToVram(BG_BACKGROUND);
+
+    // Palette
+    LoadPalette(AlbumBGPal, 0, 0x20);
+    LoadMenuElementsPalette(12 * 0x10, 1);
+    Menu_LoadStdPalAt(15 * 0x10);
 }
 
 static void PrintAlbumHeader(void)
@@ -218,10 +225,6 @@ static void ClearVramOamPlttRegs(void)
     DmaFill16(3, 0, PLTT, PLTT_SIZE);
 
     SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_OBJ_1D_MAP);
-    SetGpuReg(REG_OFFSET_BG3CNT, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG2CNT, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG1CNT, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG0CNT, DISPCNT_MODE_0);
     SetGpuReg(REG_OFFSET_BG3HOFS, 0);
     SetGpuReg(REG_OFFSET_BG3VOFS, 0);
     SetGpuReg(REG_OFFSET_BG2HOFS, 0);
@@ -252,7 +255,8 @@ static void Task_AlbumFadeOut(u8 taskId)
     if (!gPaletteFade->active)
     {
         SetMainCallback2(CB2_ReturnToFieldContinueScript);
-        Free(sAlbumPtr->tilemapPtr);
+        Free(sAlbumPtr->bg3Map);
+        Free(sAlbumPtr->bgTextMap);
         Free(sAlbumPtr);
         FreeAllWindowBuffers();
         DestroyTask(taskId);
@@ -295,10 +299,14 @@ static void CB2_Album(void)
             gMain.state++;
             break;
         case 2:
-            sAlbumPtr->tilemapPtr = Malloc(0x1000);
+            sAlbumPtr->bg3Map = Calloc(BG_MAP_BYTES);
+            sAlbumPtr->bgTextMap = Calloc(BG_MAP_BYTES);
             ResetBgsAndClearDma3BusyFlags(0);
             InitBgsFromTemplates(0, sAlbumBgTemplates, NELEMS(sAlbumBgTemplates));
-            SetBgTilemapBuffer(BG_BACKGROUND, sAlbumPtr->tilemapPtr);
+            SetBgTilemapBuffer(BG_BACKGROUND, sAlbumPtr->bg3Map);
+            SetBgTilemapBuffer(BG_TEXT, sAlbumPtr->bgTextMap);
+            CpuFill16(0, sAlbumPtr->bgTextMap, BG_MAP_BYTES);
+            CopyBgTilemapBufferToVram(BG_TEXT);
             gMain.state++;
             break;
         case 3:
@@ -308,7 +316,6 @@ static void CB2_Album(void)
         case 4:
             if (!free_temp_tile_data_buffers_if_possible())
             {
-                ShowBg(BG_TEXT);
                 ShowBg(BG_BACKGROUND);
                 CopyBgTilemapBufferToVram(BG_BACKGROUND);
                 gMain.state++;
@@ -317,6 +324,8 @@ static void CB2_Album(void)
         case 5:
             InitWindows(sAlbumWinTemplates);
             DeactivateAllTextPrinters();
+            CopyBgTilemapBufferToVram(BG_TEXT);
+            ShowBg(BG_TEXT);
             gMain.state++;
             break;
         case 6:
