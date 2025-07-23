@@ -75,9 +75,9 @@ static const struct TextColor sWhiteText =
 enum
 {
     BG_TEXTBOX,
-    BG_TEXT_2,
     BG_TEXT,
     BG_BACKGROUND,
+    BG_TEXT_2,
 };
 
 static const struct BgTemplate sAlbumBgTemplates[] =
@@ -173,17 +173,13 @@ static void __attribute__((unused)) CleanWindows(void)
 static void DisplayAlbumBG(void)
 {
     // Tiles -> VRAM
-    decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, AlbumBGTiles, 0, 0, 0);
-
-    // Map -> WRAM buffer (0x800 bytes) and then to VRAM
+    decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, &AlbumBGTiles, 0, 0, 0);
     LZDecompressWram(AlbumBGMap, sAlbumPtr->tilemapPtr); // expects 32×32
-    CopyToBgTilemapBuffer(BG_BACKGROUND, sAlbumPtr->tilemapPtr, BG_SCREEN_SIZE, 0);
-    CopyBgTilemapBufferToVram(BG_BACKGROUND);
+    LoadPalette(AlbumBGPal, 0, 0x20);   // 16 colors = 0x20 bytes
 
     // Palettes
-    LoadPalette(AlbumBGPal, 0, 0x20);   // 16 colors = 0x20 bytes
-    LoadMenuElementsPalette(12 * 0x10, 1);
-    Menu_LoadStdPalAt(15 * 0x10);
+	LoadMenuElementsPalette(0xC0, 1);
+	Menu_LoadStdPalAt(0xF0);
 }
 
 static void PrintAlbumHeader(void)
@@ -289,51 +285,51 @@ static void CB2_Album(void)
 {
     switch (gMain.state)
     {
-    case 0:
-        SetVBlankCallback(NULL);
-        ClearVramOamPlttRegs();
-        gMain.state++;
-        break;
-    case 1:
-        ClearTasksAndGraphicalStructs();
-        gMain.state++;
-        break;
-    case 2:
-        sAlbumPtr->tilemapPtr = Calloc(BG_SCREEN_SIZE);
-        ResetBgsAndClearDma3BusyFlags(0);
-        InitBgsFromTemplates(0, sAlbumBgTemplates, NELEMS(sAlbumBgTemplates));
-        SetBgTilemapBuffer(BG_BACKGROUND, sAlbumPtr->tilemapPtr);
-        gMain.state++;
-        break;
-    case 3:
-        DisplayAlbumBG();
-        gMain.state++;
-        break;
-    case 4:
-        if (!free_temp_tile_data_buffers_if_possible())
-        {
-            ShowBg(BG_TEXT);
-            ShowBg(BG_BACKGROUND);
-            CopyBgTilemapBufferToVram(BG_BACKGROUND);
+        case 0:
+            SetVBlankCallback(NULL);
+            ClearVramOamPlttRegs();
             gMain.state++;
-        }
-        break;
-    case 5:
-        InitWindows(sAlbumWinTemplates);
-        DeactivateAllTextPrinters();
-        gMain.state++;
-        break;
-    case 6:
-        BeginNormalPaletteFade(0xFFFFFFFF, 0, 16, 0, RGB_BLACK);
-        gMain.state++;
-        break;
-    case 7:
-        SetVBlankCallback(VBlankCB_Album);
-        InitAlbum();
-        CreateTask(Task_AlbumFadeIn, 0);
-        SetMainCallback2(MainCB2_Album);
-        gMain.state = 0;
-        break;
+            break;
+        case 1:
+            ClearTasksAndGraphicalStructs();
+            gMain.state++;
+            break;
+        case 2:
+            sAlbumPtr->tilemapPtr = Malloc(0x1000);
+            ResetBgsAndClearDma3BusyFlags(0);
+            InitBgsFromTemplates(0, sAlbumBgTemplates, NELEMS(sAlbumBgTemplates));
+            SetBgTilemapBuffer(BG_BACKGROUND, sAlbumPtr->tilemapPtr);
+            gMain.state++;
+            break;
+        case 3:
+            DisplayAlbumBG();
+            gMain.state++;
+            break;
+        case 4:
+            if (!free_temp_tile_data_buffers_if_possible())
+            {
+                ShowBg(BG_TEXT);
+                ShowBg(BG_BACKGROUND);
+                CopyBgTilemapBufferToVram(BG_BACKGROUND);
+                gMain.state++;
+            }
+            break;
+        case 5:
+            InitWindows(sAlbumWinTemplates);
+            DeactivateAllTextPrinters();
+            gMain.state++;
+            break;
+        case 6:
+            BeginNormalPaletteFade(0xFFFFFFFF, 0, 16, 0, RGB_BLACK);
+            gMain.state++;
+            break;
+        case 7:
+            SetVBlankCallback(VBlankCB_Album);
+            InitAlbum();
+            CreateTask(Task_AlbumFadeIn, 0);
+            SetMainCallback2(MainCB2_Album);
+            gMain.state = 0;
+            break;
     }
 }
 
