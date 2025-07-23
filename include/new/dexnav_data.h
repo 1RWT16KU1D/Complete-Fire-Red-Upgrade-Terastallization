@@ -2,6 +2,14 @@
 
 #include "../global.h"
 
+#ifndef CONTEXT_MENU_MOVE_CURSOR_FUNC
+#define CONTEXT_MENU_MOVE_CURSOR_FUNC NULL
+#endif
+
+#ifndef CONTEXT_MENU_ITEM_PRINT_FUNC
+#define CONTEXT_MENU_ITEM_PRINT_FUNC NULL
+#endif
+
 /**
  * \file dns_data.h
  * \brief A file to be included only by "src/dexnav.c". It contains declarations,
@@ -193,12 +201,12 @@ enum EncounterTypes
 	ENCOUNTER_METHOD_COUNT,
 };
 
-enum BGs
+enum DexNavBGs
 {
-	BG_TEXTBOX,
-	BG_TEXT_2,
-	BG_TEXT,
-	BG_BACKGROUND,
+        DEXNAV_BG_TEXTBOX,
+        DEXNAV_BG_TEXT_2,
+        DEXNAV_BG_TEXT,
+        DEXNAV_BG_BACKGROUND,
 };
 
 enum
@@ -223,7 +231,7 @@ static const struct WindowTemplate sDexNavWinTemplates[WINDOW_COUNT + 1] =
 {
 	[WIN_TEXTBOX] =
 	{
-		.bg = BG_TEXTBOX,
+		.bg = DEXNAV_BG_TEXTBOX,
 		.tilemapLeft = 1,
 		.tilemapTop = 15,
 		.width = 28,
@@ -233,7 +241,7 @@ static const struct WindowTemplate sDexNavWinTemplates[WINDOW_COUNT + 1] =
 	},
 	[WIN_CONTEXT_MENU] =
 	{
-		.bg = BG_TEXTBOX,
+		.bg = DEXNAV_BG_TEXTBOX,
 		.tilemapLeft = 21,
 		.tilemapTop = 7,
 		.width = 7,
@@ -243,7 +251,7 @@ static const struct WindowTemplate sDexNavWinTemplates[WINDOW_COUNT + 1] =
 	},
 	[WIN_SPECIES] =
 	{
-		.bg = BG_TEXT_2, //Above so it doesn't conflict with the type icons
+		.bg = DEXNAV_BG_TEXT_2, //Above so it doesn't conflict with the type icons
 		.tilemapLeft = 20,
 		.tilemapTop = 2,
 		.width = 9,
@@ -253,7 +261,7 @@ static const struct WindowTemplate sDexNavWinTemplates[WINDOW_COUNT + 1] =
 	},
 	[WIN_SEARCH_LEVEL] =
 	{
-		.bg = BG_TEXT,
+		.bg = DEXNAV_BG_TEXT,
 		.tilemapLeft = 20,
 		.tilemapTop = 7,
 		.width = 9,
@@ -263,7 +271,7 @@ static const struct WindowTemplate sDexNavWinTemplates[WINDOW_COUNT + 1] =
 	},
 	[WIN_METHOD] =
 	{
-		.bg = BG_TEXT,
+		.bg = DEXNAV_BG_TEXT,
 		.tilemapLeft = 20,
 		.tilemapTop = 10,
 		.width = 10,
@@ -273,7 +281,7 @@ static const struct WindowTemplate sDexNavWinTemplates[WINDOW_COUNT + 1] =
 	},
 	[WIN_HIDDEN_ABILITY] =
 	{
-		.bg = BG_TEXT,
+		.bg = DEXNAV_BG_TEXT,
 		.tilemapLeft = 20,
 		.tilemapTop = 13,
 		.width = 10,
@@ -283,7 +291,7 @@ static const struct WindowTemplate sDexNavWinTemplates[WINDOW_COUNT + 1] =
 	},
 	[WIN_HELD_ITEMS] =
 	{
-		.bg = BG_TEXT,
+		.bg = DEXNAV_BG_TEXT,
 		.tilemapLeft = 20,
 		.tilemapTop = 16,
 		.width = 10,
@@ -293,7 +301,7 @@ static const struct WindowTemplate sDexNavWinTemplates[WINDOW_COUNT + 1] =
 	},
 	[WIN_MON_TYPE_1] =
 	{
-		.bg = BG_TEXT,
+		.bg = DEXNAV_BG_TEXT,
 		.tilemapLeft = 20,
 		.tilemapTop = 4,
 		.width = 5,
@@ -303,7 +311,7 @@ static const struct WindowTemplate sDexNavWinTemplates[WINDOW_COUNT + 1] =
 	},
 	[WIN_MON_TYPE_2] =
 	{
-		.bg = BG_TEXT,
+		.bg = DEXNAV_BG_TEXT,
 		.tilemapLeft = 25,
 		.tilemapTop = 4,
 		.width = 5,
@@ -313,7 +321,7 @@ static const struct WindowTemplate sDexNavWinTemplates[WINDOW_COUNT + 1] =
 	},
 	[WIN_WATER] =
 	{
-		.bg = BG_TEXT,
+		.bg = DEXNAV_BG_TEXT,
 		.tilemapLeft = 0,
 		.tilemapTop = 2,
 		.width = 19,
@@ -323,7 +331,7 @@ static const struct WindowTemplate sDexNavWinTemplates[WINDOW_COUNT + 1] =
 	},
 	[WIN_LAND] =
 	{
-		.bg = BG_TEXT,
+		.bg = DEXNAV_BG_TEXT,
 		.tilemapLeft = 0,
 	#ifdef UNBOUND
 		.tilemapTop = 10,
@@ -337,7 +345,7 @@ static const struct WindowTemplate sDexNavWinTemplates[WINDOW_COUNT + 1] =
 	},
 	[WIN_MAP_NAME] =
 	{
-		.bg = BG_TEXT,
+		.bg = DEXNAV_BG_TEXT,
 		.tilemapLeft = 0,
 		.tilemapTop = 0,
 		.width = 12,
@@ -347,7 +355,7 @@ static const struct WindowTemplate sDexNavWinTemplates[WINDOW_COUNT + 1] =
 	},
 	[WIN_CHAIN_LENGTH] =
 	{
-		.bg = BG_TEXT,
+		.bg = DEXNAV_BG_TEXT,
 		.tilemapLeft = 22,
 		.tilemapTop = 0,
 		.width = 8,
@@ -361,9 +369,9 @@ static const struct WindowTemplate sDexNavWinTemplates[WINDOW_COUNT + 1] =
 
 static const struct BgTemplate sDexNavBgTemplates[] =
 {
-	[BG_TEXTBOX] =
+	[DEXNAV_BG_TEXTBOX] =
 	{
-		.bg = BG_TEXTBOX,
+		.bg = DEXNAV_BG_TEXTBOX,
 		.charBaseIndex = 0,
 		.mapBaseIndex = 31,
 		.screenSize = 0,
@@ -371,9 +379,9 @@ static const struct BgTemplate sDexNavBgTemplates[] =
 		.priority = 0,
 		.baseTile = 0,
 	},
-	[BG_TEXT_2] =
+	[DEXNAV_BG_TEXT_2] =
 	{
-		.bg = BG_TEXT_2,
+		.bg = DEXNAV_BG_TEXT_2,
 		.charBaseIndex = 1,
 		.mapBaseIndex = 30,
 		.screenSize = 0,
@@ -381,9 +389,9 @@ static const struct BgTemplate sDexNavBgTemplates[] =
 		.priority = 1,
 		.baseTile = 0,
 	},
-	[BG_TEXT] =
+	[DEXNAV_BG_TEXT] =
 	{
-		.bg = BG_TEXT,
+		.bg = DEXNAV_BG_TEXT,
 		.charBaseIndex = 2,
 		.mapBaseIndex = 29,
 		.screenSize = 0,
@@ -391,9 +399,9 @@ static const struct BgTemplate sDexNavBgTemplates[] =
 		.priority = 2,
 		.baseTile = 0,
 	},
-	[BG_BACKGROUND] =
+	[DEXNAV_BG_BACKGROUND] =
 	{
-		.bg = BG_BACKGROUND,
+		.bg = DEXNAV_BG_BACKGROUND,
 		.charBaseIndex = 3,
 		.mapBaseIndex = 28,
 		.screenSize = 0,
@@ -412,10 +420,10 @@ static const struct ListMenuItem sContextMenuListItems[] =
 
 static const struct ListMenuTemplate sContextMenuTemplate =
 {
-	.items = sContextMenuListItems,
-	.totalItems = 3, //Register, Scan, Close
-	.moveCursorFunc = ContextMenuMoveCursorFunc,
-	.itemPrintFunc = ContextMenuItemPrintFunc,
+        .items = sContextMenuListItems,
+        .totalItems = 3, //Register, Scan, Close
+        .moveCursorFunc = CONTEXT_MENU_MOVE_CURSOR_FUNC,
+        .itemPrintFunc = CONTEXT_MENU_ITEM_PRINT_FUNC,
 
 	.windowId = WIN_CONTEXT_MENU,
 	.header_X = 0,

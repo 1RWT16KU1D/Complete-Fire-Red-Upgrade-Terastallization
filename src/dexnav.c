@@ -196,7 +196,11 @@ static void ClearTasksAndGraphicalStructs(void);
 static void ClearVramOamPlttRegs(void);
 static void CB2_DexNav(void);
 
+#define CONTEXT_MENU_MOVE_CURSOR_FUNC ContextMenuMoveCursorFunc
+#define CONTEXT_MENU_ITEM_PRINT_FUNC ContextMenuItemPrintFunc
 #include "../include/new/dexnav_data.h"
+#undef CONTEXT_MENU_MOVE_CURSOR_FUNC
+#undef CONTEXT_MENU_ITEM_PRINT_FUNC
 
 
 // ===================================== //
@@ -2456,7 +2460,7 @@ static void PrintDexNavMessage(u8 messageId)
 	if (sDexNavGUIPtr->cursorSpriteId < MAX_SPRITES)
 		StartSpriteAnim(&gSprites[sDexNavGUIPtr->cursorSpriteId], 1); //Pointing and unmoving
 
-	ShowBg(BG_TEXTBOX);
+	ShowBg(DEXNAV_BG_TEXTBOX);
 }
 
 static void PrintDexNavError(u8 taskId, u8 specificMsgId)
@@ -2506,7 +2510,7 @@ static void HideDexNavMessage(void)
 	if (sDexNavGUIPtr->cursorSpriteId < MAX_SPRITES)
 		StartSpriteAnim(&gSprites[sDexNavGUIPtr->cursorSpriteId], 0); //Moving
 
-	HideBg(BG_TEXTBOX);
+	HideBg(DEXNAV_BG_TEXTBOX);
 }
 
 static void ContextMenuMoveCursorFunc(unusedArg s32 listIndex, bool8 onInit, unusedArg struct ListMenu* list)
@@ -3680,7 +3684,7 @@ static void LoadDexNavBgGfx(void)
 	palette = DexNavBGPal;
 	#endif
 
-	decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, tiles, 0, 0, 0);
+	decompress_and_copy_tile_data_to_vram(DEXNAV_BG_BACKGROUND, tiles, 0, 0, 0);
 	LZDecompressWram(map, sDexNavGUIPtr->tilemapPtr);
 
 	//Choose palette based on current location
@@ -3766,7 +3770,7 @@ static void CB2_DexNav(void)
 			sDexNavGUIPtr->tilemapPtr = Malloc(0x1000);
 			ResetBgsAndClearDma3BusyFlags(0);
 			InitBgsFromTemplates(0, sDexNavBgTemplates, NELEMS(sDexNavBgTemplates));
-			SetBgTilemapBuffer(BG_BACKGROUND, sDexNavGUIPtr->tilemapPtr);
+			SetBgTilemapBuffer(DEXNAV_BG_BACKGROUND, sDexNavGUIPtr->tilemapPtr);
 			gMain.state++;
 			break;
 		case 3:
@@ -3776,10 +3780,10 @@ static void CB2_DexNav(void)
 		case 4:
 			if (!free_temp_tile_data_buffers_if_possible())
 			{
-				ShowBg(BG_TEXT);
-				ShowBg(BG_TEXT_2);
-				ShowBg(BG_BACKGROUND);
-				CopyBgTilemapBufferToVram(BG_BACKGROUND);
+				ShowBg(DEXNAV_BG_TEXT);
+				ShowBg(DEXNAV_BG_TEXT_2);
+				ShowBg(DEXNAV_BG_BACKGROUND);
+				CopyBgTilemapBufferToVram(DEXNAV_BG_BACKGROUND);
 				gMain.state++;
 			}
 			break;
