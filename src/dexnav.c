@@ -129,8 +129,8 @@ static void DexNavPopulateEncounterList(void);
 static void RegisterSpecies(u16 species, u8 taskId);
 static bool8 CanWaterMonBeSearched(void);
 static void CopySpeciesNameToStringVar1_AdjustUnownName(u16 species);
-static void CleanWindow(u8 windowId);
-static void CleanWindows(void);
+extern void CleanWindow(u8 windowId);
+extern void CleanWindows(void);
 extern void CommitWindow(u8 windowId);
 static void CommitWindows(void);
 static void PrintDexNavMessage(u8 messageId);
@@ -2385,12 +2385,12 @@ static void CopySpeciesNameToStringVar1_AdjustUnownName(u16 species)
 
 //GUI Util//
 
-static void CleanWindow(u8 windowId)
+extern void CleanWindow(u8 windowId)
 {
 	FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
 }
 
-static void CleanWindows(void)
+extern void CleanWindows(void)
 {
 	for (u32 i = 0; i < WINDOW_COUNT; ++i)
 		CleanWindow(i);

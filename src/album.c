@@ -29,150 +29,49 @@
 #include "../include/sound.h"
 #include "../include/sprite.h"
 #include "../include/start_menu.h"
-#include "../include/string_util.h"
 #include "../include/text.h"
 #include "../include/text_window.h"
-#include "../include/wild_encounter.h"
 #include "../include/window.h"
-#include "../include/constants/abilities.h"
-#include "../include/constants/field_effects.h"
-#include "../include/constants/items.h"
-#include "../include/constants/maps.h"
-#include "../include/constants/metatile_behaviors.h"
-#include "../include/constants/moves.h"
-#include "../include/constants/pokedex.h"
-#include "../include/constants/region_map_sections.h"
 #include "../include/constants/songs.h"
-#include "../include/constants/species.h"
-#include "../include/gba/io_reg.h"
 
 #include "../include/new/album.h"
-#include "../include/new/battle_strings.h"
-#include "../include/new/build_pokemon.h"
-#include "../include/new/daycare.h"
 #include "../include/new/dns.h"
-#include "../include/new/item.h"
-#include "../include/new/learn_move.h"
-#include "../include/new/overworld.h"
-#include "../include/new/wild_encounter.h"
-#include "../include/new/util.h"
 
-// Exported functions
+// Imported functions
 extern void CommitWindow(u8 windowId);
+extern void CleanWindow(u8 windowId);
+extern void CleanWindows(void);
 
-struct AlbumData
+struct Album *gAlbumData;
+
+static void InitAlbumData(void)
 {
-    u16* bg3Map;
-    u16* bgTextMap;
-};
+    gAlbumData->memoryData[0].memoryName = gText_Memory_None;
+    gAlbumData->memoryData[0].memoryDesc = gText_Memory_None;
 
-#define sAlbumPtr (*((struct AlbumData**) 0x203E038))
-#define BG_SCREEN_SIZE 0x800  // 32*32*2
-#define BG_MAP_BYTES 0x800
+    gAlbumData->memoryData[1].memoryName = gText_Memory_MeloettaUnderTree;
+    gAlbumData->memoryData[1].memoryDesc = gText_MemoryDesc_MeloettaUnderTree;
 
-static const struct TextColor sWhiteText =
-{
-	.bgColor = TEXT_COLOR_TRANSPARENT,
-	.fgColor = TEXT_COLOR_WHITE,
-	.shadowColor = TEXT_COLOR_DARK_GREY,
-};
+    gAlbumData->memoryData[2].memoryName = gText_Memory_PikachuAndEevee;
+    gAlbumData->memoryData[2].memoryDesc = gText_MemoryDesc_PikachuAndEevee;
 
-enum 
-{
-    BG_UNUSED,
-    BG_INTERFACE,
-    BG_UNUSED2,
-    BG_BACKGROUND,
-};
+    gAlbumData->memoryData[3].memoryName = gText_Memory_PikachuAndEevee;
+    gAlbumData->memoryData[3].memoryDesc = gText_MemoryDesc_PikachuAndEevee;
 
-static const struct BgTemplate sAlbumBgTemplates[] =
-{
-    [BG_UNUSED] =
-    {
-        .bg = BG_UNUSED,
-        .charBaseIndex = 0,
-        .mapBaseIndex = 30,
-        .screenSize = 0,
-        .paletteMode = 0,
-        .priority = 1,
-        .baseTile = 0,
-    },
-    [BG_INTERFACE] =
-    {
-        .bg = BG_INTERFACE,
-        .charBaseIndex = 1,
-        .mapBaseIndex = 31,
-        .screenSize = 0,
-        .paletteMode = 0,
-        .priority = 0,
-        .baseTile = 0,
-    },
-    [BG_UNUSED2] =
-    {
-        .bg = BG_UNUSED2,
-        .charBaseIndex = 2,
-        .mapBaseIndex = 29,
-        .screenSize = 0,
-        .paletteMode = 0,
-        .priority = 2,
-        .baseTile = 0,
-    },
-    [BG_BACKGROUND] =
-    {
-        .bg = BG_BACKGROUND,
-        .charBaseIndex = 3,
-        .mapBaseIndex = 28,
-        .screenSize = 0,
-        .paletteMode = 0,
-        .priority = 3,
-        .baseTile = 0,
-    },
-};
+    gAlbumData->memoryData[4].memoryName = gText_Memory_None;
+    gAlbumData->memoryData[4].memoryDesc = gText_Memory_None;
 
-static const struct WindowTemplate sAlbumWinTemplates[WIN_MAX_COUNT + 1] =
-{
-    [WIN_ALBUM_HEADER] =
-    {
-        .bg = BG_INTERFACE,
-		.tilemapLeft = 1,
-		.tilemapTop = 1,
-		.width = 28,
-		.height = 4,
-		.paletteNum = 15,
-		.baseBlock = 1,
-    },
-    [WIN_ALBUM_TEXT] =
-    {
-        .bg = BG_INTERFACE,
-        .tilemapLeft = 1,
-        .tilemapTop = 3,
-        .width = 28,
-        .height = 2,
-        .paletteNum = 15,
-        .baseBlock = 57,
-    },
-    [WIN_ALBUM_DESC] =
-    {
-        .bg = BG_INTERFACE,
-        .tilemapLeft = 1,
-        .tilemapTop = 6,
-        .width = 28,
-        .height = 4,
-        .paletteNum = 15,
-        .baseBlock = 113,
-    },
-    DUMMY_WIN_TEMPLATE,
-};
+    gAlbumData->memoryData[5].memoryName = gText_Memory_None;
+    gAlbumData->memoryData[5].memoryDesc = gText_Memory_None;
 
-static void CleanWindow(u8 windowId)
-{
-	FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
-}
+    gAlbumData->memoryData[6].memoryName = gText_Memory_None;
+    gAlbumData->memoryData[6].memoryDesc = gText_Memory_None;
 
-static void __attribute__((unused)) CleanWindows(void)
-{
-	for (u32 i = 0; i < WIN_MAX_COUNT; ++i)
-		CleanWindow(i);
+    gAlbumData->memoryData[7].memoryName = gText_Memory_None;
+    gAlbumData->memoryData[7].memoryDesc = gText_Memory_None;
+
+    gAlbumData->memoryData[8].memoryName = gText_Memory_None;
+    gAlbumData->memoryData[8].memoryDesc = gText_Memory_None;
 }
 
 static void DisplayAlbumBG(void)
@@ -182,8 +81,6 @@ static void DisplayAlbumBG(void)
 
     // BGMap
     LZDecompressWram(AlbumBGMap, sAlbumPtr->bg3Map);
-    for (int i = 0; i < BG_MAP_BYTES / 2; i++)
-        sAlbumPtr->bg3Map[i] &= 0x0FFF;
     CopyBgTilemapBufferToVram(BG_BACKGROUND);
 
     // Palette
@@ -203,9 +100,18 @@ static void PrintGUIAlbumHeader(void)
     CommitWindow(WIN_ALBUM_HEADER);
 }
 
-static void PrintGUIAlbumMemories(void)
+static void PrintOrUpdateGUIAlbumMemories(u8 currMemoryId)
 {
+    u8 fontSize = 1; // Normal Text
+    u8 y = 0;
 
+    for (u8 i = currMemoryId; i < (currMemoryId + 7); ++i)
+    {
+        WindowPrint(WIN_ALBUM_MEMORY_NAME, fontSize, 0, y, &sWhiteText, 0, gAlbumData->memoryData[i].memoryName);
+        y += 10;
+    }
+
+    CommitWindow(WIN_ALBUM_MEMORY_NAME);
 }
 
 static void CommitWindows(void)
@@ -265,7 +171,6 @@ static void Task_AlbumFadeOut(u8 taskId)
     {
         SetMainCallback2(CB2_ReturnToFieldContinueScript);
         Free(sAlbumPtr->bg3Map);
-        Free(sAlbumPtr->bgTextMap);
         Free(sAlbumPtr);
         FreeAllWindowBuffers();
         DestroyTask(taskId);
@@ -288,13 +193,20 @@ static void Task_AlbumFadeIn(u8 taskId)
         gTasks[taskId].func = Task_AlbumWaitForKeyPress;
 }
 
+static void PrintGUIAlbumItems(void)
+{
+    PrintGUIAlbumHeader();
+    //PrintOrUpdateGUIAlbumMemories(0);
+}
+
 static void InitAlbum(void)
 {
     // Remove glitches
     CleanWindows();
     CommitWindows();
 
-    PrintGUIAlbumHeader();
+    InitAlbumData();
+    PrintGUIAlbumItems();
 }
 
 static void CB2_Album(void)
@@ -312,12 +224,9 @@ static void CB2_Album(void)
             break;
         case 2:
             sAlbumPtr->bg3Map = Calloc(BG_MAP_BYTES);
-            sAlbumPtr->bgTextMap = Calloc(BG_MAP_BYTES);
             ResetBgsAndClearDma3BusyFlags(0);
             InitBgsFromTemplates(0, sAlbumBgTemplates, NELEMS(sAlbumBgTemplates));
             SetBgTilemapBuffer(BG_BACKGROUND, sAlbumPtr->bg3Map);
-            SetBgTilemapBuffer(BG_INTERFACE, sAlbumPtr->bgTextMap);
-            CpuFill16(0, sAlbumPtr->bgTextMap, BG_MAP_BYTES);
             CopyBgTilemapBufferToVram(BG_INTERFACE);
             gMain.state++;
             break;
@@ -358,7 +267,7 @@ static void Task_InitAlbum(u8 taskId)
 {
     if (!gPaletteFade->active)
     {
-        sAlbumPtr = Calloc(sizeof(struct AlbumData));
+        sAlbumPtr = Calloc(sizeof(struct Album));
         PlayRainStoppingSoundEffect();
         SetMainCallback2(CB2_Album);
         DestroyTask(taskId);
@@ -379,7 +288,7 @@ bool8 AlbumCallback(void)
         PlayRainStoppingSoundEffect();
         DestroySafariZoneStatsWindow();
         CleanupOverworldWindowsAndTilemaps();
-        sAlbumPtr = Calloc(sizeof(struct AlbumData));
+        sAlbumPtr = Calloc(sizeof(struct Album));
         SetMainCallback2(CB2_Album);
         return TRUE;
     }
