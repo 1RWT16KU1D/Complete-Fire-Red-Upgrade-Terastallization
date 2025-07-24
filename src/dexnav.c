@@ -131,7 +131,7 @@ static bool8 CanWaterMonBeSearched(void);
 static void CopySpeciesNameToStringVar1_AdjustUnownName(u16 species);
 static void CleanWindow(u8 windowId);
 static void CleanWindows(void);
-static void CommitWindow(u8 windowId);
+extern void CommitWindow(u8 windowId);
 static void CommitWindows(void);
 static void PrintDexNavMessage(u8 messageId);
 static void PrintDexNavError(u8 taskId, u8 specificMsgId3);
@@ -2396,7 +2396,7 @@ static void CleanWindows(void)
 		CleanWindow(i);
 }
 
-static void CommitWindow(u8 windowId)
+extern void CommitWindow(u8 windowId)
 {
 	CopyWindowToVram(windowId, COPYWIN_BOTH);
 	PutWindowTilemap(windowId);

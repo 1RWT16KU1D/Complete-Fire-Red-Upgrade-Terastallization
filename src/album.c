@@ -57,6 +57,9 @@
 #include "../include/new/wild_encounter.h"
 #include "../include/new/util.h"
 
+// Exported functions
+extern void CommitWindow(u8 windowId);
+
 struct AlbumData
 {
     u16* bg3Map;
@@ -76,32 +79,32 @@ static const struct TextColor sWhiteText =
 
 enum 
 {
-    BG_TEXT = 0,
     BG_UNUSED,
+    BG_INTERFACE,
     BG_UNUSED2,
     BG_BACKGROUND,
 };
 
 static const struct BgTemplate sAlbumBgTemplates[] =
 {
-    [BG_TEXT] =
-    {
-        .bg = BG_TEXT,
-        .charBaseIndex = 0,
-        .mapBaseIndex = 31,
-        .screenSize = 0,
-        .paletteMode = 0,
-        .priority = 0,
-        .baseTile = 0,
-    },
     [BG_UNUSED] =
     {
         .bg = BG_UNUSED,
-        .charBaseIndex = 1,
+        .charBaseIndex = 0,
         .mapBaseIndex = 30,
         .screenSize = 0,
         .paletteMode = 0,
         .priority = 1,
+        .baseTile = 0,
+    },
+    [BG_INTERFACE] =
+    {
+        .bg = BG_INTERFACE,
+        .charBaseIndex = 1,
+        .mapBaseIndex = 31,
+        .screenSize = 0,
+        .paletteMode = 0,
+        .priority = 0,
         .baseTile = 0,
     },
     [BG_UNUSED2] =
@@ -130,17 +133,17 @@ static const struct WindowTemplate sAlbumWinTemplates[WIN_MAX_COUNT + 1] =
 {
     [WIN_ALBUM_HEADER] =
     {
-        .bg = BG_TEXT,
-        .tilemapLeft = 1,
-        .tilemapTop = 1,
-        .width = 28,
-        .height = 2,
-        .paletteNum = 15,
-        .baseBlock = 1,
+        .bg = BG_INTERFACE,
+		.tilemapLeft = 1,
+		.tilemapTop = 1,
+		.width = 28,
+		.height = 4,
+		.paletteNum = 15,
+		.baseBlock = 1,
     },
     [WIN_ALBUM_TEXT] =
     {
-        .bg = BG_TEXT,
+        .bg = BG_INTERFACE,
         .tilemapLeft = 1,
         .tilemapTop = 3,
         .width = 28,
@@ -150,7 +153,7 @@ static const struct WindowTemplate sAlbumWinTemplates[WIN_MAX_COUNT + 1] =
     },
     [WIN_ALBUM_DESC] =
     {
-        .bg = BG_TEXT,
+        .bg = BG_INTERFACE,
         .tilemapLeft = 1,
         .tilemapTop = 6,
         .width = 28,
@@ -189,14 +192,20 @@ static void DisplayAlbumBG(void)
     Menu_LoadStdPalAt(15 * 0x10);
 }
 
-static void PrintAlbumHeader(void)
+static void PrintGUIAlbumHeader(void)
 {
     const u8* text = gText_AlbumHeader;
-
+    u8 fontSize = 1; // Normal text
     CleanWindow(WIN_ALBUM_HEADER);
-    WindowPrint(WIN_ALBUM_HEADER, 1, 175, 0, &sWhiteText, 0, text);
-    CopyWindowToVram(WIN_ALBUM_HEADER, COPYWIN_BOTH);
-    PutWindowTilemap(WIN_ALBUM_HEADER);
+
+    // Show message
+    WindowPrint(WIN_ALBUM_HEADER, fontSize, 175, 0, &sWhiteText, 0, text);
+    CommitWindow(WIN_ALBUM_HEADER);
+}
+
+static void PrintGUIAlbumMemories(void)
+{
+
 }
 
 static void CommitWindows(void)
@@ -281,8 +290,11 @@ static void Task_AlbumFadeIn(u8 taskId)
 
 static void InitAlbum(void)
 {
-    PrintAlbumHeader();
+    // Remove glitches
+    CleanWindows();
     CommitWindows();
+
+    PrintGUIAlbumHeader();
 }
 
 static void CB2_Album(void)
@@ -304,9 +316,9 @@ static void CB2_Album(void)
             ResetBgsAndClearDma3BusyFlags(0);
             InitBgsFromTemplates(0, sAlbumBgTemplates, NELEMS(sAlbumBgTemplates));
             SetBgTilemapBuffer(BG_BACKGROUND, sAlbumPtr->bg3Map);
-            SetBgTilemapBuffer(BG_TEXT, sAlbumPtr->bgTextMap);
+            SetBgTilemapBuffer(BG_INTERFACE, sAlbumPtr->bgTextMap);
             CpuFill16(0, sAlbumPtr->bgTextMap, BG_MAP_BYTES);
-            CopyBgTilemapBufferToVram(BG_TEXT);
+            CopyBgTilemapBufferToVram(BG_INTERFACE);
             gMain.state++;
             break;
         case 3:
@@ -324,8 +336,8 @@ static void CB2_Album(void)
         case 5:
             InitWindows(sAlbumWinTemplates);
             DeactivateAllTextPrinters();
-            CopyBgTilemapBufferToVram(BG_TEXT);
-            ShowBg(BG_TEXT);
+            CopyBgTilemapBufferToVram(BG_INTERFACE);
+            ShowBg(BG_INTERFACE);
             gMain.state++;
             break;
         case 6:
