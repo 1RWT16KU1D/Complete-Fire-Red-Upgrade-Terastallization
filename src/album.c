@@ -42,36 +42,35 @@ extern void CommitWindow(u8 windowId);
 extern void CleanWindow(u8 windowId);
 extern void CleanWindows(void);
 
-struct Album *gAlbumData;
 
 static void InitAlbumData(void)
 {
-    gAlbumData->memoryData[0].memoryName = gText_Memory_None;
-    gAlbumData->memoryData[0].memoryDesc = gText_Memory_None;
+    sAlbumPtr->memoryData[0].memoryName = gText_Memory_None;
+    sAlbumPtr->memoryData[0].memoryDesc = gText_Memory_None;
 
-    gAlbumData->memoryData[1].memoryName = gText_Memory_MeloettaUnderTree;
-    gAlbumData->memoryData[1].memoryDesc = gText_MemoryDesc_MeloettaUnderTree;
+    sAlbumPtr->memoryData[1].memoryName = gText_Memory_MeloettaUnderTree;
+    sAlbumPtr->memoryData[1].memoryDesc = gText_MemoryDesc_MeloettaUnderTree;
 
-    gAlbumData->memoryData[2].memoryName = gText_Memory_PikachuAndEevee;
-    gAlbumData->memoryData[2].memoryDesc = gText_MemoryDesc_PikachuAndEevee;
+    sAlbumPtr->memoryData[2].memoryName = gText_Memory_PikachuAndEevee;
+    sAlbumPtr->memoryData[2].memoryDesc = gText_MemoryDesc_PikachuAndEevee;
 
-    gAlbumData->memoryData[3].memoryName = gText_Memory_PikachuAndEevee;
-    gAlbumData->memoryData[3].memoryDesc = gText_MemoryDesc_PikachuAndEevee;
+    sAlbumPtr->memoryData[3].memoryName = gText_Memory_PikachuAndEevee;
+    sAlbumPtr->memoryData[3].memoryDesc = gText_MemoryDesc_PikachuAndEevee;
 
-    gAlbumData->memoryData[4].memoryName = gText_Memory_None;
-    gAlbumData->memoryData[4].memoryDesc = gText_Memory_None;
+    sAlbumPtr->memoryData[4].memoryName = gText_Memory_None;
+    sAlbumPtr->memoryData[4].memoryDesc = gText_Memory_None;
 
-    gAlbumData->memoryData[5].memoryName = gText_Memory_None;
-    gAlbumData->memoryData[5].memoryDesc = gText_Memory_None;
+    sAlbumPtr->memoryData[5].memoryName = gText_Memory_None;
+    sAlbumPtr->memoryData[5].memoryDesc = gText_Memory_None;
 
-    gAlbumData->memoryData[6].memoryName = gText_Memory_None;
-    gAlbumData->memoryData[6].memoryDesc = gText_Memory_None;
+    sAlbumPtr->memoryData[6].memoryName = gText_Memory_None;
+    sAlbumPtr->memoryData[6].memoryDesc = gText_Memory_None;
 
-    gAlbumData->memoryData[7].memoryName = gText_Memory_None;
-    gAlbumData->memoryData[7].memoryDesc = gText_Memory_None;
+    sAlbumPtr->memoryData[7].memoryName = gText_Memory_None;
+    sAlbumPtr->memoryData[7].memoryDesc = gText_Memory_None;
 
-    gAlbumData->memoryData[8].memoryName = gText_Memory_None;
-    gAlbumData->memoryData[8].memoryDesc = gText_Memory_None;
+    sAlbumPtr->memoryData[8].memoryName = gText_Memory_None;
+    sAlbumPtr->memoryData[8].memoryDesc = gText_Memory_None;
 }
 
 static void DisplayAlbumBG(void)
@@ -105,9 +104,12 @@ static void PrintOrUpdateGUIAlbumMemories(u8 currMemoryId)
     u8 fontSize = 1; // Normal Text
     u8 y = 0;
 
-    for (u8 i = currMemoryId; i < (currMemoryId + 7); ++i)
+    CleanWindow(WIN_ALBUM_MEMORY_NAME);
+
+    for (u8 i = 0; i < 7 && (currMemoryId + i) < MEMORIES_COUNT; ++i)
     {
-        WindowPrint(WIN_ALBUM_MEMORY_NAME, fontSize, 0, y, &sWhiteText, 0, gAlbumData->memoryData[i].memoryName);
+        WindowPrint(WIN_ALBUM_MEMORY_NAME, fontSize, 0, y, &sWhiteText, 0,
+                   sAlbumPtr->memoryData[currMemoryId + i].memoryName);
         y += 10;
     }
 
@@ -172,7 +174,7 @@ static void Task_AlbumFadeOut(u8 taskId)
         SetMainCallback2(CB2_ReturnToFieldContinueScript);
         Free(sAlbumPtr->bg3Map);
         Free(sAlbumPtr);
-        gAlbumData = NULL;
+        sAlbumPtr = NULL;
         FreeAllWindowBuffers();
         DestroyTask(taskId);
     }
@@ -269,7 +271,6 @@ static void Task_InitAlbum(u8 taskId)
     if (!gPaletteFade->active)
     {
         sAlbumPtr = Calloc(sizeof(struct Album));
-        gAlbumData = sAlbumPtr;
         PlayRainStoppingSoundEffect();
         SetMainCallback2(CB2_Album);
         DestroyTask(taskId);
@@ -291,7 +292,6 @@ bool8 AlbumCallback(void)
         DestroySafariZoneStatsWindow();
         CleanupOverworldWindowsAndTilemaps();
         sAlbumPtr = Calloc(sizeof(struct Album));
-        gAlbumData = sAlbumPtr;
         SetMainCallback2(CB2_Album);
         return TRUE;
     }
