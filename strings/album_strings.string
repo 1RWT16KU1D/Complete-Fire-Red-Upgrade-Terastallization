@@ -1,8 +1,27 @@
 #org @gText_AlbumHeader
-Album
+Memories
 
-#org @gText_AlbumMemoryName
-Meloetta's Dreams
 
-#org @gText_AlbumMemoryDesc
-[PLAYER]'s memories with\nMeloetta under the tree[.]
+// Memory Names
+#org @gText_Memory_None
+??????
+
+#org @gText_Memory_MeloettaUnderTree
+Meloetta under the tree[.]
+
+#org @gText_Memory_PikachuAndEevee
+Pikachu and Eevee!
+
+#org @gText_Memory_InsideCave
+Inside Mt. Moon[.]
+
+
+// Memory Descriptions
+#org @gText_MemoryDesc_MeloettaUnderTree
+You meet Meloetta under a tree! You and\nher eat some berries.
+
+#org @gText_MemoryDesc_PikachuAndEevee
+Pikachu plays with Eevee and\nbecome best friends!
+
+#org @gText_MemoryDesc_InsideCave
+You enter the Mt. Moon and\nfind the Moon stone!
