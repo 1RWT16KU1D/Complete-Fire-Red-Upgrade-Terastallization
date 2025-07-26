@@ -179,20 +179,15 @@ static void InitAlbumData(void)
     sAlbumPtr->memoryData[9].memoryName = gText_Memory_MeloettaUnderTree;
     sAlbumPtr->memoryData[9].memoryDesc = gText_MemoryDesc_MeloettaUnderTree;
 
-    sAlbumPtr->memoryData[10].memoryName = gText_Memory_PikachuAndEevee;
-    sAlbumPtr->memoryData[10].memoryDesc = gText_MemoryDesc_PikachuAndEevee;
 
-    sAlbumPtr->memoryData[11].memoryName = gText_Memory_PikachuAndEevee;
-    sAlbumPtr->memoryData[11].memoryDesc = gText_MemoryDesc_PikachuAndEevee;
-
-    // Will only be initialised at start
-    sAlbumPtr->selectedMemory = 1;
-    sAlbumPtr->selectedMemoryInAlbum = 1;
+    // Initial cursor position
+    sAlbumPtr->selectedMemory = 0;
+    sAlbumPtr->selectedMemoryInAlbum = 0;
 }
 
 static void SpriteCB_WhiteArrowMemorySelection(struct Sprite* sprite)
 {
-    sprite->pos1.y = (sAlbumPtr->selectedMemoryInAlbum * 10);
+    sprite->pos1.y = (sAlbumPtr->selectedMemoryInAlbum * 16) + 8;
     sprite->pos2.x = 4;
 }
 
@@ -229,7 +224,7 @@ static void PrintGUIAlbumHeader(void)
     CommitWindow(WIN_ALBUM_HEADER);
 }
 
-static void PrintOrUpdateGUIAlbumMemories(void)
+static void PrintGUIAlbumMemoryNames(void)
 {
     u8 fontSize = 1; // Normal Text
     u8 y = 0;
@@ -238,7 +233,7 @@ static void PrintOrUpdateGUIAlbumMemories(void)
 
     CleanWindow(WIN_ALBUM_MEMORY_NAME);
 
-    for (u8 i = 0; i < 7 && (startId + i) < MEMORIES_COUNT; ++i)
+    for (u8 i = 0; i < ALBUM_MEMORIES_PER_PAGE && (startId + i) < MEMORIES_COUNT; ++i)
     {
         WindowPrint(WIN_ALBUM_MEMORY_NAME, fontSize, 0, y, &sWhiteText, 0,
                    sAlbumPtr->memoryData[startId + i].memoryName);
@@ -248,7 +243,7 @@ static void PrintOrUpdateGUIAlbumMemories(void)
     CommitWindow(WIN_ALBUM_MEMORY_NAME);
 }
 
-static void PrintOrUpdateGUIAlbumDescriptions(void)
+static void PrintGUIAlbumDescription(void)
 {
     u8 fontSize = 1;
     u8 y = 0;
@@ -326,30 +321,32 @@ static void Task_AlbumFadeOut(u8 taskId)
 
 static void Task_AlbumWaitForKeyPress(u8 taskId)
 {
-    if (gMain.newKeys & (DPAD_DOWN | DPAD_UP))
+    if (gMain.newKeys & DPAD_DOWN)
     {
-        if (gMain.newKeys & DPAD_DOWN)
+        if (sAlbumPtr->selectedMemory < MEMORIES_COUNT - 1)
         {
-            if (sAlbumPtr->selectedMemoryInAlbum < MEMORIES_COUNT)
-            {
-                if (sAlbumPtr->selectedMemoryInAlbum < 6)
-                    sAlbumPtr->selectedMemoryInAlbum++;
-                sAlbumPtr->selectedMemory++;
-            }
-            PrintOrUpdateGUIAlbumMemories();
-            PrintOrUpdateGUIAlbumDescriptions();
+            sAlbumPtr->selectedMemory++;
+
+            if (sAlbumPtr->selectedMemoryInAlbum < ALBUM_MEMORIES_PER_PAGE - 1 &&
+                sAlbumPtr->selectedMemoryInAlbum < MEMORIES_COUNT - 1)
+                sAlbumPtr->selectedMemoryInAlbum++;
         }
-        else
+
+        PrintGUIAlbumMemoryNames();
+        PrintGUIAlbumDescription();
+    }
+    else if (gMain.newKeys & DPAD_UP)
+    {
+        if (sAlbumPtr->selectedMemory > 0)
         {
-            if (sAlbumPtr->selectedMemoryInAlbum > 1)
-            {
-                if (sAlbumPtr->selectedMemoryInAlbum > 1)
-                    sAlbumPtr->selectedMemoryInAlbum--;
-                sAlbumPtr->selectedMemory--;
-            }
-            PrintOrUpdateGUIAlbumMemories();
-            PrintOrUpdateGUIAlbumDescriptions();
+            sAlbumPtr->selectedMemory--;
+
+            if (sAlbumPtr->selectedMemoryInAlbum > 0)
+                sAlbumPtr->selectedMemoryInAlbum--;
         }
+
+        PrintGUIAlbumMemoryNames();
+        PrintGUIAlbumDescription();
     }
 
     if (gMain.newKeys & (A_BUTTON | B_BUTTON))
@@ -369,8 +366,8 @@ static void Task_AlbumFadeIn(u8 taskId)
 static void PrintGUIAlbumItems(void)
 {
     PrintGUIAlbumHeader();
-    PrintOrUpdateGUIAlbumMemories();
-    PrintOrUpdateGUIAlbumDescriptions();
+    PrintGUIAlbumMemoryNames();
+    PrintGUIAlbumDescription();
 }
 
 static void InitAlbum(void)

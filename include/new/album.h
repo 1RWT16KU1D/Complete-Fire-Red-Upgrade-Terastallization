@@ -5,6 +5,7 @@
 #define MEMORIES_COUNT 10
 #define sAlbumPtr (*((struct Album**) 0x203E038))
 #define BG_MAP_BYTES 0x800
+#define ALBUM_MEMORIES_PER_PAGE 7
 
 enum AlbumWindows
 {
