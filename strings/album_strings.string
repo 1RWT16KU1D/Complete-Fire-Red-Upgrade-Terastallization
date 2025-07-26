@@ -15,13 +15,49 @@ Pikachu and Eevee!
 #org @gText_Memory_InsideCave
 Inside Mt. Moon[.]
 
+#org @gText_Memory_NightSkyWish
+Wishing under the stars[.]
+
+#org @gText_Memory_SeasideShells
+Shells by the seaside
+
+#org @gText_Memory_CampfireTales
+Campfire stories[.]
+
+#org @gText_Memory_SakuraPath
+Path of Blossoms
+
+#org @gText_Memory_SnowballFight
+Snowball fight!
+
+#org @gText_Memory_LabDiscovery
+Strange Lab Discovery
+
 
 // Memory Descriptions
 #org @gText_MemoryDesc_MeloettaUnderTree
-You meet Meloetta under a tree! You and\nher eat some berries.
+ You meet Meloetta under a tree! You and\n her eat some berries.
 
 #org @gText_MemoryDesc_PikachuAndEevee
 Pikachu plays with Eevee and\nbecome best friends!
 
 #org @gText_MemoryDesc_InsideCave
 You enter the Mt. Moon and\nfind the Moon stone!
+
+#org @gText_MemoryDesc_NightSkyWish
+You close your eyes and wish on\na shooting star in the night sky.
+
+#org @gText_MemoryDesc_SeasideShells
+You collect colorful shells while\nwalking along the calm beach.
+
+#org @gText_MemoryDesc_CampfireTales
+You and your Pok\emon sit by a\ncampfire and share spooky tales.
+
+#org @gText_MemoryDesc_SakuraPath
+Petals fall like snow as you walk\ndown the cherry blossom trail.
+
+#org @gText_MemoryDesc_SnowballFight
+You have a friendly snowball fight\nwith a Sneasel and your partner.
+
+#org @gText_MemoryDesc_LabDiscovery
+You discover old notes in a\nforgotten lab about Mega Evolution.

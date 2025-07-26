@@ -71,9 +71,21 @@ extern const u8 gText_Memory_None[];
 extern const u8 gText_Memory_MeloettaUnderTree[];
 extern const u8 gText_Memory_PikachuAndEevee[];
 extern const u8 gText_Memory_InsideCave[];
+extern const u8 gText_Memory_NightSkyWish[];
+extern const u8 gText_Memory_SeasideShells[];
+extern const u8 gText_Memory_CampfireTales[];
+extern const u8 gText_Memory_SakuraPath[];
+extern const u8 gText_Memory_SnowballFight[];
+extern const u8 gText_Memory_LabDiscovery[];
 
 // Memory Descriptions
 extern const u8 gText_MemoryDesc_None[];
 extern const u8 gText_MemoryDesc_MeloettaUnderTree[];
 extern const u8 gText_MemoryDesc_PikachuAndEevee[];
 extern const u8 gText_MemoryDesc_InsideCave[];
+extern const u8 gText_MemoryDesc_NightSkyWish[];
+extern const u8 gText_MemoryDesc_SeasideShells[];
+extern const u8 gText_MemoryDesc_CampfireTales[];
+extern const u8 gText_MemoryDesc_SakuraPath[];
+extern const u8 gText_MemoryDesc_SnowballFight[];
+extern const u8 gText_MemoryDesc_LabDiscovery[];
