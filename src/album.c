@@ -358,6 +358,7 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
     {
         PrintGUIAlbumMemoryNames();
         PrintGUIAlbumDescription();
+        PlaySE(SE_SELECT);
     }
 
     if (gMain.newKeys & B_BUTTON)
