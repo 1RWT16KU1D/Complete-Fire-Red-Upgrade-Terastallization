@@ -161,8 +161,8 @@ static void InitAlbumData(void)
     sAlbumPtr->memoryData[3].memoryName = gText_Memory_PikachuAndEevee;
     sAlbumPtr->memoryData[3].memoryDesc = gText_MemoryDesc_PikachuAndEevee;
 
-    sAlbumPtr->memoryData[4].memoryName = gText_Memory_None;
-    sAlbumPtr->memoryData[4].memoryDesc = gText_Memory_None;
+    sAlbumPtr->memoryData[4].memoryName = gText_Memory_InsideCave;
+    sAlbumPtr->memoryData[4].memoryDesc = gText_MemoryDesc_InsideCave;
 
     sAlbumPtr->memoryData[5].memoryName = gText_Memory_None;
     sAlbumPtr->memoryData[5].memoryDesc = gText_Memory_None;
@@ -173,8 +173,8 @@ static void InitAlbumData(void)
     sAlbumPtr->memoryData[7].memoryName = gText_Memory_PikachuAndEevee;
     sAlbumPtr->memoryData[7].memoryDesc = gText_MemoryDesc_PikachuAndEevee;
 
-    sAlbumPtr->memoryData[8].memoryName = gText_Memory_None;
-    sAlbumPtr->memoryData[8].memoryDesc = gText_Memory_None;
+    sAlbumPtr->memoryData[8].memoryName = gText_Memory_InsideCave;
+    sAlbumPtr->memoryData[8].memoryDesc = gText_MemoryDesc_InsideCave;
 
     sAlbumPtr->memoryData[9].memoryName = gText_Memory_MeloettaUnderTree;
     sAlbumPtr->memoryData[9].memoryDesc = gText_MemoryDesc_MeloettaUnderTree;
@@ -182,8 +182,8 @@ static void InitAlbumData(void)
     sAlbumPtr->memoryData[10].memoryName = gText_Memory_PikachuAndEevee;
     sAlbumPtr->memoryData[10].memoryDesc = gText_MemoryDesc_PikachuAndEevee;
 
-    sAlbumPtr->memoryData[11].memoryName = gText_Memory_PikachuAndEevee;
-    sAlbumPtr->memoryData[11].memoryDesc = gText_MemoryDesc_PikachuAndEevee;
+    sAlbumPtr->memoryData[11].memoryName = gText_Memory_None;
+    sAlbumPtr->memoryData[11].memoryDesc = gText_Memory_None;
 
     // Will only be initialised at start
     sAlbumPtr->selectedMemory = 1;
@@ -352,7 +352,7 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
         }
     }
 
-    if (gMain.newKeys & (A_BUTTON | B_BUTTON))
+    if (gMain.newKeys & B_BUTTON)
     {
         PlaySE(SE_PC_OFF);
         BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
