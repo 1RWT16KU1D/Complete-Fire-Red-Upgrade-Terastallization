@@ -39,6 +39,7 @@ struct Album
 
     // Tracker Data
     u8 selectedMemory;
+    u8 selectedMemoryInAlbum; // Max of 7
 };
 
 static const struct TextColor sWhiteText =
@@ -48,89 +49,13 @@ static const struct TextColor sWhiteText =
 	.shadowColor = TEXT_COLOR_DARK_GREY,
 };
 
-static const struct BgTemplate sAlbumBgTemplates[] =
-{
-    [BG_UNUSED] =
-    {
-        .bg = BG_UNUSED,
-        .charBaseIndex = 0,
-        .mapBaseIndex = 30,
-        .screenSize = 0,
-        .paletteMode = 0,
-        .priority = 1,
-        .baseTile = 0,
-    },
-    [BG_INTERFACE] =
-    {
-        .bg = BG_INTERFACE,
-        .charBaseIndex = 1,
-        .mapBaseIndex = 31,
-        .screenSize = 0,
-        .paletteMode = 0,
-        .priority = 0,
-        .baseTile = 0,
-    },
-    [BG_UNUSED2] =
-    {
-        .bg = BG_UNUSED2,
-        .charBaseIndex = 2,
-        .mapBaseIndex = 29,
-        .screenSize = 0,
-        .paletteMode = 0,
-        .priority = 2,
-        .baseTile = 0,
-    },
-    [BG_BACKGROUND] =
-    {
-        .bg = BG_BACKGROUND,
-        .charBaseIndex = 3,
-        .mapBaseIndex = 28,
-        .screenSize = 0,
-        .paletteMode = 0,
-        .priority = 3,
-        .baseTile = 0,
-    },
-};
-
-static const struct WindowTemplate sAlbumWinTemplates[WIN_MAX_COUNT + 1] =
-{
-    [WIN_ALBUM_HEADER] =
-    {
-        .bg = BG_INTERFACE,
-		.tilemapLeft = 1,
-		.tilemapTop = 1,
-		.width = 28,
-		.height = 4,
-		.paletteNum = 15,
-		.baseBlock = 1,
-    },
-    [WIN_ALBUM_MEMORY_NAME] =
-    {
-        .bg = BG_INTERFACE,
-		.tilemapLeft = 1,
-		.tilemapTop = 1,
-		.width = 28,
-		.height = 4,
-		.paletteNum = 15,
-		.baseBlock = 1,
-    },
-    [WIN_ALBUM_MEMORY_DESC] =
-    {
-        .bg = BG_INTERFACE,
-        .tilemapLeft = 1,
-        .tilemapTop = 6,
-        .width = 28,
-        .height = 4,
-        .paletteNum = 15,
-        .baseBlock = 113,
-    },
-    DUMMY_WIN_TEMPLATE,
-};
-
 /* ============= Image Data ============= */
 extern const u8 AlbumBGTiles[];
 extern const u8 AlbumBGMap[];
 extern const u16 AlbumBGPal[];
+
+extern const u8 AlbumCursorTiles[];
+extern const u8 AlbumCursorPal[];
 
 // Memory Images
 //extern const u8 Memory_MeloettaUnderTreeTiles[];
