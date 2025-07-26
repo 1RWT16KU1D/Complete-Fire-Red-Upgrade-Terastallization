@@ -172,6 +172,7 @@ static void Task_AlbumFadeOut(u8 taskId)
         SetMainCallback2(CB2_ReturnToFieldContinueScript);
         Free(sAlbumPtr->bg3Map);
         Free(sAlbumPtr);
+        gAlbumData = NULL;
         FreeAllWindowBuffers();
         DestroyTask(taskId);
     }
@@ -196,7 +197,7 @@ static void Task_AlbumFadeIn(u8 taskId)
 static void PrintGUIAlbumItems(void)
 {
     PrintGUIAlbumHeader();
-    //PrintOrUpdateGUIAlbumMemories(0);
+    PrintOrUpdateGUIAlbumMemories(1);
 }
 
 static void InitAlbum(void)
@@ -268,6 +269,7 @@ static void Task_InitAlbum(u8 taskId)
     if (!gPaletteFade->active)
     {
         sAlbumPtr = Calloc(sizeof(struct Album));
+        gAlbumData = sAlbumPtr;
         PlayRainStoppingSoundEffect();
         SetMainCallback2(CB2_Album);
         DestroyTask(taskId);
@@ -289,6 +291,7 @@ bool8 AlbumCallback(void)
         DestroySafariZoneStatsWindow();
         CleanupOverworldWindowsAndTilemaps();
         sAlbumPtr = Calloc(sizeof(struct Album));
+        gAlbumData = sAlbumPtr;
         SetMainCallback2(CB2_Album);
         return TRUE;
     }
