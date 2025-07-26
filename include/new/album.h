@@ -2,7 +2,7 @@
 
 #include "../global.h"
 
-#define MEMORIES_COUNT 30
+#define MEMORIES_COUNT 10
 #define sAlbumPtr (*((struct Album**) 0x203E038))
 #define BG_MAP_BYTES 0x800
 
@@ -35,7 +35,7 @@ struct Album
     u16* bg3Map;
 
     // Memory Data
-    struct Memory memoryData[MEMORIES_COUNT];
+    struct Memory memoryData[MEMORIES_COUNT + 2];
 
     // Tracker Data
     u8 selectedMemory;
