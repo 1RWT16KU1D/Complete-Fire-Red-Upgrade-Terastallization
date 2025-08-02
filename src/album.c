@@ -255,30 +255,24 @@ static void PrintGUIAlbumDescription(void)
     CommitWindow(WIN_ALBUM_MEMORY_DESC);
 }
 
-#define PAL_TAG self->template->paletteTag
-
-static void UpdateCursorHighlight(struct Sprite *self, bool8 isKeyUp)
+static void UpdateCursorHighlight(bool8 isKeyUp, bool8 isStartUp)
 {
     const u16* romPal = AlbumBGPal;
-    u16* pal = &gPlttBufferFaded2[IndexOfSpritePaletteTag(PAL_TAG) * 16];
-    u16 originalCursorPal = pal[6];
-
-    u8 selectedMemory = sAlbumPtr->selectedMemoryInAlbum;
-    u8 paletteIdToChange = 6;
-
-    if (selectedMemory > 1)
-        paletteIdToChange += selectedMemory;
+    u16* pal = gPlttBufferFaded;
+    u16 defaultPal = romPal[7];
 
     // Change the palette
-    pal[paletteIdToChange] = RGB(31,31,31); // Pure white
+    u8 newIndex = sAlbumPtr->selectedMemoryInAlbum;
+    u8 palId = newIndex + 7;
 
     // Restore previous highlighted palette
-    if (isKeyUp)
-        paletteIdToChange += 6;
+    if (isKeyUp && !isStartUp)
+        pal[palId + 1] = defaultPal;
     else
-        paletteIdToChange -= 6;
+        pal[palId - 1] = defaultPal;
 
-    pal[paletteIdToChange] = originalCursorPal;
+    // Highlight selected cursor
+    pal[palId] = RGB(31,31,31);
 }
 
 static void CommitWindows(void)
@@ -361,7 +355,7 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
                 sAlbumPtr->selectedMemoryInAlbum++;
             }
 
-            UpdateCursorHighlight(sAlbumPtr->bgMap, FALSE);
+            UpdateCursorHighlight(FALSE, FALSE);
             scrolled = TRUE;
         }
     }
@@ -376,7 +370,7 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
                 sAlbumPtr->selectedMemoryInAlbum--;
             }
 
-            UpdateCursorHighlight(sAlbumPtr->bgMap, TRUE);
+            UpdateCursorHighlight(TRUE, FALSE);
             scrolled = TRUE;
         }
     }
@@ -418,6 +412,7 @@ static void InitAlbum(void)
 
     InitAlbumData();
     PrintGUIAlbumItems();
+    UpdateCursorHighlight(TRUE, TRUE);
     //ShowMemorySelectionArrow();
 }
 
