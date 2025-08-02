@@ -33,7 +33,7 @@ struct Memory
 struct Album
 {
     // Image Data
-    u16* bg3Map;
+    u16* bgMap;
 
     // Memory Data
     struct Memory memoryData[MEMORIES_COUNT + 2];

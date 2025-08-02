@@ -196,7 +196,7 @@ static void DisplayAlbumBG(void)
     decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, AlbumBGTiles, 0, 0, 0);
 
     // BGMap
-    LZDecompressWram(AlbumBGMap, sAlbumPtr->bg3Map);
+    LZDecompressWram(AlbumBGMap, sAlbumPtr->bgMap);
     CopyBgTilemapBufferToVram(BG_BACKGROUND);
 
     // Palette
@@ -255,6 +255,32 @@ static void PrintGUIAlbumDescription(void)
     CommitWindow(WIN_ALBUM_MEMORY_DESC);
 }
 
+#define PAL_TAG self->template->paletteTag
+
+static void UpdateCursorHighlight(struct Sprite *self, bool8 isKeyUp)
+{
+    const u16* romPal = AlbumBGPal;
+    u16* pal = &gPlttBufferFaded2[IndexOfSpritePaletteTag(PAL_TAG) * 16];
+    u16 originalCursorPal = pal[6];
+
+    u8 selectedMemory = sAlbumPtr->selectedMemoryInAlbum;
+    u8 paletteIdToChange = 6;
+
+    if (selectedMemory > 1)
+        paletteIdToChange += selectedMemory;
+
+    // Change the palette
+    pal[paletteIdToChange] = RGB(31,31,31); // Pure white
+
+    // Restore previous highlighted palette
+    if (isKeyUp)
+        paletteIdToChange += 6;
+    else
+        paletteIdToChange -= 6;
+
+    pal[paletteIdToChange] = originalCursorPal;
+}
+
 static void CommitWindows(void)
 {
     for (u32 i = 0; i < WIN_MAX_COUNT; ++i)
@@ -311,7 +337,7 @@ static void Task_AlbumFadeOut(u8 taskId)
     if (!gPaletteFade->active)
     {
         SetMainCallback2(CB2_ReturnToFieldContinueScript);
-        Free(sAlbumPtr->bg3Map);
+        Free(sAlbumPtr->bgMap);
         Free(sAlbumPtr);
         sAlbumPtr = NULL;
         FreeAllWindowBuffers();
@@ -335,6 +361,7 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
                 sAlbumPtr->selectedMemoryInAlbum++;
             }
 
+            UpdateCursorHighlight(sAlbumPtr->bgMap, FALSE);
             scrolled = TRUE;
         }
     }
@@ -349,6 +376,7 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
                 sAlbumPtr->selectedMemoryInAlbum--;
             }
 
+            UpdateCursorHighlight(sAlbumPtr->bgMap, TRUE);
             scrolled = TRUE;
         }
     }
@@ -368,7 +396,6 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
         gTasks[taskId].func = Task_AlbumFadeOut;
     }
 }
-
 
 static void Task_AlbumFadeIn(u8 taskId)
 {
@@ -408,10 +435,10 @@ static void CB2_Album(void)
             gMain.state++;
             break;
         case 2:
-            sAlbumPtr->bg3Map = Calloc(BG_MAP_BYTES);
+            sAlbumPtr->bgMap = Calloc(BG_MAP_BYTES);
             ResetBgsAndClearDma3BusyFlags(0);
             InitBgsFromTemplates(0, sAlbumBgTemplates, NELEMS(sAlbumBgTemplates));
-            SetBgTilemapBuffer(BG_BACKGROUND, sAlbumPtr->bg3Map);
+            SetBgTilemapBuffer(BG_BACKGROUND, sAlbumPtr->bgMap);
             CopyBgTilemapBufferToVram(BG_INTERFACE);
             gMain.state++;
             break;
