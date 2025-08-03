@@ -1,6 +1,6 @@
-#include "defines.h"
 #include "../include/battle.h"
 #include "../include/bg.h"
+#include "../include/decompress.h"
 #include "../include/event_data.h"
 #include "../include/event_object_movement.h"
 #include "../include/field_effect.h"
@@ -36,11 +36,15 @@
 
 #include "../include/new/album.h"
 #include "../include/new/dns.h"
+#include "../include/new/ram_locs.h"
+#include "../include/new/Vanilla_functions.h"
 
 // Imported functions
-extern void CommitWindow(u8 windowId);
-extern void CleanWindow(u8 windowId);
-extern void CleanWindows(void);
+static void CommitWindow(u8 windowId);
+static void CleanWindow(u8 windowId);
+static void CleanWindows(void);
+static void CommitWindows(void);
+static void ShowImage(void);
 
 static const struct BgTemplate sAlbumBgTemplates[] =
 {
@@ -236,15 +240,6 @@ static void UpdateCursorHighlight(bool8 isKeyUp, bool8 isStartUp)
     pal[palId] = RGB(31,31,31); // Pure white
 }
 
-static void CommitWindows(void)
-{
-    for (u32 i = 0; i < WIN_MAX_COUNT; ++i)
-    {
-        CopyWindowToVram(i, COPYWIN_BOTH);
-        PutWindowTilemap(i);
-    }
-}
-
 static void ClearTasksAndGraphicalStructs(void)
 {
     ScanlineEffect_Stop();
@@ -342,6 +337,14 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
         PrintGUIAlbumMemoryNames();
         PrintGUIAlbumDescription();
         PlaySE(SE_SELECT);
+    }
+
+    if (gMain.newKeys & A_BUTTON)
+    {
+        PlaySE(SE_SELECT);
+        FadeScreen(FADE_TO_BLACK, 0);
+        ShowImage();
+        FadeScreen(FADE_FROM_BLACK, 0);
     }
 
     if (gMain.newKeys & B_BUTTON)
@@ -463,4 +466,65 @@ bool8 AlbumCallback(void)
     }
 
     return FALSE;
+}
+
+extern void CleanWindow(u8 windowId)
+{
+	FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
+}
+
+extern void CleanWindows(void)
+{
+	for (u32 i = 0; i < WIN_MAX_COUNT; ++i)
+		CleanWindow(i);
+}
+
+extern void CommitWindow(u8 windowId)
+{
+	CopyWindowToVram(windowId, COPYWIN_BOTH);
+	PutWindowTilemap(windowId);
+}
+
+static void CommitWindows(void)
+{
+	for (u32 i = 0; i < WIN_MAX_COUNT; ++i)
+		CommitWindow(i);
+}
+
+static void LoadImage(u16 image) 
+{
+    u8 *tiles, *map;
+    u16 *palette;
+    tiles = ImageDataTable[image].tiles; 
+    map = ImageDataTable[image].tilemap;
+    palette = ImageDataTable[image].pal;
+	DecompressAndCopyTileDataToVram(0, tiles, 0, 0, 0);
+	LZDecompressWram(map, tilemapbuffer);
+	LoadPalette(palette, 0, 0x20);  
+}
+
+static void ShowImage(void) 
+{ 
+    DmaFill16(3, 0, VRAM, VRAM_SIZE);
+    DmaFill32(3, 0, OAM, OAM_SIZE);
+    DmaFill16(3, 0, PLTT, PLTT_SIZE);
+    SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_OBJ_1D_MAP);
+    SetGpuReg(REG_OFFSET_BG3CNT, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG2CNT, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG1CNT, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG0CNT, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG3HOFS, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG3VOFS, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG2HOFS, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG2VOFS, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG1HOFS, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG1VOFS, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG0HOFS, DISPCNT_MODE_0);
+    SetGpuReg(REG_OFFSET_BG0VOFS, DISPCNT_MODE_0);
+    tilemapbuffer = Malloc(0x1000);
+    CleanupOverworldWindowsAndTilemaps();
+    SetBgTilemapBuffer(0, tilemapbuffer); 
+    LoadImage(sAlbumPtr->selectedMemory);
+    ShowBg(0); 
+    CopyBgTilemapBufferToVram(0);
 }

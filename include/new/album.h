@@ -2,7 +2,7 @@
 
 #include "../global.h"
 
-#define MEMORIES_COUNT 10
+#define MEMORIES_COUNT 9
 #define sAlbumPtr (*((struct Album**) 0x203E038))
 #define BG_MAP_BYTES 0x800
 #define ALBUM_MEMORIES_PER_PAGE 7
@@ -84,3 +84,17 @@ extern const u8 gText_MemoryDesc_CampfireTales[];
 extern const u8 gText_MemoryDesc_SakuraPath[];
 extern const u8 gText_MemoryDesc_SnowballFight[];
 extern const u8 gText_MemoryDesc_LabDiscovery[];
+
+// Script call
+extern const u8 EventScript_AlbumMemorySelected[];
+
+struct ImageData 
+{
+  u8 *tiles;
+  u8 *tilemap; 
+  u16 *pal;
+};
+#define ImageDataTable ((const struct ImageData *) 0x8FE4E80)
+
+#define tilemapbuffer (*((u8**) 0x203E038))
+
