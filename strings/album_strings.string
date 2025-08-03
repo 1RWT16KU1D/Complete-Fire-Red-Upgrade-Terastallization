@@ -3,9 +3,6 @@ Memories
 
 
 // Memory Names
-#org @gText_Memory_None
-??????
-
 #org @gText_Memory_MeloettaUnderTree
 Meloetta under the tree[.]
 
@@ -32,7 +29,6 @@ Snowball fight!
 
 #org @gText_Memory_LabDiscovery
 Strange Lab Discovery
-
 
 // Memory Descriptions
 #org @gText_MemoryDesc_MeloettaUnderTree

@@ -42,32 +42,6 @@ extern void CommitWindow(u8 windowId);
 extern void CleanWindow(u8 windowId);
 extern void CleanWindows(void);
 
-#define ALBUM_CURSOR_TAG 0x3070
-static void SpriteCB_WhiteArrowMemorySelection(struct Sprite* sprite);
-
-static const struct OamData sOamData_WhiteArrowMemorySelection =
-{
-	.affineMode = ST_OAM_AFFINE_OFF,
-	.objMode = ST_OAM_OBJ_NORMAL,
-	.shape = SPRITE_SHAPE(8x16),
-	.size = SPRITE_SIZE(8x16),
-	.priority = 0,
-};
-
-static const struct SpriteTemplate sRaidBattleCursorSpriteTemplate =
-{
-	.tileTag = ALBUM_CURSOR_TAG,
-	.paletteTag = ALBUM_CURSOR_TAG,
-	.oam = &sOamData_WhiteArrowMemorySelection,
-	.anims = gDummySpriteAnimTable,
-	.images = NULL,
-	.affineAnims = gDummySpriteAffineAnimTable,
-	.callback = SpriteCB_WhiteArrowMemorySelection,
-};
-
-static const struct CompressedSpriteSheet sAlbumMemoryCursorSpriteSheet = {AlbumCursorTiles, (8 * 16) / 2, ALBUM_CURSOR_TAG};
-static const struct CompressedSpritePalette sAlbumMemoryCursorSpritePalette = {AlbumCursorPal, ALBUM_CURSOR_TAG};
-
 static const struct BgTemplate sAlbumBgTemplates[] =
 {
     [BG_INTERFACE] =
@@ -149,45 +123,36 @@ static const struct WindowTemplate sAlbumWinTemplates[WIN_MAX_COUNT + 1] =
 
 static void InitAlbumData(void)
 {
-    sAlbumPtr->memoryData[0].memoryName = gText_Memory_None;
-    sAlbumPtr->memoryData[0].memoryDesc = gText_Memory_None;
+    sAlbumPtr->memoryData[0].memoryName = gText_Memory_MeloettaUnderTree;
+    sAlbumPtr->memoryData[0].memoryDesc = gText_MemoryDesc_MeloettaUnderTree;
 
-    sAlbumPtr->memoryData[1].memoryName = gText_Memory_MeloettaUnderTree;
-    sAlbumPtr->memoryData[1].memoryDesc = gText_MemoryDesc_MeloettaUnderTree;
+    sAlbumPtr->memoryData[1].memoryName = gText_Memory_PikachuAndEevee;
+    sAlbumPtr->memoryData[1].memoryDesc = gText_MemoryDesc_PikachuAndEevee;
 
-    sAlbumPtr->memoryData[2].memoryName = gText_Memory_PikachuAndEevee;
-    sAlbumPtr->memoryData[2].memoryDesc = gText_MemoryDesc_PikachuAndEevee;
+    sAlbumPtr->memoryData[2].memoryName = gText_Memory_InsideCave;
+    sAlbumPtr->memoryData[2].memoryDesc = gText_MemoryDesc_InsideCave;
 
-    sAlbumPtr->memoryData[3].memoryName = gText_Memory_InsideCave;
-    sAlbumPtr->memoryData[3].memoryDesc = gText_MemoryDesc_InsideCave;
+    sAlbumPtr->memoryData[3].memoryName = gText_Memory_NightSkyWish;
+    sAlbumPtr->memoryData[3].memoryDesc = gText_MemoryDesc_NightSkyWish;
 
-    sAlbumPtr->memoryData[4].memoryName = gText_Memory_NightSkyWish;
-    sAlbumPtr->memoryData[4].memoryDesc = gText_MemoryDesc_NightSkyWish;
+    sAlbumPtr->memoryData[4].memoryName = gText_Memory_SeasideShells;
+    sAlbumPtr->memoryData[4].memoryDesc = gText_MemoryDesc_SeasideShells;
 
-    sAlbumPtr->memoryData[5].memoryName = gText_Memory_SeasideShells;
-    sAlbumPtr->memoryData[5].memoryDesc = gText_MemoryDesc_SeasideShells;
+    sAlbumPtr->memoryData[5].memoryName = gText_Memory_CampfireTales;
+    sAlbumPtr->memoryData[5].memoryDesc = gText_MemoryDesc_CampfireTales;
 
-    sAlbumPtr->memoryData[6].memoryName = gText_Memory_CampfireTales;
-    sAlbumPtr->memoryData[6].memoryDesc = gText_MemoryDesc_CampfireTales;
+    sAlbumPtr->memoryData[6].memoryName = gText_Memory_SakuraPath;
+    sAlbumPtr->memoryData[6].memoryDesc = gText_MemoryDesc_SakuraPath;
 
-    sAlbumPtr->memoryData[7].memoryName = gText_Memory_SakuraPath;
-    sAlbumPtr->memoryData[7].memoryDesc = gText_MemoryDesc_SakuraPath;
+    sAlbumPtr->memoryData[7].memoryName = gText_Memory_SnowballFight;
+    sAlbumPtr->memoryData[7].memoryDesc = gText_MemoryDesc_SnowballFight;
 
-    sAlbumPtr->memoryData[8].memoryName = gText_Memory_SnowballFight;
-    sAlbumPtr->memoryData[8].memoryDesc = gText_MemoryDesc_SnowballFight;
-
-    sAlbumPtr->memoryData[9].memoryName = gText_Memory_LabDiscovery;
-    sAlbumPtr->memoryData[9].memoryDesc = gText_MemoryDesc_LabDiscovery;
+    sAlbumPtr->memoryData[8].memoryName = gText_Memory_LabDiscovery;
+    sAlbumPtr->memoryData[8].memoryDesc = gText_MemoryDesc_LabDiscovery;
 
     // Initial cursor position
-    sAlbumPtr->selectedMemory = 1;
+    sAlbumPtr->selectedMemory = 0;
     sAlbumPtr->selectedMemoryInAlbum = 0;
-}
-
-static void SpriteCB_WhiteArrowMemorySelection(struct Sprite* sprite)
-{
-    sprite->pos1.y = (sAlbumPtr->selectedMemoryInAlbum * 16) + 8;
-    sprite->pos2.x = 4;
 }
 
 static void DisplayAlbumBG(void)
@@ -203,13 +168,6 @@ static void DisplayAlbumBG(void)
     LoadPalette(AlbumBGPal, 0, 0x20);
     LoadMenuElementsPalette(12 * 0x10, 1);
     Menu_LoadStdPalAt(15 * 0x10);
-}
-
-static void __attribute__((unused)) ShowMemorySelectionArrow(void)
-{
-	LoadCompressedSpriteSheetUsingHeap(&sAlbumMemoryCursorSpriteSheet);
-	LoadCompressedSpritePaletteUsingHeap(&sAlbumMemoryCursorSpritePalette);
-	CreateSprite(&sRaidBattleCursorSpriteTemplate, 8, 16, 0);
 }
 
 static void PrintGUIAlbumHeader(void)
@@ -266,13 +224,16 @@ static void UpdateCursorHighlight(bool8 isKeyUp, bool8 isStartUp)
     u8 palId = newIndex + 7;
 
     // Restore previous highlighted palette
-    if (isKeyUp && !isStartUp)
-        pal[palId + 1] = defaultPal;
-    else
-        pal[palId - 1] = defaultPal;
+    if (!isStartUp)
+    {
+        if (isKeyUp)
+            pal[palId + 1] = defaultPal;
+        else
+            pal[palId - 1] = defaultPal;
+    }
 
     // Highlight selected cursor
-    pal[palId] = RGB(31,31,31);
+    pal[palId] = RGB(31,31,31); // Pure white
 }
 
 static void CommitWindows(void)
@@ -394,7 +355,10 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
 static void Task_AlbumFadeIn(u8 taskId)
 {
     if (!gPaletteFade->active)
+    {
+        UpdateCursorHighlight(TRUE, TRUE);
         gTasks[taskId].func = Task_AlbumWaitForKeyPress;
+    }
 }
 
 static void PrintGUIAlbumItems(void)
@@ -412,8 +376,6 @@ static void InitAlbum(void)
 
     InitAlbumData();
     PrintGUIAlbumItems();
-    UpdateCursorHighlight(TRUE, TRUE);
-    //ShowMemorySelectionArrow();
 }
 
 static void CB2_Album(void)

@@ -55,9 +55,6 @@ extern const u8 AlbumBGTiles[];
 extern const u8 AlbumBGMap[];
 extern const u16 AlbumBGPal[];
 
-extern const u8 AlbumCursorTiles[];
-extern const u8 AlbumCursorPal[];
-
 // Memory Images
 //extern const u8 Memory_MeloettaUnderTreeTiles[];
 //extern const u8 Memory_MeloettaUnderTreeMap[];
@@ -67,7 +64,6 @@ extern const u8 AlbumCursorPal[];
 extern const u8 gText_AlbumHeader[];
 
 // Memory Names
-extern const u8 gText_Memory_None[];
 extern const u8 gText_Memory_MeloettaUnderTree[];
 extern const u8 gText_Memory_PikachuAndEevee[];
 extern const u8 gText_Memory_InsideCave[];
@@ -79,7 +75,6 @@ extern const u8 gText_Memory_SnowballFight[];
 extern const u8 gText_Memory_LabDiscovery[];
 
 // Memory Descriptions
-extern const u8 gText_MemoryDesc_None[];
 extern const u8 gText_MemoryDesc_MeloettaUnderTree[];
 extern const u8 gText_MemoryDesc_PikachuAndEevee[];
 extern const u8 gText_MemoryDesc_InsideCave[];
