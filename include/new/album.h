@@ -88,13 +88,11 @@ extern const u8 gText_MemoryDesc_LabDiscovery[];
 // Script call
 extern const u8 EventScript_AlbumMemorySelected[];
 
-struct ImageData 
+struct ImageData
 {
   u8 *tiles;
-  u8 *tilemap; 
+  u8 *tilemap;
   u16 *pal;
 };
 #define ImageDataTable ((const struct ImageData *) 0x8FE4E80)
-
-#define tilemapbuffer (*((u8**) 0x203E038))
 
