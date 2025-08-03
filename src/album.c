@@ -46,6 +46,59 @@ static void CleanWindows(void);
 static void CommitWindows(void);
 static void ShowImage(void);
 
+struct PreloadedImage
+{
+    u8 *tiles;
+    u32 tilesSize;
+    u8 *tilemap;
+    u32 tilemapSize;
+    const u16 *pal;
+};
+
+static struct PreloadedImage sPreloadedImages[MEMORIES_COUNT];
+
+static u32 GetDecompressedSize(const u8 *src)
+{
+    return (src[1] << 16) | (src[2] << 8) | src[3];
+}
+
+static void PreloadAlbumImages(void)
+{
+    for (u8 i = 0; i < MEMORIES_COUNT; ++i)
+    {
+        const struct ImageData *image = &ImageDataTable[i];
+
+        u32 size = GetDecompressedSize(image->tiles);
+        sPreloadedImages[i].tilesSize = size;
+        sPreloadedImages[i].tiles = Malloc(size);
+        LZDecompressWram(image->tiles, sPreloadedImages[i].tiles);
+
+        size = GetDecompressedSize(image->tilemap);
+        sPreloadedImages[i].tilemapSize = size;
+        sPreloadedImages[i].tilemap = Malloc(size);
+        LZDecompressWram(image->tilemap, sPreloadedImages[i].tilemap);
+
+        sPreloadedImages[i].pal = image->pal;
+    }
+}
+
+static void FreeAlbumImages(void)
+{
+    for (u8 i = 0; i < MEMORIES_COUNT; ++i)
+    {
+        if (sPreloadedImages[i].tiles)
+        {
+            Free(sPreloadedImages[i].tiles);
+            sPreloadedImages[i].tiles = NULL;
+        }
+        if (sPreloadedImages[i].tilemap)
+        {
+            Free(sPreloadedImages[i].tilemap);
+            sPreloadedImages[i].tilemap = NULL;
+        }
+    }
+}
+
 static const struct BgTemplate sAlbumBgTemplates[] =
 {
     [BG_INTERFACE] =
@@ -287,6 +340,7 @@ static void Task_AlbumFadeOut(u8 taskId)
     if (!gPaletteFade->active)
     {
         SetMainCallback2(CB2_ReturnToFieldContinueScript);
+        FreeAlbumImages();
         Free(sAlbumPtr->bgMap);
         Free(sAlbumPtr);
         sAlbumPtr = NULL;
@@ -377,6 +431,7 @@ static void InitAlbum(void)
     CleanWindows();
     CommitWindows();
 
+    PreloadAlbumImages();
     InitAlbumData();
     PrintGUIAlbumItems();
 }
@@ -491,40 +546,26 @@ static void CommitWindows(void)
 		CommitWindow(i);
 }
 
-static void LoadImage(u16 image) 
+static void LoadImage(u16 image)
 {
-    u8 *tiles, *map;
-    u16 *palette;
-    tiles = ImageDataTable[image].tiles; 
-    map = ImageDataTable[image].tilemap;
-    palette = ImageDataTable[image].pal;
-	DecompressAndCopyTileDataToVram(0, tiles, 0, 0, 0);
-	LZDecompressWram(map, tilemapbuffer);
-	LoadPalette(palette, 0, 0x20);  
+    const struct PreloadedImage *img = &sPreloadedImages[image];
+
+    CpuFastCopy(img->tiles, (void *)BG_CHAR_ADDR(0), img->tilesSize);
+    SetBgTilemapBuffer(0, img->tilemap);
+    CopyBgTilemapBufferToVram(0);
+    LoadPalette(img->pal, 0, 0x20);
+    SetBgAttribute(0, BG_ATTR_PRIORITY, 0);
 }
 
-static void ShowImage(void) 
-{ 
+static void ShowImage(void)
+{
     DmaFill16(3, 0, VRAM, VRAM_SIZE);
     DmaFill32(3, 0, OAM, OAM_SIZE);
     DmaFill16(3, 0, PLTT, PLTT_SIZE);
     SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_OBJ_1D_MAP);
-    SetGpuReg(REG_OFFSET_BG3CNT, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG2CNT, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG1CNT, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG0CNT, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG3HOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG3VOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG2HOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG2VOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG1HOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG1VOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG0HOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG0VOFS, DISPCNT_MODE_0);
-    tilemapbuffer = Malloc(0x1000);
+    SetGpuReg(REG_OFFSET_BG0HOFS, 0);
+    SetGpuReg(REG_OFFSET_BG0VOFS, 0);
     CleanupOverworldWindowsAndTilemaps();
-    SetBgTilemapBuffer(0, tilemapbuffer); 
     LoadImage(sAlbumPtr->selectedMemory);
-    ShowBg(0); 
-    CopyBgTilemapBufferToVram(0);
+    ShowBg(0);
 }
