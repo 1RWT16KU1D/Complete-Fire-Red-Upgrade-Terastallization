@@ -12,13 +12,14 @@ enum AlbumWindows
     WIN_ALBUM_HEADER,
     WIN_ALBUM_MEMORY_NAME,
     WIN_ALBUM_MEMORY_DESC,
+    WIN_ALBUM_MISC,
     WIN_MAX_COUNT,
 };
 
 enum AlbumBGs
 {
-    BG_UNUSED,
     BG_INTERFACE,
+    BG_UNUSED,
     BG_UNUSED2,
     BG_BACKGROUND,
 };
@@ -55,11 +56,6 @@ extern const u8 AlbumBGTiles[];
 extern const u8 AlbumBGMap[];
 extern const u16 AlbumBGPal[];
 
-// Memory Images
-//extern const u8 Memory_MeloettaUnderTreeTiles[];
-//extern const u8 Memory_MeloettaUnderTreeMap[];
-//extern const u8 Memory_MeloettaUnderTreePal[];
-
 /* ============= Text Declarations ============== */
 extern const u8 gText_AlbumHeader[];
 
@@ -90,11 +86,10 @@ extern const u8 EventScript_AlbumMemorySelected[];
 
 struct ImageData 
 {
-  u8 *tiles;
-  u8 *tilemap; 
-  u16 *pal;
+    u8 *tiles;
+    u8 *tilemap; 
+    u16 *pal;
 };
+
 #define ImageDataTable ((const struct ImageData *) 0x8FE4E80)
-
-#define tilemapbuffer (*((u8**) 0x203E038))
-
+#define tilemapbuffer (*((u8**) 0x203E03C))

@@ -122,6 +122,16 @@ static const struct WindowTemplate sAlbumWinTemplates[WIN_MAX_COUNT + 1] =
         .paletteNum = 15,
         .baseBlock = 353,
     },
+    [WIN_ALBUM_MISC] =
+    {
+        .bg = BG_INTERFACE,
+        .tilemapLeft = 22,
+        .tilemapTop = 7,
+        .width = 8,
+        .height = 5,
+        .paletteNum = 15,
+        .baseBlock = 533,
+    },
     DUMMY_WIN_TEMPLATE,
 };
 
@@ -342,9 +352,8 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
     if (gMain.newKeys & A_BUTTON)
     {
         PlaySE(SE_SELECT);
-        FadeScreen(FADE_TO_BLACK, 0);
-        ShowImage();
-        FadeScreen(FADE_FROM_BLACK, 0);
+        BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
+        gTasks[taskId].func = Task_AlbumFadeOut;
     }
 
     if (gMain.newKeys & B_BUTTON)
@@ -359,7 +368,7 @@ static void Task_AlbumFadeIn(u8 taskId)
 {
     if (!gPaletteFade->active)
     {
-        UpdateCursorHighlight(TRUE, TRUE);
+        UpdateCursorHighlight(FALSE, TRUE);
         gTasks[taskId].func = Task_AlbumWaitForKeyPress;
     }
 }
@@ -446,7 +455,7 @@ static void Task_InitAlbum(u8 taskId)
     }
 }
 
-void ShowAlbum_Init(void)
+static void ShowAlbum_Init(void)
 {
     FadeScreen(FADE_TO_BLACK, 0);
     CreateTask(Task_InitAlbum, 0);
@@ -491,40 +500,15 @@ static void CommitWindows(void)
 		CommitWindow(i);
 }
 
-static void LoadImage(u16 image) 
+static void unusedArg ShowImage(void)
 {
-    u8 *tiles, *map;
-    u16 *palette;
-    tiles = ImageDataTable[image].tiles; 
-    map = ImageDataTable[image].tilemap;
-    palette = ImageDataTable[image].pal;
-	DecompressAndCopyTileDataToVram(0, tiles, 0, 0, 0);
-	LZDecompressWram(map, tilemapbuffer);
-	LoadPalette(palette, 0, 0x20);  
-}
-
-static void ShowImage(void) 
-{ 
     DmaFill16(3, 0, VRAM, VRAM_SIZE);
     DmaFill32(3, 0, OAM, OAM_SIZE);
     DmaFill16(3, 0, PLTT, PLTT_SIZE);
     SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_OBJ_1D_MAP);
-    SetGpuReg(REG_OFFSET_BG3CNT, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG2CNT, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG1CNT, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG0CNT, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG3HOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG3VOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG2HOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG2VOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG1HOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG1VOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG0HOFS, DISPCNT_MODE_0);
-    SetGpuReg(REG_OFFSET_BG0VOFS, DISPCNT_MODE_0);
-    tilemapbuffer = Malloc(0x1000);
+    SetGpuReg(REG_OFFSET_BG0HOFS, 0);
+    SetGpuReg(REG_OFFSET_BG0VOFS, 0);
     CleanupOverworldWindowsAndTilemaps();
-    SetBgTilemapBuffer(0, tilemapbuffer); 
-    LoadImage(sAlbumPtr->selectedMemory);
-    ShowBg(0); 
-    CopyBgTilemapBufferToVram(0);
+    //LoadImage(sAlbumPtr->selectedMemory);
+    ShowBg(BG_BACKGROUND);
 }
