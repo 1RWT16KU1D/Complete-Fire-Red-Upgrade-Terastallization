@@ -45,6 +45,18 @@ static void CleanWindow(u8 windowId);
 static void CleanWindows(void);
 static void CommitWindows(void);
 static void ShowImage(void);
+static void Task_AlbumShowImage(u8 taskId);
+static void LoadAlbumImage(u8 memoryId);
+static void Task_ImageFadeIn(u8 taskId);
+static void Task_ImageWaitForKeyPress(u8 taskId);
+static void Task_ImageFadeOut(u8 taskId);
+static void CB2_Image(void);
+static void VBlankCB_Image(void);
+static void MainCB2_Image(void);
+
+static u8 sSavedSelectedMemory;
+static u8 sSavedSelectedMemoryInAlbum;
+static bool8 sReturnFromImage;
 
 static const struct BgTemplate sAlbumBgTemplates[] =
 {
@@ -305,6 +317,15 @@ static void Task_AlbumFadeOut(u8 taskId)
     }
 }
 
+static void Task_AlbumShowImage(u8 taskId)
+{
+    if (!gPaletteFade->active)
+    {
+        ShowImage();
+        DestroyTask(taskId);
+    }
+}
+
 static void Task_AlbumWaitForKeyPress(u8 taskId)
 {
     bool8 scrolled = FALSE;
@@ -353,7 +374,7 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
     {
         PlaySE(SE_SELECT);
         BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
-        gTasks[taskId].func = Task_AlbumFadeOut;
+        gTasks[taskId].func = Task_AlbumShowImage;
     }
 
     if (gMain.newKeys & B_BUTTON)
@@ -387,6 +408,12 @@ static void InitAlbum(void)
     CommitWindows();
 
     InitAlbumData();
+    if (sReturnFromImage)
+    {
+        sAlbumPtr->selectedMemory = sSavedSelectedMemory;
+        sAlbumPtr->selectedMemoryInAlbum = sSavedSelectedMemoryInAlbum;
+        sReturnFromImage = FALSE;
+    }
     PrintGUIAlbumItems();
 }
 
@@ -496,19 +523,121 @@ extern void CommitWindow(u8 windowId)
 
 static void CommitWindows(void)
 {
-	for (u32 i = 0; i < WIN_MAX_COUNT; ++i)
-		CommitWindow(i);
+        for (u32 i = 0; i < WIN_MAX_COUNT; ++i)
+                CommitWindow(i);
 }
 
-static void unusedArg ShowImage(void)
+static const struct BgTemplate sImageBgTemplate =
 {
-    DmaFill16(3, 0, VRAM, VRAM_SIZE);
-    DmaFill32(3, 0, OAM, OAM_SIZE);
-    DmaFill16(3, 0, PLTT, PLTT_SIZE);
-    SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_OBJ_1D_MAP);
-    SetGpuReg(REG_OFFSET_BG0HOFS, 0);
-    SetGpuReg(REG_OFFSET_BG0VOFS, 0);
-    CleanupOverworldWindowsAndTilemaps();
-    //LoadImage(sAlbumPtr->selectedMemory);
-    ShowBg(BG_BACKGROUND);
+    .bg = BG_BACKGROUND,
+    .charBaseIndex = 3,
+    .mapBaseIndex = 28,
+    .screenSize = 0,
+    .paletteMode = 0,
+    .priority = 0,
+    .baseTile = 0,
+};
+
+static void LoadAlbumImage(u8 memoryId)
+{
+    const struct ImageData *image = &ImageDataTable[memoryId];
+    decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, image->tiles, 0, 0, 0);
+    LZDecompressWram(image->tilemap, tilemapbuffer);
+    CopyBgTilemapBufferToVram(BG_BACKGROUND);
+    LoadPalette(image->pal, 0, 0x20);
+}
+
+static void VBlankCB_Image(void)
+{
+    LoadOam();
+    ProcessSpriteCopyRequests();
+    TransferPlttBuffer();
+}
+
+static void MainCB2_Image(void)
+{
+    RunTasks();
+    AnimateSprites();
+    BuildOamBuffer();
+    UpdatePaletteFade();
+}
+
+static void Task_ImageFadeIn(u8 taskId)
+{
+    if (!gPaletteFade->active)
+        gTasks[taskId].func = Task_ImageWaitForKeyPress;
+}
+
+static void Task_ImageWaitForKeyPress(u8 taskId)
+{
+    if (gMain.newKeys & B_BUTTON)
+    {
+        PlaySE(SE_PC_OFF);
+        BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
+        gTasks[taskId].func = Task_ImageFadeOut;
+    }
+}
+
+static void Task_ImageFadeOut(u8 taskId)
+{
+    if (!gPaletteFade->active)
+    {
+        Free(tilemapbuffer);
+        tilemapbuffer = NULL;
+        CleanupOverworldWindowsAndTilemaps();
+        sAlbumPtr = Calloc(sizeof(struct Album));
+        gMain.state = 0;
+        SetMainCallback2(CB2_Album);
+        DestroyTask(taskId);
+    }
+}
+
+static void CB2_Image(void)
+{
+    switch (gMain.state)
+    {
+        case 0:
+            SetVBlankCallback(NULL);
+            ClearVramOamPlttRegs();
+            gMain.state++;
+            break;
+        case 1:
+            ClearTasksAndGraphicalStructs();
+            ResetBgsAndClearDma3BusyFlags(0);
+            tilemapbuffer = Calloc(BG_MAP_BYTES);
+            InitBgsFromTemplates(0, &sImageBgTemplate, 1);
+            SetBgTilemapBuffer(BG_BACKGROUND, tilemapbuffer);
+            gMain.state++;
+            break;
+        case 2:
+            LoadAlbumImage(sSavedSelectedMemory);
+            ShowBg(BG_BACKGROUND);
+            gMain.state++;
+            break;
+        case 3:
+            if (!free_temp_tile_data_buffers_if_possible())
+            {
+                BeginNormalPaletteFade(0xFFFFFFFF, 0, 16, 0, RGB_BLACK);
+                SetVBlankCallback(VBlankCB_Image);
+                CreateTask(Task_ImageFadeIn, 0);
+                SetMainCallback2(MainCB2_Image);
+                gMain.state = 0;
+            }
+            break;
+    }
+}
+
+static void ShowImage(void)
+{
+    sSavedSelectedMemory = sAlbumPtr->selectedMemory;
+    sSavedSelectedMemoryInAlbum = sAlbumPtr->selectedMemoryInAlbum;
+    sReturnFromImage = TRUE;
+
+    Free(sAlbumPtr->bgMap);
+    Free(sAlbumPtr);
+    sAlbumPtr = NULL;
+    FreeAllWindowBuffers();
+
+    gMain.state = 0;
+    SetMainCallback2(CB2_Image);
 }
