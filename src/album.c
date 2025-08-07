@@ -520,7 +520,6 @@ static void LoadAlbumImage(u8 memoryId)
     DmaFill16(3, 0, tilemapbuffer, BG_MAP_BYTES);
     decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, image->tiles, 0, 0, 0);
     LZDecompressWram(image->tilemap, tilemapbuffer);
-    CopyBgTilemapBufferToVram(BG_BACKGROUND);
     LoadPalette(image->pal, 0, 0x20);
     LoadMenuElementsPalette(12 * 0x10, 1);
     Menu_LoadStdPalAt(15 * 0x10);
@@ -588,12 +587,13 @@ static void CB2_Image(void)
             break;
         case 2:
             LoadAlbumImage(VarGet(VAR_ALBUM_SELECTED_MEMORY));
-            ShowBg(BG_BACKGROUND);
             gMain.state++;
             break;
         case 3:
             if (!free_temp_tile_data_buffers_if_possible())
             {
+                CopyBgTilemapBufferToVram(BG_BACKGROUND);
+                ShowBg(BG_BACKGROUND);
                 BeginNormalPaletteFade(0xFFFFFFFF, 0, 16, 0, RGB_BLACK);
                 SetVBlankCallback(VBlankCB_Image);
                 CreateTask(Task_ImageFadeIn, 0);
