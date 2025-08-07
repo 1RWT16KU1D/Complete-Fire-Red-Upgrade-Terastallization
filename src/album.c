@@ -374,6 +374,8 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
     if (gMain.newKeys & B_BUTTON)
     {
         PlaySE(SE_PC_OFF);
+        VarSet(VAR_ALBUM_SELECTED_MEMORY, sAlbumPtr->selectedMemory);
+        VarSet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM, sAlbumPtr->selectedMemoryInAlbum);
         BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
         gTasks[taskId].func = Task_AlbumFadeOut;
     }
@@ -402,21 +404,6 @@ static void InitAlbum(void)
     CommitWindows();
 
     InitAlbumData();
-    if (VarGet(VAR_ALBUM_FIRST_TIME) == TRUE)
-    {
-        sAlbumPtr->selectedMemory = 0;
-        sAlbumPtr->selectedMemoryInAlbum = 0;
-        VarSet(VAR_ALBUM_SELECTED_MEMORY, sAlbumPtr->selectedMemory);
-        VarSet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM, sAlbumPtr->selectedMemoryInAlbum);
-
-        VarSet(VAR_ALBUM_FIRST_TIME, FALSE);
-    }
-    else
-    {
-        sAlbumPtr->selectedMemory = VarGet(VAR_ALBUM_SELECTED_MEMORY);
-        sAlbumPtr->selectedMemoryInAlbum = VarGet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM);
-        VarSet(VAR_ALBUM_FIRST_TIME, FALSE);
-    }
     PrintGUIAlbumItems();
 }
 
@@ -427,6 +414,8 @@ static void CB2_Album(void)
         case 0:
             SetVBlankCallback(NULL);
             ClearVramOamPlttRegs();
+            if (sAlbumPtr == NULL)
+                sAlbumPtr = Calloc(sizeof(struct Album));
             gMain.state++;
             break;
         case 1:
@@ -617,8 +606,6 @@ static void CB2_Image(void)
 
 static void ShowImage(void)
 {
-    VarSet(VAR_ALBUM_FIRST_TIME, TRUE);
-
     Free(sAlbumPtr->bgMap);
     Free(sAlbumPtr);
     sAlbumPtr = NULL;
