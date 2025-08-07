@@ -374,8 +374,8 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
     if (gMain.newKeys & B_BUTTON)
     {
         PlaySE(SE_PC_OFF);
-        VarSet(VAR_ALBUM_SELECTED_MEMORY, sAlbumPtr->selectedMemory);
-        VarSet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM, sAlbumPtr->selectedMemoryInAlbum);
+        VarSet(VAR_ALBUM_SELECTED_MEMORY, 0);
+        VarSet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM, 0);
         BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
         gTasks[taskId].func = Task_AlbumFadeOut;
     }
@@ -402,6 +402,10 @@ static void InitAlbum(void)
     // Remove glitches
     CleanWindows();
     CommitWindows();
+
+    // Restore the last selected memory and cursor position
+    sAlbumPtr->selectedMemory = VarGet(VAR_ALBUM_SELECTED_MEMORY);
+    sAlbumPtr->selectedMemoryInAlbum = VarGet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM);
 
     InitAlbumData();
     PrintGUIAlbumItems();
@@ -516,8 +520,8 @@ static const struct BgTemplate sImageBgTemplate =
 static void LoadAlbumImage(u8 memoryId)
 {
     const struct ImageData *image = &ImageDataTable[memoryId];
-    DmaFill16(3, 0, BG_CHAR_ADDR(3), 0x4000);
-    DmaFill16(3, 0, tilemapbuffer, BG_MAP_BYTES);
+    CpuFastFill16(0, BG_CHAR_ADDR(3), 0x4000);
+    CpuFastFill16(0, tilemapbuffer, BG_MAP_BYTES);
     decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, image->tiles, 0, 0, 0);
     LZDecompressWram(image->tilemap, tilemapbuffer);
     LoadPalette(image->pal, 0, 0x20);
