@@ -39,7 +39,7 @@
 #include "../include/new/ram_locs.h"
 #include "../include/new/Vanilla_functions.h"
 
-// Imported functions
+// This file's functions
 static void CommitWindow(u8 windowId);
 static void CleanWindow(u8 windowId);
 static void CleanWindows(void);
@@ -53,10 +53,6 @@ static void Task_ImageFadeOut(u8 taskId);
 static void CB2_Image(void);
 static void VBlankCB_Image(void);
 static void MainCB2_Image(void);
-
-static u8 sSavedSelectedMemory;
-static u8 sSavedSelectedMemoryInAlbum;
-static bool8 sReturnFromImage;
 
 static const struct BgTemplate sAlbumBgTemplates[] =
 {
@@ -175,10 +171,6 @@ static void InitAlbumData(void)
 
     sAlbumPtr->memoryData[8].memoryName = gText_Memory_LabDiscovery;
     sAlbumPtr->memoryData[8].memoryDesc = gText_MemoryDesc_LabDiscovery;
-
-    // Initial cursor position
-    sAlbumPtr->selectedMemory = 0;
-    sAlbumPtr->selectedMemoryInAlbum = 0;
 }
 
 static void DisplayAlbumBG(void)
@@ -373,6 +365,8 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
     if (gMain.newKeys & A_BUTTON)
     {
         PlaySE(SE_SELECT);
+        VarSet(VAR_ALBUM_SELECTED_MEMORY, sAlbumPtr->selectedMemory);
+        VarSet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM, sAlbumPtr->selectedMemoryInAlbum);
         BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
         gTasks[taskId].func = Task_AlbumShowImage;
     }
@@ -408,11 +402,20 @@ static void InitAlbum(void)
     CommitWindows();
 
     InitAlbumData();
-    if (sReturnFromImage)
+    if (VarGet(VAR_ALBUM_FIRST_TIME) == TRUE)
     {
-        sAlbumPtr->selectedMemory = sSavedSelectedMemory;
-        sAlbumPtr->selectedMemoryInAlbum = sSavedSelectedMemoryInAlbum;
-        sReturnFromImage = FALSE;
+        sAlbumPtr->selectedMemory = 0;
+        sAlbumPtr->selectedMemoryInAlbum = 0;
+        VarSet(VAR_ALBUM_SELECTED_MEMORY, sAlbumPtr->selectedMemory);
+        VarSet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM, sAlbumPtr->selectedMemoryInAlbum);
+
+        VarSet(VAR_ALBUM_FIRST_TIME, FALSE);
+    }
+    else
+    {
+        sAlbumPtr->selectedMemory = VarGet(VAR_ALBUM_SELECTED_MEMORY);
+        sAlbumPtr->selectedMemoryInAlbum = VarGet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM);
+        VarSet(VAR_ALBUM_FIRST_TIME, FALSE);
     }
     PrintGUIAlbumItems();
 }
@@ -471,23 +474,6 @@ static void CB2_Album(void)
     }
 }
 
-static void Task_InitAlbum(u8 taskId)
-{
-    if (!gPaletteFade->active)
-    {
-        sAlbumPtr = Calloc(sizeof(struct Album));
-        PlayRainStoppingSoundEffect();
-        SetMainCallback2(CB2_Album);
-        DestroyTask(taskId);
-    }
-}
-
-static void ShowAlbum_Init(void)
-{
-    FadeScreen(FADE_TO_BLACK, 0);
-    CreateTask(Task_InitAlbum, 0);
-}
-
 bool8 AlbumCallback(void)
 {
     if (!gPaletteFade->active)
@@ -541,10 +527,14 @@ static const struct BgTemplate sImageBgTemplate =
 static void LoadAlbumImage(u8 memoryId)
 {
     const struct ImageData *image = &ImageDataTable[memoryId];
+    DmaFill16(3, 0, BG_CHAR_ADDR(3), 0x4000);
+    DmaFill16(3, 0, tilemapbuffer, BG_MAP_BYTES);
     decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, image->tiles, 0, 0, 0);
     LZDecompressWram(image->tilemap, tilemapbuffer);
     CopyBgTilemapBufferToVram(BG_BACKGROUND);
     LoadPalette(image->pal, 0, 0x20);
+    LoadMenuElementsPalette(12 * 0x10, 1);
+    Menu_LoadStdPalAt(15 * 0x10);
 }
 
 static void VBlankCB_Image(void)
@@ -584,8 +574,6 @@ static void Task_ImageFadeOut(u8 taskId)
     {
         Free(tilemapbuffer);
         tilemapbuffer = NULL;
-        CleanupOverworldWindowsAndTilemaps();
-        sAlbumPtr = Calloc(sizeof(struct Album));
         gMain.state = 0;
         SetMainCallback2(CB2_Album);
         DestroyTask(taskId);
@@ -610,7 +598,7 @@ static void CB2_Image(void)
             gMain.state++;
             break;
         case 2:
-            LoadAlbumImage(sSavedSelectedMemory);
+            LoadAlbumImage(VarGet(VAR_ALBUM_SELECTED_MEMORY));
             ShowBg(BG_BACKGROUND);
             gMain.state++;
             break;
@@ -629,9 +617,7 @@ static void CB2_Image(void)
 
 static void ShowImage(void)
 {
-    sSavedSelectedMemory = sAlbumPtr->selectedMemory;
-    sSavedSelectedMemoryInAlbum = sAlbumPtr->selectedMemoryInAlbum;
-    sReturnFromImage = TRUE;
+    VarSet(VAR_ALBUM_FIRST_TIME, TRUE);
 
     Free(sAlbumPtr->bgMap);
     Free(sAlbumPtr);
