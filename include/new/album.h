@@ -46,6 +46,9 @@ struct Album
     // Tracker Data
     u8 selectedMemory;
     u8 selectedMemoryInAlbum; // Max of 7
+
+    // Index of the first memory currently shown
+    u8 displayedStartId;
 };
 
 static const struct TextColor sWhiteText =

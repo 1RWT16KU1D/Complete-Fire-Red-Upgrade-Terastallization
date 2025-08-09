@@ -203,8 +203,7 @@ static void PrintGUIAlbumMemoryNames(void)
 {
     u8 fontSize = 1; // Normal Text
     u8 y = 0;
-
-    u8 startId = sAlbumPtr->selectedMemory - sAlbumPtr->selectedMemoryInAlbum;
+    u8 startId = sAlbumPtr->displayedStartId;
 
     CleanWindow(WIN_ALBUM_MEMORY_NAME);
 
@@ -321,6 +320,8 @@ static void Task_AlbumShowImage(u8 taskId)
 static void Task_AlbumWaitForKeyPress(u8 taskId)
 {
     bool8 scrolled = FALSE;
+    bool8 redrawNames = FALSE;
+    u8 prevStartId = sAlbumPtr->displayedStartId;
 
     if (gMain.newKeys & DPAD_DOWN)
     {
@@ -354,10 +355,18 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
         }
     }
 
-    // Update the names and descriptions
     if (scrolled)
     {
-        PrintGUIAlbumMemoryNames();
+        u8 newStartId = sAlbumPtr->selectedMemory - sAlbumPtr->selectedMemoryInAlbum;
+        if (newStartId != prevStartId)
+        {
+            sAlbumPtr->displayedStartId = newStartId;
+            redrawNames = TRUE;
+        }
+
+        if (redrawNames)
+            PrintGUIAlbumMemoryNames();
+
         PrintGUIAlbumDescription();
         PlaySE(SE_SELECT);
     }
@@ -406,6 +415,8 @@ static void InitAlbum(void)
     // Restore the last selected memory and cursor position
     sAlbumPtr->selectedMemory = VarGet(VAR_ALBUM_SELECTED_MEMORY);
     sAlbumPtr->selectedMemoryInAlbum = VarGet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM);
+
+    sAlbumPtr->displayedStartId = sAlbumPtr->selectedMemory - sAlbumPtr->selectedMemoryInAlbum;
 
     InitAlbumData();
     PrintGUIAlbumItems();
