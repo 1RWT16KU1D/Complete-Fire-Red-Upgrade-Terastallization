@@ -96,4 +96,4 @@ struct ImageData
 };
 
 #define ImageDataTable ((const struct ImageData *) 0x8FE4E80)
-#define tilemapbuffer (*((u8**) 0x203E03C))
+#define tilemapbuffer (*((u8**) 0x203E038))

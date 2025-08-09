@@ -509,8 +509,8 @@ static void CommitWindows(void)
 static const struct BgTemplate sImageBgTemplate =
 {
     .bg = BG_BACKGROUND,
-    .charBaseIndex = 3,
-    .mapBaseIndex = 28,
+    .charBaseIndex = 0,
+    .mapBaseIndex = 31,
     .screenSize = 0,
     .paletteMode = 0,
     .priority = 0,
@@ -520,14 +520,16 @@ static const struct BgTemplate sImageBgTemplate =
 static void LoadAlbumImage(u8 memoryId)
 {
     const struct ImageData *image = &ImageDataTable[memoryId];
-    CpuFastFill16(0, BG_CHAR_ADDR(3), 0x4000);
+
+    // Clear all 64 KB of BG CHR so large tilesets don't mix with leftovers
+    CpuFastFill16(0, (void*)BG_CHAR_ADDR(0), BG_CHAR_SIZE * 4);
+
     CpuFastFill16(0, tilemapbuffer, BG_MAP_BYTES);
     decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, image->tiles, 0, 0, 0);
     LZDecompressWram(image->tilemap, tilemapbuffer);
     LoadPalette(image->pal, 0, 0x20);
-    LoadMenuElementsPalette(12 * 0x10, 1);
-    Menu_LoadStdPalAt(15 * 0x10);
 }
+
 
 static void VBlankCB_Image(void)
 {
