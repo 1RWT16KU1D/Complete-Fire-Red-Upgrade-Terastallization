@@ -77,6 +77,8 @@ extern const u8 AlbumBGTiles[];
 extern const u8 AlbumBGMap[];
 extern const u16 AlbumBGPal[];
 
+extern const u16 AlbumBonusBGPal[];
+
 /* ============= Text Declarations ============== */
 extern const u8 gText_AlbumHeader[];
 extern const u8 gText_BonusHeader[];

@@ -54,6 +54,7 @@ static void CB2_Image(void);
 static void VBlankCB_Image(void);
 static void MainCB2_Image(void);
 static void ResetHighlightPalettes(void);
+static void PrintGUIAlbumItems(void);
 
 static const struct BgTemplate sAlbumBgTemplates[] =
 {
@@ -311,7 +312,10 @@ static void DisplayAlbumBG(void)
     CopyBgTilemapBufferToVram(BG_BACKGROUND);
 
     // Palette
-    LoadPalette(AlbumBGPal, 0, 0x20);
+    if (sAlbumPtr->isBonusPage)
+        LoadPalette(AlbumBonusBGPal, 0, 0x20);
+    else
+        LoadPalette(AlbumBGPal, 0, 0x20);
     LoadMenuElementsPalette(12 * 0x10, 1);
     Menu_LoadStdPalAt(15 * 0x10);
 }
@@ -360,7 +364,7 @@ static void PrintGUIAlbumDescription(void)
 
 static void UpdateCursorHighlight(bool8 isKeyUp, bool8 isStartUp)
 {
-    const u16* romPal = AlbumBGPal;
+    const u16* romPal = sAlbumPtr->isBonusPage ? AlbumBonusBGPal : AlbumBGPal;
     u16* pal = gPlttBufferFaded;
     u16 defaultPal = romPal[7];
 
@@ -383,7 +387,7 @@ static void UpdateCursorHighlight(bool8 isKeyUp, bool8 isStartUp)
 
 static void ResetHighlightPalettes(void)
 {
-    const u16* romPal = AlbumBGPal;
+    const u16* romPal = AlbumBonusBGPal;
     u16* pal = gPlttBufferFaded;
     u16 defaultPal = romPal[7];
 
@@ -470,6 +474,7 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
         sAlbumPtr->selectedMemoryInAlbum = sAlbumPtr->bonusSelectedMemoryInAlbum;
         sAlbumPtr->displayedStartId = sAlbumPtr->bonusDisplayedStartId;
         sAlbumPtr->isBonusPage = TRUE;
+        DisplayAlbumBG();
         InitAlbumData(TRUE);
         PrintGUIAlbumItems();
         ResetHighlightPalettes();
@@ -486,6 +491,7 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
         sAlbumPtr->selectedMemoryInAlbum = sAlbumPtr->normalSelectedMemoryInAlbum;
         sAlbumPtr->displayedStartId = sAlbumPtr->normalDisplayedStartId;
         sAlbumPtr->isBonusPage = FALSE;
+        DisplayAlbumBG();
         InitAlbumData(FALSE);
         PrintGUIAlbumItems();
         ResetHighlightPalettes();
