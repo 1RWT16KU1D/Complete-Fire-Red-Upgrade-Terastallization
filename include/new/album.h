@@ -3,6 +3,8 @@
 #include "../global.h"
 
 #define MEMORIES_COUNT 9
+#define BONUS_MEMORIES_COUNT 5
+#define TOTAL_MEMORIES_COUNT (MEMORIES_COUNT + BONUS_MEMORIES_COUNT)
 #define sAlbumPtr (*((struct Album**) 0x203E038))
 #define BG_MAP_BYTES 0x800
 #define ALBUM_MEMORIES_PER_PAGE 7
@@ -28,6 +30,13 @@ enum AlbumBGs
     BG_BACKGROUND,
 };
 
+enum AlbumPages
+{
+    ALBUM_PAGE_MEMORIES,
+    ALBUM_PAGE_BONUS,
+    ALBUM_PAGE_COUNT,
+};
+
 struct Memory
 {
     bool8 unlocked;
@@ -41,11 +50,12 @@ struct Album
     u16* bgMap;
 
     // Memory Data
-    struct Memory memoryData[MEMORIES_COUNT + 2];
+    struct Memory memoryData[TOTAL_MEMORIES_COUNT];
 
     // Tracker Data
-    u8 selectedMemory;
-    u8 selectedMemoryInAlbum; // Max of 7
+    u8 selectedMemory[ALBUM_PAGE_COUNT];
+    u8 selectedMemoryInAlbum[ALBUM_PAGE_COUNT]; // Max of 7
+    u8 page;
 };
 
 static const struct TextColor sWhiteText =
@@ -62,6 +72,7 @@ extern const u16 AlbumBGPal[];
 
 /* ============= Text Declarations ============== */
 extern const u8 gText_AlbumHeader[];
+extern const u8 gText_BonusHeader[];
 
 // Memory Names
 extern const u8 gText_Memory_MeloettaUnderTree[];
@@ -74,6 +85,13 @@ extern const u8 gText_Memory_SakuraPath[];
 extern const u8 gText_Memory_SnowballFight[];
 extern const u8 gText_Memory_LabDiscovery[];
 
+// Bonus Memory Names
+extern const u8 gText_Bonus_MysteryEncounter[];
+extern const u8 gText_Bonus_LegendaryMeeting[];
+extern const u8 gText_Bonus_SecretBase[];
+extern const u8 gText_Bonus_SkyCruise[];
+extern const u8 gText_Bonus_AncientPuzzle[];
+
 // Memory Descriptions
 extern const u8 gText_MemoryDesc_MeloettaUnderTree[];
 extern const u8 gText_MemoryDesc_PikachuAndEevee[];
@@ -84,6 +102,13 @@ extern const u8 gText_MemoryDesc_CampfireTales[];
 extern const u8 gText_MemoryDesc_SakuraPath[];
 extern const u8 gText_MemoryDesc_SnowballFight[];
 extern const u8 gText_MemoryDesc_LabDiscovery[];
+
+// Bonus Memory Descriptions
+extern const u8 gText_BonusDesc_MysteryEncounter[];
+extern const u8 gText_BonusDesc_LegendaryMeeting[];
+extern const u8 gText_BonusDesc_SecretBase[];
+extern const u8 gText_BonusDesc_SkyCruise[];
+extern const u8 gText_BonusDesc_AncientPuzzle[];
 
 // Script call
 extern const u8 EventScript_AlbumMemorySelected[];

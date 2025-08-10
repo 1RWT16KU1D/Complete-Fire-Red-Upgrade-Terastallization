@@ -171,6 +171,22 @@ static void InitAlbumData(void)
 
     sAlbumPtr->memoryData[8].memoryName = gText_Memory_LabDiscovery;
     sAlbumPtr->memoryData[8].memoryDesc = gText_MemoryDesc_LabDiscovery;
+
+    // Bonus memories
+    sAlbumPtr->memoryData[9].memoryName = gText_Bonus_MysteryEncounter;
+    sAlbumPtr->memoryData[9].memoryDesc = gText_BonusDesc_MysteryEncounter;
+
+    sAlbumPtr->memoryData[10].memoryName = gText_Bonus_LegendaryMeeting;
+    sAlbumPtr->memoryData[10].memoryDesc = gText_BonusDesc_LegendaryMeeting;
+
+    sAlbumPtr->memoryData[11].memoryName = gText_Bonus_SecretBase;
+    sAlbumPtr->memoryData[11].memoryDesc = gText_BonusDesc_SecretBase;
+
+    sAlbumPtr->memoryData[12].memoryName = gText_Bonus_SkyCruise;
+    sAlbumPtr->memoryData[12].memoryDesc = gText_BonusDesc_SkyCruise;
+
+    sAlbumPtr->memoryData[13].memoryName = gText_Bonus_AncientPuzzle;
+    sAlbumPtr->memoryData[13].memoryDesc = gText_BonusDesc_AncientPuzzle;
 }
 
 static void DisplayAlbumBG(void)
@@ -190,7 +206,7 @@ static void DisplayAlbumBG(void)
 
 static void PrintGUIAlbumHeader(void)
 {
-    const u8* text = gText_AlbumHeader;
+    const u8* text = (sAlbumPtr->page == ALBUM_PAGE_BONUS) ? gText_BonusHeader : gText_AlbumHeader;
     u8 fontSize = 1; // Normal text
     CleanWindow(WIN_ALBUM_HEADER);
 
@@ -199,19 +215,31 @@ static void PrintGUIAlbumHeader(void)
     CommitWindow(WIN_ALBUM_HEADER);
 }
 
+static u8 GetPageOffset(void)
+{
+    return (sAlbumPtr->page == ALBUM_PAGE_BONUS) ? MEMORIES_COUNT : 0;
+}
+
+static u8 GetMemoryCount(void)
+{
+    return (sAlbumPtr->page == ALBUM_PAGE_BONUS) ? BONUS_MEMORIES_COUNT : MEMORIES_COUNT;
+}
+
 static void PrintGUIAlbumMemoryNames(void)
 {
     u8 fontSize = 1; // Normal Text
     u8 y = 0;
+    u8 page = sAlbumPtr->page;
 
-    u8 startId = sAlbumPtr->selectedMemory - sAlbumPtr->selectedMemoryInAlbum;
+    u8 startId = sAlbumPtr->selectedMemory[page] - sAlbumPtr->selectedMemoryInAlbum[page];
+    u16 base = GetPageOffset();
 
     CleanWindow(WIN_ALBUM_MEMORY_NAME);
 
-    for (u8 i = 0; i < ALBUM_MEMORIES_PER_PAGE && (startId + i) < MEMORIES_COUNT; ++i)
+    for (u8 i = 0; i < ALBUM_MEMORIES_PER_PAGE && (startId + i) < GetMemoryCount(); ++i)
     {
         WindowPrint(WIN_ALBUM_MEMORY_NAME, fontSize, 0, y, &sWhiteText, 0,
-                   sAlbumPtr->memoryData[startId + i].memoryName);
+                   sAlbumPtr->memoryData[base + startId + i].memoryName);
         y += 16;
     }
 
@@ -223,7 +251,9 @@ static void PrintGUIAlbumDescription(void)
     u8 fontSize = 1;
     u8 x = 0;
     u8 y = 0;
-    u8 memoryId = sAlbumPtr->selectedMemory;
+    u8 page = sAlbumPtr->page;
+    u16 base = GetPageOffset();
+    u16 memoryId = base + sAlbumPtr->selectedMemory[page];
 
     CleanWindow(WIN_ALBUM_MEMORY_DESC);
     WindowPrint(WIN_ALBUM_MEMORY_DESC, fontSize, x, y, &sWhiteText, 0,
@@ -236,9 +266,10 @@ static void UpdateCursorHighlight(bool8 isKeyUp, bool8 isStartUp)
     const u16* romPal = AlbumBGPal;
     u16* pal = gPlttBufferFaded;
     u16 defaultPal = romPal[7];
+    u8 page = sAlbumPtr->page;
 
     // Change the palette
-    u8 newIndex = sAlbumPtr->selectedMemoryInAlbum;
+    u8 newIndex = sAlbumPtr->selectedMemoryInAlbum[page];
     u8 palId = newIndex + 7;
 
     // Restore previous highlighted palette
@@ -321,17 +352,18 @@ static void Task_AlbumShowImage(u8 taskId)
 static void Task_AlbumWaitForKeyPress(u8 taskId)
 {
     bool8 scrolled = FALSE;
+    u8 page = sAlbumPtr->page;
 
     if (gMain.newKeys & DPAD_DOWN)
     {
-        if (sAlbumPtr->selectedMemory < MEMORIES_COUNT - 1)
+        if (sAlbumPtr->selectedMemory[page] < GetMemoryCount() - 1)
         {
-            sAlbumPtr->selectedMemory++;
+            sAlbumPtr->selectedMemory[page]++;
 
-            if (sAlbumPtr->selectedMemoryInAlbum < ALBUM_MEMORIES_PER_PAGE - 1 &&
-                sAlbumPtr->selectedMemoryInAlbum < MEMORIES_COUNT - 1)
+            if (sAlbumPtr->selectedMemoryInAlbum[page] < ALBUM_MEMORIES_PER_PAGE - 1 &&
+                sAlbumPtr->selectedMemoryInAlbum[page] < GetMemoryCount() - 1)
             {
-                sAlbumPtr->selectedMemoryInAlbum++;
+                sAlbumPtr->selectedMemoryInAlbum[page]++;
             }
 
             UpdateCursorHighlight(FALSE, FALSE);
@@ -340,13 +372,13 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
     }
     else if (gMain.newKeys & DPAD_UP)
     {
-        if (sAlbumPtr->selectedMemory > 0)
+        if (sAlbumPtr->selectedMemory[page] > 0)
         {
-            sAlbumPtr->selectedMemory--;
+            sAlbumPtr->selectedMemory[page]--;
 
-            if (sAlbumPtr->selectedMemoryInAlbum > 0)
+            if (sAlbumPtr->selectedMemoryInAlbum[page] > 0)
             {
-                sAlbumPtr->selectedMemoryInAlbum--;
+                sAlbumPtr->selectedMemoryInAlbum[page]--;
             }
 
             UpdateCursorHighlight(TRUE, FALSE);
@@ -362,11 +394,29 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
         PlaySE(SE_SELECT);
     }
 
+    if (gMain.newKeys & R_BUTTON && page == ALBUM_PAGE_MEMORIES)
+    {
+        sAlbumPtr->page = ALBUM_PAGE_BONUS;
+        LoadPalette(AlbumBGPal, 0, 0x20);
+        PrintGUIAlbumItems();
+        UpdateCursorHighlight(FALSE, TRUE);
+        return;
+    }
+
+    if (gMain.newKeys & L_BUTTON && page == ALBUM_PAGE_BONUS)
+    {
+        sAlbumPtr->page = ALBUM_PAGE_MEMORIES;
+        LoadPalette(AlbumBGPal, 0, 0x20);
+        PrintGUIAlbumItems();
+        UpdateCursorHighlight(FALSE, TRUE);
+        return;
+    }
+
     if (gMain.newKeys & A_BUTTON)
     {
         PlaySE(SE_SELECT);
-        VarSet(VAR_ALBUM_SELECTED_MEMORY, sAlbumPtr->selectedMemory);
-        VarSet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM, sAlbumPtr->selectedMemoryInAlbum);
+        VarSet(VAR_ALBUM_SELECTED_MEMORY, GetPageOffset() + sAlbumPtr->selectedMemory[page]);
+        VarSet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM, sAlbumPtr->selectedMemoryInAlbum[page]);
         BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
         gTasks[taskId].func = Task_AlbumShowImage;
     }
@@ -403,11 +453,15 @@ static void InitAlbum(void)
     CleanWindows();
     CommitWindows();
 
-    // Restore the last selected memory and cursor position
-    sAlbumPtr->selectedMemory = VarGet(VAR_ALBUM_SELECTED_MEMORY);
-    sAlbumPtr->selectedMemoryInAlbum = VarGet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM);
-
     InitAlbumData();
+
+    // Restore the last selected memory and cursor position
+    sAlbumPtr->selectedMemory[ALBUM_PAGE_MEMORIES] = VarGet(VAR_ALBUM_SELECTED_MEMORY);
+    sAlbumPtr->selectedMemoryInAlbum[ALBUM_PAGE_MEMORIES] = VarGet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM);
+    sAlbumPtr->selectedMemory[ALBUM_PAGE_BONUS] = 0;
+    sAlbumPtr->selectedMemoryInAlbum[ALBUM_PAGE_BONUS] = 0;
+    sAlbumPtr->page = ALBUM_PAGE_MEMORIES;
+
     PrintGUIAlbumItems();
 }
 

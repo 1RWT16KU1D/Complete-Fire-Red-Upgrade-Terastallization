@@ -1,6 +1,9 @@
 #org @gText_AlbumHeader
 Memories
 
+#org @gText_BonusHeader
+Bonus
+
 
 // Memory Names
 #org @gText_Memory_MeloettaUnderTree
@@ -30,6 +33,22 @@ Snowball fight!
 #org @gText_Memory_LabDiscovery
 Strange Lab Discovery
 
+// Bonus Memory Names
+#org @gText_Bonus_MysteryEncounter
+Mystery Encounter
+
+#org @gText_Bonus_LegendaryMeeting
+Legendary Meeting
+
+#org @gText_Bonus_SecretBase
+Secret Base Discovery
+
+#org @gText_Bonus_SkyCruise
+Sky Cruise
+
+#org @gText_Bonus_AncientPuzzle
+Ancient Puzzle
+
 // Memory Descriptions
 #org @gText_MemoryDesc_MeloettaUnderTree
  You meet Meloetta under a tree! You and\n her eat some berries.
@@ -57,3 +76,18 @@ Strange Lab Discovery
 
 #org @gText_MemoryDesc_LabDiscovery
  You discover old notes in a\n forgotten lab about Mega Evolution.
+
+#org @gText_BonusDesc_MysteryEncounter
+ You meet a wandering Celebi who\n shows you visions of the past.
+
+#org @gText_BonusDesc_LegendaryMeeting
+ You bump into Mewtwo deep inside\n Cerulean Cave.
+
+#org @gText_BonusDesc_SecretBase
+ You discover a hidden base filled\n with dazzling treasures.
+
+#org @gText_BonusDesc_SkyCruise
+ You soar through the clouds on\n the back of a Dragonite.
+
+#org @gText_BonusDesc_AncientPuzzle
+ You solve a long-forgotten puzzle\n and awaken a giant Regigigas.
