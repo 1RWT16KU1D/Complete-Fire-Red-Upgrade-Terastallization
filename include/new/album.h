@@ -11,6 +11,12 @@
 
 #define VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM 0x5100
 #define VAR_ALBUM_SELECTED_MEMORY 0x5101
+#define VAR_ALBUM_NORMAL_SELECTED_MEMORY           0x5102
+#define VAR_ALBUM_NORMAL_SELECTED_MEMORY_IN_ALBUM  0x5103
+#define VAR_ALBUM_NORMAL_DISPLAYED_START_ID        0x5104
+#define VAR_ALBUM_BONUS_SELECTED_MEMORY            0x5105
+#define VAR_ALBUM_BONUS_SELECTED_MEMORY_IN_ALBUM   0x5106
+#define VAR_ALBUM_BONUS_DISPLAYED_START_ID         0x5107
 #define VAR_ALBUM_FIRST_TIME 0x5012
 #define VAR_IS_BONUS_PAGE 0x5013
 
@@ -65,7 +71,6 @@ struct Album
     u8 bonusDisplayedStartId;
     u8 memoryCount;
     bool8 isBonusPage;
-    bool8 isBonus;
 };
 
 static const struct TextColor sWhiteText =
