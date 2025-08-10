@@ -609,7 +609,7 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
             BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
             PlaySE(SE_SELECT);
             sAlbumPtr->isBonus = sAlbumPtr->isBonusPage;
-            sLastWasBonus = sAlbumPtr->isBonus;
+            sLastWasBonus = sAlbumPtr->isBonusPage;
             gTasks[taskId].func = Task_AlbumShowImage;
         }
     }
@@ -678,7 +678,6 @@ static void InitAlbum(void)
 
     InitAlbumData(sAlbumPtr->isBonusPage);
     PrintGUIAlbumItems();
-    sLastWasBonus = FALSE;
 }
 
 static void CB2_Album(void)
