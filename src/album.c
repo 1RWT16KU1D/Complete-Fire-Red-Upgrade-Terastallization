@@ -270,29 +270,51 @@ static const u8 *const sBonusMemoryDescs[] =
     gText_BonusDesc_5,
 };
 
+// Tables defining the display order for the memories.
+// Modify these arrays to reorder memories in the album.
+static const u8 sMemoryOrder[MEMORIES_COUNT] =
+{
+    0, 1, 2, 3, 4, 5, 6, 7,
+    8, 9, 10, 11, 12, 13, 14, 15,
+    16, 17, 18, 19, 20, 21, 22, 23,
+    24, 25, 26, 27, 28, 29, 30, 31,
+    32, 33, 34, 35, 36, 37, 38, 39,
+    40, 41, 42, 43,
+};
+
+static const u8 sBonusMemoryOrder[BONUS_MEMORIES_COUNT] =
+{
+    0, 1, 2, 3, 4,
+};
+
 static void InitAlbumData(bool8 bonusPage)
 {
     const u8 *const *names;
     const u8 *const *descs;
+    const u8 *order;
     u8 count;
 
     if (bonusPage)
     {
         names = sBonusMemoryNames;
         descs = sBonusMemoryDescs;
+        order = sBonusMemoryOrder;
         count = BONUS_MEMORIES_COUNT;
     }
     else
     {
         names = sMemoryNames;
         descs = sMemoryDescs;
+        order = sMemoryOrder;
         count = MEMORIES_COUNT;
     }
 
     for (u8 i = 0; i < count; ++i)
     {
-        sAlbumPtr->memoryData[i].memoryName = names[i];
-        sAlbumPtr->memoryData[i].memoryDesc = descs[i];
+        u8 memoryId = order[i];
+
+        sAlbumPtr->memoryData[i].memoryName = names[memoryId];
+        sAlbumPtr->memoryData[i].memoryDesc = descs[memoryId];
 
         if (bonusPage)
         {
@@ -300,7 +322,7 @@ static void InitAlbumData(bool8 bonusPage)
         }
         else
         {
-            sAlbumPtr->memoryData[i].unlocked = FlagGet(FLAG_FIRST_MEMORY + i);
+            sAlbumPtr->memoryData[i].unlocked = FlagGet(FLAG_FIRST_MEMORY + memoryId);
 
             if (!sAlbumPtr->memoryData[i].unlocked)
             {
@@ -908,9 +930,14 @@ static void CB2_Image(void)
             gMain.state++;
             break;
         case 2:
-            LoadAlbumImage(VarGet(VAR_ALBUM_SELECTED_MEMORY));
+        {
+            u16 index = VarGet(VAR_ALBUM_SELECTED_MEMORY);
+            bool8 bonus = VarGet(VAR_IS_BONUS_PAGE);
+            u8 memoryId = bonus ? sBonusMemoryOrder[index] : sMemoryOrder[index];
+            LoadAlbumImage(memoryId);
             gMain.state++;
             break;
+        }
         case 3:
             if (!free_temp_tile_data_buffers_if_possible())
             {
