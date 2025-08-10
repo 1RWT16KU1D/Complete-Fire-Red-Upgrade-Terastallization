@@ -1,6 +1,9 @@
 #org @gText_AlbumHeader
 Memories
 
+#org @gText_BonusHeader
+ Bonus
+
 #org @gText_MenuAlbum
 Album
 
@@ -152,6 +155,21 @@ Serenade in the Safari
 #org @gText_Memory_43
 43
 
+#org @gText_BonusMemory_1
+A Secret Melody
+
+#org @gText_BonusMemory_2
+Festival of Lights
+
+#org @gText_BonusMemory_3
+Mystic Forest Encounter
+
+#org @gText_BonusMemory_4
+Ocean's Gift
+
+#org @gText_BonusMemory_5
+Skyward Journey
+
 // Memory Descriptions
 #org @gText_Desc_None
  No description available
@@ -283,7 +301,22 @@ Serenade in the Safari
  42nd Memory
 
 #org @gText_MemoryDesc_43
- 43rd Memory
+43rd Memory
+
+#org @gText_BonusDesc_1
+ You uncover a hidden melody\n with Meloetta.
+
+#org @gText_BonusDesc_2
+ You celebrate a luminous festival\n with friends.
+
+#org @gText_BonusDesc_3
+ You and Meloetta meet a rare mythical\n Pok\emon in the forest.
+
+#org @gText_BonusDesc_4
+ The sea bestows a mysterious treasure\n upon you.
+
+#org @gText_BonusDesc_5
+ You soar above the clouds on a\n thrilling adventure.
 
 #org @gText_AlbumFlagSet
 Flags set!
