@@ -143,34 +143,117 @@ static const struct WindowTemplate sAlbumWinTemplates[WIN_MAX_COUNT + 1] =
     DUMMY_WIN_TEMPLATE,
 };
 
+static const u8 *const sMemoryNames[] =
+{
+    gText_None,
+    gText_Memory_1,
+    gText_Memory_2,
+    gText_Memory_3,
+    gText_Memory_4,
+    gText_Memory_5,
+    gText_Memory_6,
+    gText_Memory_7,
+    gText_Memory_8,
+    gText_Memory_9,
+    gText_Memory_10,
+    gText_Memory_11,
+    gText_Memory_12,
+    gText_Memory_13,
+    gText_Memory_14,
+    gText_Memory_15,
+    gText_Memory_16,
+    gText_Memory_17,
+    gText_Memory_18,
+    gText_Memory_19,
+    gText_Memory_20,
+    gText_Memory_21,
+    gText_Memory_22,
+    gText_Memory_23,
+    gText_Memory_24,
+    gText_Memory_25,
+    gText_Memory_26,
+    gText_Memory_27,
+    gText_Memory_28,
+    gText_Memory_29,
+    gText_Memory_30,
+    gText_Memory_31,
+    gText_Memory_32,
+    gText_Memory_33,
+    gText_Memory_34,
+    gText_Memory_35,
+    gText_Memory_36,
+    gText_Memory_37,
+    gText_Memory_38,
+    gText_Memory_39,
+    gText_Memory_40,
+    gText_Memory_41,
+    gText_Memory_42,
+    gText_Memory_43,
+};
+
+static const u8 *const sMemoryDescs[] =
+{
+    gText_Desc_None,
+    gText_MemoryDesc_1,
+    gText_MemoryDesc_2,
+    gText_MemoryDesc_3,
+    gText_MemoryDesc_4,
+    gText_MemoryDesc_5,
+    gText_MemoryDesc_6,
+    gText_MemoryDesc_7,
+    gText_MemoryDesc_8,
+    gText_MemoryDesc_9,
+    gText_MemoryDesc_10,
+    gText_MemoryDesc_11,
+    gText_MemoryDesc_12,
+    gText_MemoryDesc_13,
+    gText_MemoryDesc_14,
+    gText_MemoryDesc_15,
+    gText_MemoryDesc_16,
+    gText_MemoryDesc_17,
+    gText_MemoryDesc_18,
+    gText_MemoryDesc_19,
+    gText_MemoryDesc_20,
+    gText_MemoryDesc_21,
+    gText_MemoryDesc_22,
+    gText_MemoryDesc_23,
+    gText_MemoryDesc_24,
+    gText_MemoryDesc_25,
+    gText_MemoryDesc_26,
+    gText_MemoryDesc_27,
+    gText_MemoryDesc_28,
+    gText_MemoryDesc_29,
+    gText_MemoryDesc_30,
+    gText_MemoryDesc_31,
+    gText_MemoryDesc_32,
+    gText_MemoryDesc_33,
+    gText_MemoryDesc_34,
+    gText_MemoryDesc_35,
+    gText_MemoryDesc_36,
+    gText_MemoryDesc_37,
+    gText_MemoryDesc_38,
+    gText_MemoryDesc_39,
+    gText_MemoryDesc_40,
+    gText_MemoryDesc_41,
+    gText_MemoryDesc_42,
+    gText_MemoryDesc_43,
+};
+
 static void InitAlbumData(void)
 {
-    sAlbumPtr->memoryData[0].memoryName = gText_Memory_MeloettaUnderTree;
-    sAlbumPtr->memoryData[0].memoryDesc = gText_MemoryDesc_MeloettaUnderTree;
+    for (u8 i = 0; i < MEMORIES_COUNT; ++i)
+    {
+        sAlbumPtr->memoryData[i].memoryName = sMemoryNames[i];
+        sAlbumPtr->memoryData[i].memoryDesc = sMemoryDescs[i];
 
-    sAlbumPtr->memoryData[1].memoryName = gText_Memory_PikachuAndEevee;
-    sAlbumPtr->memoryData[1].memoryDesc = gText_MemoryDesc_PikachuAndEevee;
+        sAlbumPtr->memoryData[i].unlocked = FlagGet(FLAG_FIRST_MEMORY + i);
 
-    sAlbumPtr->memoryData[2].memoryName = gText_Memory_InsideCave;
-    sAlbumPtr->memoryData[2].memoryDesc = gText_MemoryDesc_InsideCave;
-
-    sAlbumPtr->memoryData[3].memoryName = gText_Memory_NightSkyWish;
-    sAlbumPtr->memoryData[3].memoryDesc = gText_MemoryDesc_NightSkyWish;
-
-    sAlbumPtr->memoryData[4].memoryName = gText_Memory_SeasideShells;
-    sAlbumPtr->memoryData[4].memoryDesc = gText_MemoryDesc_SeasideShells;
-
-    sAlbumPtr->memoryData[5].memoryName = gText_Memory_CampfireTales;
-    sAlbumPtr->memoryData[5].memoryDesc = gText_MemoryDesc_CampfireTales;
-
-    sAlbumPtr->memoryData[6].memoryName = gText_Memory_SakuraPath;
-    sAlbumPtr->memoryData[6].memoryDesc = gText_MemoryDesc_SakuraPath;
-
-    sAlbumPtr->memoryData[7].memoryName = gText_Memory_SnowballFight;
-    sAlbumPtr->memoryData[7].memoryDesc = gText_MemoryDesc_SnowballFight;
-
-    sAlbumPtr->memoryData[8].memoryName = gText_Memory_LabDiscovery;
-    sAlbumPtr->memoryData[8].memoryDesc = gText_MemoryDesc_LabDiscovery;
+        if (!sAlbumPtr->memoryData[i].unlocked)
+        {
+            sAlbumPtr->memoryData[i].memoryName = gText_None;
+            sAlbumPtr->memoryData[i].memoryDesc = gText_Desc_None;
+        }
+    }
 }
 
 static void DisplayAlbumBG(void)
@@ -203,8 +286,7 @@ static void PrintGUIAlbumMemoryNames(void)
 {
     u8 fontSize = 1; // Normal Text
     u8 y = 0;
-
-    u8 startId = sAlbumPtr->selectedMemory - sAlbumPtr->selectedMemoryInAlbum;
+    u8 startId = sAlbumPtr->displayedStartId;
 
     CleanWindow(WIN_ALBUM_MEMORY_NAME);
 
@@ -300,7 +382,7 @@ static void Task_AlbumFadeOut(u8 taskId)
 {
     if (!gPaletteFade->active)
     {
-        SetMainCallback2(CB2_ReturnToFieldContinueScript);
+        SetMainCallback2(CB2_ReturnToFieldWithOpenMenu);
         Free(sAlbumPtr->bgMap);
         Free(sAlbumPtr);
         sAlbumPtr = NULL;
@@ -321,8 +403,10 @@ static void Task_AlbumShowImage(u8 taskId)
 static void Task_AlbumWaitForKeyPress(u8 taskId)
 {
     bool8 scrolled = FALSE;
+    bool8 redrawNames = FALSE;
+    u8 prevStartId = sAlbumPtr->displayedStartId;
 
-    if (gMain.newKeys & DPAD_DOWN)
+    if (JOY_NEW_AND_REPEATED(DPAD_DOWN))
     {
         if (sAlbumPtr->selectedMemory < MEMORIES_COUNT - 1)
         {
@@ -338,7 +422,7 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
             scrolled = TRUE;
         }
     }
-    else if (gMain.newKeys & DPAD_UP)
+    else if (JOY_NEW_AND_REPEATED(DPAD_UP))
     {
         if (sAlbumPtr->selectedMemory > 0)
         {
@@ -354,21 +438,33 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
         }
     }
 
-    // Update the names and descriptions
     if (scrolled)
     {
-        PrintGUIAlbumMemoryNames();
+        u8 newStartId = sAlbumPtr->selectedMemory - sAlbumPtr->selectedMemoryInAlbum;
+        if (newStartId != prevStartId)
+        {
+            sAlbumPtr->displayedStartId = newStartId;
+            redrawNames = TRUE;
+        }
+
+        if (redrawNames)
+            PrintGUIAlbumMemoryNames();
+
         PrintGUIAlbumDescription();
         PlaySE(SE_SELECT);
     }
 
     if (gMain.newKeys & A_BUTTON)
     {
-        PlaySE(SE_SELECT);
         VarSet(VAR_ALBUM_SELECTED_MEMORY, sAlbumPtr->selectedMemory);
         VarSet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM, sAlbumPtr->selectedMemoryInAlbum);
-        BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
-        gTasks[taskId].func = Task_AlbumShowImage;
+
+        if (sAlbumPtr->memoryData[sAlbumPtr->selectedMemory].unlocked)
+        {
+            BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
+            PlaySE(SE_SELECT);
+            gTasks[taskId].func = Task_AlbumShowImage;
+        }
     }
 
     if (gMain.newKeys & B_BUTTON)
@@ -406,6 +502,8 @@ static void InitAlbum(void)
     // Restore the last selected memory and cursor position
     sAlbumPtr->selectedMemory = VarGet(VAR_ALBUM_SELECTED_MEMORY);
     sAlbumPtr->selectedMemoryInAlbum = VarGet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM);
+
+    sAlbumPtr->displayedStartId = sAlbumPtr->selectedMemory - sAlbumPtr->selectedMemoryInAlbum;
 
     InitAlbumData();
     PrintGUIAlbumItems();
@@ -467,7 +565,7 @@ static void CB2_Album(void)
     }
 }
 
-bool8 AlbumCallback(void)
+bool8 StartMenuAlbumCallback(void)
 {
     if (!gPaletteFade->active)
     {
@@ -479,7 +577,6 @@ bool8 AlbumCallback(void)
         SetMainCallback2(CB2_Album);
         return TRUE;
     }
-
     return FALSE;
 }
 
@@ -529,7 +626,6 @@ static void LoadAlbumImage(u8 memoryId)
     LZDecompressWram(image->tilemap, tilemapbuffer);
     LoadPalette(image->pal, 0, 0x20);
 }
-
 
 static void VBlankCB_Image(void)
 {
