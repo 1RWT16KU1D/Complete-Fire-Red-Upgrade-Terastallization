@@ -1,59 +1,289 @@
 #org @gText_AlbumHeader
 Memories
 
+#org @gText_MenuAlbum
+Album
+
+#org @gText_MenuDexNav
+DexNav
+
+#org @gText_MenuExitRight
+Exit  [DPAD_RIGHT]
+
+#org @gText_MenuExitLeft
+Exit  [DPAD_LEFT]
+
+#org @gText_DexNavDescription
+Search for wild Pok\emon in the area\nwith potential special qualities!
+
+#org @gText_AlbumDescription
+A lovely album capturing your journey\nwith Meloetta.
 
 // Memory Names
-#org @gText_Memory_MeloettaUnderTree
-Meloetta under the tree[.]
+#org @gText_None
+-
 
-#org @gText_Memory_PikachuAndEevee
-Pikachu and Eevee!
+#org @gText_Memory_1
+Choose your Kanto starter!
 
-#org @gText_Memory_InsideCave
-Inside Mt. Moon[.]
+#org @gText_Memory_2
+A Pok\ePark Cadence
 
-#org @gText_Memory_NightSkyWish
+#org @gText_Memory_3
+Ballad by the Sunset Bay
+
+#org @gText_Memory_4
 Wishing under the stars[.]
 
-#org @gText_Memory_SeasideShells
+#org @gText_Memory_5
 Shells by the seaside
 
-#org @gText_Memory_CampfireTales
+#org @gText_Memory_6
 Campfire stories[.]
 
-#org @gText_Memory_SakuraPath
-Path of Blossoms
+#org @gText_Memory_7
+Where the leaves first fell
 
-#org @gText_Memory_SnowballFight
+#org @gText_Memory_8
 Snowball fight!
 
-#org @gText_Memory_LabDiscovery
+#org @gText_Memory_9
 Strange Lab Discovery
 
+#org @gText_Memory_10
+10
+
+#org @gText_Memory_11
+11
+
+#org @gText_Memory_12
+12
+
+#org @gText_Memory_13
+13
+
+#org @gText_Memory_14
+14
+
+#org @gText_Memory_15
+Serenade in the Safari
+
+#org @gText_Memory_16
+16
+
+#org @gText_Memory_17
+17
+
+#org @gText_Memory_18
+18
+
+#org @gText_Memory_19
+19
+
+#org @gText_Memory_20
+20
+
+#org @gText_Memory_21
+21
+
+#org @gText_Memory_22
+22
+
+#org @gText_Memory_23
+23
+
+#org @gText_Memory_24
+24
+
+#org @gText_Memory_25
+25
+
+#org @gText_Memory_26
+26
+
+#org @gText_Memory_27
+27
+
+#org @gText_Memory_28
+28
+
+#org @gText_Memory_29
+29
+
+#org @gText_Memory_30
+30
+
+#org @gText_Memory_31
+31
+
+#org @gText_Memory_32
+32
+
+#org @gText_Memory_33
+33
+
+#org @gText_Memory_34
+34
+
+#org @gText_Memory_35
+35
+
+#org @gText_Memory_36
+36
+
+#org @gText_Memory_37
+37
+
+#org @gText_Memory_38
+38
+
+#org @gText_Memory_39
+39
+
+#org @gText_Memory_40
+40
+
+#org @gText_Memory_41
+41
+
+#org @gText_Memory_42
+42
+
+#org @gText_Memory_43
+43
+
 // Memory Descriptions
-#org @gText_MemoryDesc_MeloettaUnderTree
- You meet Meloetta under a tree! You and\n her eat some berries.
+#org @gText_Desc_None
+ No description available
 
-#org @gText_MemoryDesc_PikachuAndEevee
- Pikachu plays with Eevee and\n become best friends!
+#org @gText_MemoryDesc_1
+ You meet Professor Oak and he\n gives you your Kanto partner!
 
-#org @gText_MemoryDesc_InsideCave
- You enter the Mt. Moon and\n find the Moon stone!
+#org @gText_MemoryDesc_2
+ Meloetta sings a prelude in the\n Pok\ePark with you!
 
-#org @gText_MemoryDesc_NightSkyWish
+#org @gText_MemoryDesc_3
+ Meloetta and you admire the sunset at\n the harbour footbridge.
+
+#org @gText_MemoryDesc_4
  You close your eyes and wish on\n a shooting star in the night sky.
 
-#org @gText_MemoryDesc_SeasideShells
+#org @gText_MemoryDesc_5
  You collect colorful shells while\n walking along the calm beach.
 
-#org @gText_MemoryDesc_CampfireTales
+#org @gText_MemoryDesc_6
  You and your Pok\emon sit by a\n campfire and share spooky tales.
 
-#org @gText_MemoryDesc_SakuraPath
- Petals fall like snow as you walk\n down the cherry blossom trail.
+#org @gText_MemoryDesc_7
+ Meloetta takes a look at her\n favourite spot- the Autumn tree!
 
-#org @gText_MemoryDesc_SnowballFight
+#org @gText_MemoryDesc_8
  You have a friendly snowball fight\n with a Sneasel and your partner.
 
-#org @gText_MemoryDesc_LabDiscovery
+#org @gText_MemoryDesc_9
  You discover old notes in a\n forgotten lab about Mega Evolution.
+
+#org @gText_MemoryDesc_10
+ 10th Memory
+
+#org @gText_MemoryDesc_11
+ 11th Memory
+
+#org @gText_MemoryDesc_12
+ 12th Memory
+
+#org @gText_MemoryDesc_13
+ 13th Memory
+
+#org @gText_MemoryDesc_14
+ 14th Memory
+
+#org @gText_MemoryDesc_15
+ A memory of your first visit to the\n Safari Zone with Meloetta.
+
+#org @gText_MemoryDesc_16
+ 16th Memory
+
+#org @gText_MemoryDesc_17
+ 17th Memory
+
+#org @gText_MemoryDesc_18
+ 18th Memory
+
+#org @gText_MemoryDesc_19
+ 19th Memory
+
+#org @gText_MemoryDesc_20
+ 20th Memory
+
+#org @gText_MemoryDesc_21
+ 21st Memory
+
+#org @gText_MemoryDesc_22
+ 22nd Memory
+
+#org @gText_MemoryDesc_23
+ 23rd Memory
+
+#org @gText_MemoryDesc_24
+ 24th Memory
+
+#org @gText_MemoryDesc_25
+ 25th Memory
+
+#org @gText_MemoryDesc_26
+ 26th Memory
+
+#org @gText_MemoryDesc_27
+ 27th Memory
+
+#org @gText_MemoryDesc_28
+ 28th Memory
+
+#org @gText_MemoryDesc_29
+ 29th Memory
+
+#org @gText_MemoryDesc_30
+ 30th Memory
+
+#org @gText_MemoryDesc_31
+ 31st Memory
+
+#org @gText_MemoryDesc_32
+ 32nd Memory
+
+#org @gText_MemoryDesc_33
+ 33rd Memory
+
+#org @gText_MemoryDesc_34
+ 34th Memory
+
+#org @gText_MemoryDesc_35
+ 35th Memory
+
+#org @gText_MemoryDesc_36
+ 36th Memory
+
+#org @gText_MemoryDesc_37
+ 37th Memory
+
+#org @gText_MemoryDesc_38
+ 38th Memory
+
+#org @gText_MemoryDesc_39
+ 39th Memory
+
+#org @gText_MemoryDesc_40
+ 40th Memory
+
+#org @gText_MemoryDesc_41
+ 41st Memory
+
+#org @gText_MemoryDesc_42
+ 42nd Memory
+
+#org @gText_MemoryDesc_43
+ 43rd Memory
+
+#org @gText_AlbumFlagSet
+Flags set!
