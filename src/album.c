@@ -39,7 +39,6 @@
 #include "../include/new/ram_locs.h"
 #include "../include/new/Vanilla_functions.h"
 
-static bool8 sLastWasBonus;
 
 // This file's functions
 static void CommitWindow(u8 windowId);
@@ -134,25 +133,25 @@ static const struct WindowTemplate sAlbumWinTemplates[WIN_MAX_COUNT + 1] =
         .paletteNum = 15,
         .baseBlock = 353,
     },
-    [WIN_ALBUM_INSTRUCTIONS] =
-    {
-        .bg = BG_INTERFACE,
-        .tilemapLeft = 22,
-        .tilemapTop = 5,
-        .width = 7,
-        .height = 4,
-        .paletteNum = 15,
-        .baseBlock = 533,
-    },
     [WIN_ALBUM_MEMORIES_COUNT] =
     {
         .bg = BG_INTERFACE,
         .tilemapLeft = 22,
-        .tilemapTop = 9,
+        .tilemapTop = 5,
+        .width = 8,
+        .height = 4,
+        .paletteNum = 15,
+        .baseBlock = 533,
+    },
+    [WIN_ALBUM_INSTRUCTIONS] =
+    {
+        .bg = BG_INTERFACE,
+        .tilemapLeft = 22,
+        .tilemapTop = 10,
         .width = 8,
         .height = 5,
         .paletteNum = 15,
-        .baseBlock = 561,
+        .baseBlock = 565,
     },
     DUMMY_WIN_TEMPLATE,
 };
@@ -310,12 +309,17 @@ static void InitAlbumData(bool8 bonusPage)
             }
         }
     }
-
     sAlbumPtr->memoryCount = count;
 }
 
 static void DisplayAlbumBG(void)
 {
+    if (!FlagGet(FLAG_ALBUM_SE_DONE))
+    {
+        PlaySE(SE_RG_CARD3);
+        FlagSet(FLAG_ALBUM_SE_DONE);
+    }
+
     // Tiles
     decompress_and_copy_tile_data_to_vram(BG_BACKGROUND, AlbumBGTiles, 0, 0, 0);
 
@@ -328,6 +332,7 @@ static void DisplayAlbumBG(void)
         LoadPalette(AlbumBonusBGPal, 0, 0x20);
     else
         LoadPalette(AlbumBGPal, 0, 0x20);
+
     LoadMenuElementsPalette(12 * 0x10, 1);
     Menu_LoadStdPalAt(15 * 0x10);
 }
@@ -398,16 +403,14 @@ static void PrintGUIAlbumMemoriesUnlocked(void)
 
     CleanWindow(WIN_ALBUM_MEMORIES_COUNT);
 
-    {
-        u8 buff[32];
-        u8 num[4];
+    u8 buff[12];
+    u8 num[4];
 
-        StringCopy(buff, gText_AlbumMemoriesUnlocked); // e.g. "Unlocked: "
-        ConvertIntToDecimalStringN(num, unlocked, STR_CONV_MODE_LEFT_ALIGN, 3);
+    StringCopy(buff, gText_AlbumMemoriesUnlocked);
+    ConvertIntToDecimalStringN(num, unlocked, STR_CONV_MODE_LEFT_ALIGN, 3);
 
-        StringAppend(buff, num);
-        WindowPrint(WIN_ALBUM_MEMORIES_COUNT, fontSize, 0, y, &sWhiteText, 0, buff);
-    }
+    StringAppend(buff, num);
+    WindowPrint(WIN_ALBUM_MEMORIES_COUNT, fontSize, 0, y, &sWhiteText, 0, buff);
 
     CommitWindow(WIN_ALBUM_MEMORIES_COUNT);
 }
@@ -495,7 +498,13 @@ static void Task_AlbumFadeOut(u8 taskId)
         Free(sAlbumPtr->bgMap);
         Free(sAlbumPtr);
         sAlbumPtr = NULL;
-        sLastWasBonus = FALSE;
+        VarSet(VAR_IS_BONUS_PAGE, 0);
+        VarSet(VAR_ALBUM_NORMAL_SELECTED_MEMORY, 0);
+        VarSet(VAR_ALBUM_NORMAL_SELECTED_MEMORY_IN_ALBUM, 0);
+        VarSet(VAR_ALBUM_NORMAL_DISPLAYED_START_ID, 0);
+        VarSet(VAR_ALBUM_BONUS_SELECTED_MEMORY, 0);
+        VarSet(VAR_ALBUM_BONUS_SELECTED_MEMORY_IN_ALBUM, 0);
+        VarSet(VAR_ALBUM_BONUS_DISPLAYED_START_ID, 0);
         FreeAllWindowBuffers();
         DestroyTask(taskId);
     }
@@ -604,12 +613,34 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
         VarSet(VAR_ALBUM_SELECTED_MEMORY, sAlbumPtr->selectedMemory);
         VarSet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM, sAlbumPtr->selectedMemoryInAlbum);
 
+        // Save the page you're currently on
+        if (sAlbumPtr->isBonusPage)
+        {
+            VarSet(VAR_ALBUM_BONUS_SELECTED_MEMORY,            sAlbumPtr->selectedMemory);
+            VarSet(VAR_ALBUM_BONUS_SELECTED_MEMORY_IN_ALBUM,   sAlbumPtr->selectedMemoryInAlbum);
+            VarSet(VAR_ALBUM_BONUS_DISPLAYED_START_ID,         sAlbumPtr->displayedStartId);
+
+            // And also save the cached normal-page cursor we keep in RAM
+            VarSet(VAR_ALBUM_NORMAL_SELECTED_MEMORY,           sAlbumPtr->normalSelectedMemory);
+            VarSet(VAR_ALBUM_NORMAL_SELECTED_MEMORY_IN_ALBUM,  sAlbumPtr->normalSelectedMemoryInAlbum);
+            VarSet(VAR_ALBUM_NORMAL_DISPLAYED_START_ID,        sAlbumPtr->normalDisplayedStartId);
+        }
+        else
+        {
+            VarSet(VAR_ALBUM_NORMAL_SELECTED_MEMORY,           sAlbumPtr->selectedMemory);
+            VarSet(VAR_ALBUM_NORMAL_SELECTED_MEMORY_IN_ALBUM,  sAlbumPtr->selectedMemoryInAlbum);
+            VarSet(VAR_ALBUM_NORMAL_DISPLAYED_START_ID,        sAlbumPtr->displayedStartId);
+
+            VarSet(VAR_ALBUM_BONUS_SELECTED_MEMORY,            sAlbumPtr->bonusSelectedMemory);
+            VarSet(VAR_ALBUM_BONUS_SELECTED_MEMORY_IN_ALBUM,   sAlbumPtr->bonusSelectedMemoryInAlbum);
+            VarSet(VAR_ALBUM_BONUS_DISPLAYED_START_ID,         sAlbumPtr->bonusDisplayedStartId);
+        }
+
         if (sAlbumPtr->memoryData[sAlbumPtr->selectedMemory].unlocked)
         {
             BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
             PlaySE(SE_SELECT);
-            sAlbumPtr->isBonus = sAlbumPtr->isBonusPage;
-            sLastWasBonus = sAlbumPtr->isBonusPage;
+            VarSet(VAR_IS_BONUS_PAGE, sAlbumPtr->isBonusPage);
             gTasks[taskId].func = Task_AlbumShowImage;
         }
     }
@@ -617,6 +648,7 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
     if (gMain.newKeys & B_BUTTON)
     {
         PlaySE(SE_PC_OFF);
+        FlagClear(FLAG_ALBUM_SE_DONE);
         VarSet(VAR_ALBUM_SELECTED_MEMORY, 0);
         VarSet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM, 0);
         BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
@@ -648,32 +680,46 @@ static void InitAlbum(void)
     CleanWindows();
     CommitWindows();
 
-    // Restore the last selected memory and cursor position
-    sAlbumPtr->selectedMemory = VarGet(VAR_ALBUM_SELECTED_MEMORY);
-    sAlbumPtr->selectedMemoryInAlbum = VarGet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM);
+    // Which page are we coming back to?
+    sAlbumPtr->isBonusPage = VarGet(VAR_IS_BONUS_PAGE);
 
-    sAlbumPtr->displayedStartId = sAlbumPtr->selectedMemory - sAlbumPtr->selectedMemoryInAlbum;
+    // Restore both pages' saved positions
+    sAlbumPtr->normalSelectedMemory          = VarGet(VAR_ALBUM_NORMAL_SELECTED_MEMORY);
+    sAlbumPtr->normalSelectedMemoryInAlbum   = VarGet(VAR_ALBUM_NORMAL_SELECTED_MEMORY_IN_ALBUM);
+    sAlbumPtr->normalDisplayedStartId        = VarGet(VAR_ALBUM_NORMAL_DISPLAYED_START_ID);
 
-    sAlbumPtr->normalSelectedMemory = 0;
-    sAlbumPtr->normalSelectedMemoryInAlbum = 0;
-    sAlbumPtr->normalDisplayedStartId = 0;
-    sAlbumPtr->bonusSelectedMemory = 0;
-    sAlbumPtr->bonusSelectedMemoryInAlbum = 0;
-    sAlbumPtr->bonusDisplayedStartId = 0;
-    sAlbumPtr->isBonus = sLastWasBonus;
-    sAlbumPtr->isBonusPage = sAlbumPtr->isBonus;
+    sAlbumPtr->bonusSelectedMemory           = VarGet(VAR_ALBUM_BONUS_SELECTED_MEMORY);
+    sAlbumPtr->bonusSelectedMemoryInAlbum    = VarGet(VAR_ALBUM_BONUS_SELECTED_MEMORY_IN_ALBUM);
+    sAlbumPtr->bonusDisplayedStartId         = VarGet(VAR_ALBUM_BONUS_DISPLAYED_START_ID);
 
-    if (sAlbumPtr->isBonusPage)
+    // For compatibility with existing single-page vars, fall back if unset
+    if (!sAlbumPtr->isBonusPage)
     {
-        sAlbumPtr->bonusSelectedMemory = sAlbumPtr->selectedMemory;
-        sAlbumPtr->bonusSelectedMemoryInAlbum = sAlbumPtr->selectedMemoryInAlbum;
-        sAlbumPtr->bonusDisplayedStartId = sAlbumPtr->displayedStartId;
+        if (sAlbumPtr->normalSelectedMemory == 0 
+            && VarGet(VAR_ALBUM_SELECTED_MEMORY) != 0)
+        {
+            sAlbumPtr->normalSelectedMemory        = VarGet(VAR_ALBUM_SELECTED_MEMORY);
+            sAlbumPtr->normalSelectedMemoryInAlbum = VarGet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM);
+            sAlbumPtr->normalDisplayedStartId      = sAlbumPtr->normalSelectedMemory
+                                                    - sAlbumPtr->normalSelectedMemoryInAlbum;
+        }
+        sAlbumPtr->selectedMemory        = sAlbumPtr->normalSelectedMemory;
+        sAlbumPtr->selectedMemoryInAlbum = sAlbumPtr->normalSelectedMemoryInAlbum;
+        sAlbumPtr->displayedStartId      = sAlbumPtr->normalDisplayedStartId;
     }
     else
     {
-        sAlbumPtr->normalSelectedMemory = sAlbumPtr->selectedMemory;
-        sAlbumPtr->normalSelectedMemoryInAlbum = sAlbumPtr->selectedMemoryInAlbum;
-        sAlbumPtr->normalDisplayedStartId = sAlbumPtr->displayedStartId;
+        if (sAlbumPtr->bonusSelectedMemory == 0 
+            && VarGet(VAR_ALBUM_SELECTED_MEMORY) != 0)
+        {
+            sAlbumPtr->bonusSelectedMemory         = VarGet(VAR_ALBUM_SELECTED_MEMORY);
+            sAlbumPtr->bonusSelectedMemoryInAlbum  = VarGet(VAR_ALBUM_SELECTED_MEMORY_IN_ALBUM);
+            sAlbumPtr->bonusDisplayedStartId       = sAlbumPtr->bonusSelectedMemory
+                                                    - sAlbumPtr->bonusSelectedMemoryInAlbum;
+        }
+        sAlbumPtr->selectedMemory        = sAlbumPtr->bonusSelectedMemory;
+        sAlbumPtr->selectedMemoryInAlbum = sAlbumPtr->bonusSelectedMemoryInAlbum;
+        sAlbumPtr->displayedStartId      = sAlbumPtr->bonusDisplayedStartId;
     }
 
     InitAlbumData(sAlbumPtr->isBonusPage);
@@ -690,8 +736,7 @@ static void CB2_Album(void)
             if (sAlbumPtr == NULL)
             {
                 sAlbumPtr = Calloc(sizeof(struct Album));
-                sAlbumPtr->isBonusPage = sLastWasBonus;
-                sAlbumPtr->isBonus = sLastWasBonus;
+                sAlbumPtr->isBonusPage = VarGet(VAR_IS_BONUS_PAGE);
             }
             gMain.state++;
             break;
