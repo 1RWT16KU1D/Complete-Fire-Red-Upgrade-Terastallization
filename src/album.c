@@ -134,15 +134,25 @@ static const struct WindowTemplate sAlbumWinTemplates[WIN_MAX_COUNT + 1] =
         .paletteNum = 15,
         .baseBlock = 353,
     },
-    [WIN_ALBUM_MISC] =
+    [WIN_ALBUM_INSTRUCTIONS] =
     {
         .bg = BG_INTERFACE,
         .tilemapLeft = 22,
-        .tilemapTop = 7,
+        .tilemapTop = 5,
+        .width = 7,
+        .height = 4,
+        .paletteNum = 15,
+        .baseBlock = 533,
+    },
+    [WIN_ALBUM_MEMORIES_COUNT] =
+    {
+        .bg = BG_INTERFACE,
+        .tilemapLeft = 22,
+        .tilemapTop = 9,
         .width = 8,
         .height = 5,
         .paletteNum = 15,
-        .baseBlock = 533,
+        .baseBlock = 561,
     },
     DUMMY_WIN_TEMPLATE,
 };
@@ -333,6 +343,17 @@ static void PrintGUIAlbumHeader(void)
     CommitWindow(WIN_ALBUM_HEADER);
 }
 
+static void PrintGUIAlbumPageInstructions(void)
+{
+    const u8* text = sAlbumPtr->isBonusPage ? gText_BonusPageInstructions : gText_AlbumPageInstructions;
+    u8 fontSize = 0; // Smaller text
+    CleanWindow(WIN_ALBUM_INSTRUCTIONS);
+
+    // Show message
+    WindowPrint(WIN_ALBUM_INSTRUCTIONS, fontSize, 0, 0, &sWhiteText, 0, text);
+    CommitWindow(WIN_ALBUM_INSTRUCTIONS);
+}
+
 static void PrintGUIAlbumMemoryNames(void)
 {
     u8 fontSize = 1; // Normal Text
@@ -364,6 +385,33 @@ static void PrintGUIAlbumDescription(void)
     CommitWindow(WIN_ALBUM_MEMORY_DESC);
 }
 
+static void PrintGUIAlbumMemoriesUnlocked(void)
+{
+    u8 fontSize = 0; // Smaller text
+    u8 y = 0;
+    u8 unlocked = 0;
+
+    // Count unlocked memories
+    for (u8 i = 0; i < sAlbumPtr->memoryCount; ++i)
+        if (sAlbumPtr->memoryData[i].unlocked)
+            unlocked++;
+
+    CleanWindow(WIN_ALBUM_MEMORIES_COUNT);
+
+    {
+        u8 buff[32];
+        u8 num[4];
+
+        StringCopy(buff, gText_AlbumMemoriesUnlocked); // e.g. "Unlocked: "
+        ConvertIntToDecimalStringN(num, unlocked, STR_CONV_MODE_LEFT_ALIGN, 3);
+
+        StringAppend(buff, num);
+        WindowPrint(WIN_ALBUM_MEMORIES_COUNT, fontSize, 0, y, &sWhiteText, 0, buff);
+    }
+
+    CommitWindow(WIN_ALBUM_MEMORIES_COUNT);
+}
+
 static void UpdateCursorHighlight(bool8 isKeyUp, bool8 isStartUp)
 {
     const u16* romPal = sAlbumPtr->isBonusPage ? AlbumBonusBGPal : AlbumBGPal;
@@ -389,7 +437,7 @@ static void UpdateCursorHighlight(bool8 isKeyUp, bool8 isStartUp)
 
 static void ResetHighlightPalettes(void)
 {
-    const u16* romPal = AlbumBonusBGPal;
+    const u16* romPal = sAlbumPtr->isBonusPage ? AlbumBonusBGPal : AlbumBGPal;
     u16* pal = gPlttBufferFaded;
     u16 defaultPal = romPal[7];
 
@@ -590,6 +638,8 @@ static void PrintGUIAlbumItems(void)
     PrintGUIAlbumHeader();
     PrintGUIAlbumMemoryNames();
     PrintGUIAlbumDescription();
+    PrintGUIAlbumPageInstructions();
+    PrintGUIAlbumMemoriesUnlocked();
 }
 
 static void InitAlbum(void)

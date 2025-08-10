@@ -24,7 +24,8 @@ enum AlbumWindows
     WIN_ALBUM_HEADER,
     WIN_ALBUM_MEMORY_NAME,
     WIN_ALBUM_MEMORY_DESC,
-    WIN_ALBUM_MISC,
+    WIN_ALBUM_INSTRUCTIONS,
+    WIN_ALBUM_MEMORIES_COUNT,
     WIN_MAX_COUNT,
 };
 
@@ -185,6 +186,13 @@ extern const u8 gText_BonusDesc_2[];
 extern const u8 gText_BonusDesc_3[];
 extern const u8 gText_BonusDesc_4[];
 extern const u8 gText_BonusDesc_5[];
+
+// Instructions
+extern const u8 gText_AlbumPageInstructions[];
+extern const u8 gText_BonusPageInstructions[];
+
+// Memories unlocked
+extern const u8 gText_AlbumMemoriesUnlocked[];
 
 struct ImageData 
 {
