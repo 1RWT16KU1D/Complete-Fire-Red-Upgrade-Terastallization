@@ -3,6 +3,7 @@
 #include "../global.h"
 
 #define MEMORIES_COUNT 44
+#define BONUS_MEMORIES_COUNT 5
 #define sAlbumPtr (*((struct Album**) 0x203E038))
 #define BG_MAP_BYTES 0x800
 #define ALBUM_MEMORIES_PER_PAGE 7
@@ -48,12 +49,20 @@ struct Album
     u16* bgMap;
 
     // Memory Data
-    struct Memory memoryData[MEMORIES_COUNT + 2];
+    struct Memory memoryData[MEMORIES_COUNT + BONUS_MEMORIES_COUNT + 2];
 
     // Tracker Data
     u8 selectedMemory;
     u8 selectedMemoryInAlbum; // Max of 7
     u8 displayedStartId; // Start ID for the displayed memories
+    u8 normalSelectedMemory;
+    u8 normalSelectedMemoryInAlbum;
+    u8 normalDisplayedStartId;
+    u8 bonusSelectedMemory;
+    u8 bonusSelectedMemoryInAlbum;
+    u8 bonusDisplayedStartId;
+    u8 memoryCount;
+    bool8 isBonusPage;
 };
 
 static const struct TextColor sWhiteText =
@@ -70,6 +79,7 @@ extern const u16 AlbumBGPal[];
 
 /* ============= Text Declarations ============== */
 extern const u8 gText_AlbumHeader[];
+extern const u8 gText_BonusHeader[];
 
 // Memory Names
 extern const u8 gText_None[];
@@ -116,6 +126,11 @@ extern const u8 gText_Memory_40[];
 extern const u8 gText_Memory_41[];
 extern const u8 gText_Memory_42[];
 extern const u8 gText_Memory_43[];
+extern const u8 gText_BonusMemory_1[];
+extern const u8 gText_BonusMemory_2[];
+extern const u8 gText_BonusMemory_3[];
+extern const u8 gText_BonusMemory_4[];
+extern const u8 gText_BonusMemory_5[];
 
 // Memory Descriptions
 extern const u8 gText_Desc_None[];
@@ -162,6 +177,11 @@ extern const u8 gText_MemoryDesc_40[];
 extern const u8 gText_MemoryDesc_41[];
 extern const u8 gText_MemoryDesc_42[];
 extern const u8 gText_MemoryDesc_43[];
+extern const u8 gText_BonusDesc_1[];
+extern const u8 gText_BonusDesc_2[];
+extern const u8 gText_BonusDesc_3[];
+extern const u8 gText_BonusDesc_4[];
+extern const u8 gText_BonusDesc_5[];
 
 struct ImageData 
 {

@@ -53,6 +53,7 @@ static void Task_ImageFadeOut(u8 taskId);
 static void CB2_Image(void);
 static void VBlankCB_Image(void);
 static void MainCB2_Image(void);
+static void ResetHighlightPalettes(void);
 
 static const struct BgTemplate sAlbumBgTemplates[] =
 {
@@ -239,21 +240,65 @@ static const u8 *const sMemoryDescs[] =
     gText_MemoryDesc_43,
 };
 
-static void InitAlbumData(void)
+static const u8 *const sBonusMemoryNames[] =
 {
-    for (u8 i = 0; i < MEMORIES_COUNT; ++i)
+    gText_BonusMemory_1,
+    gText_BonusMemory_2,
+    gText_BonusMemory_3,
+    gText_BonusMemory_4,
+    gText_BonusMemory_5,
+};
+
+static const u8 *const sBonusMemoryDescs[] =
+{
+    gText_BonusDesc_1,
+    gText_BonusDesc_2,
+    gText_BonusDesc_3,
+    gText_BonusDesc_4,
+    gText_BonusDesc_5,
+};
+
+static void InitAlbumData(bool8 bonusPage)
+{
+    const u8 *const *names;
+    const u8 *const *descs;
+    u8 count;
+
+    if (bonusPage)
     {
-        sAlbumPtr->memoryData[i].memoryName = sMemoryNames[i];
-        sAlbumPtr->memoryData[i].memoryDesc = sMemoryDescs[i];
+        names = sBonusMemoryNames;
+        descs = sBonusMemoryDescs;
+        count = BONUS_MEMORIES_COUNT;
+    }
+    else
+    {
+        names = sMemoryNames;
+        descs = sMemoryDescs;
+        count = MEMORIES_COUNT;
+    }
 
-        sAlbumPtr->memoryData[i].unlocked = FlagGet(FLAG_FIRST_MEMORY + i);
+    for (u8 i = 0; i < count; ++i)
+    {
+        sAlbumPtr->memoryData[i].memoryName = names[i];
+        sAlbumPtr->memoryData[i].memoryDesc = descs[i];
 
-        if (!sAlbumPtr->memoryData[i].unlocked)
+        if (bonusPage)
         {
-            sAlbumPtr->memoryData[i].memoryName = gText_None;
-            sAlbumPtr->memoryData[i].memoryDesc = gText_Desc_None;
+            sAlbumPtr->memoryData[i].unlocked = TRUE;
+        }
+        else
+        {
+            sAlbumPtr->memoryData[i].unlocked = FlagGet(FLAG_FIRST_MEMORY + i);
+
+            if (!sAlbumPtr->memoryData[i].unlocked)
+            {
+                sAlbumPtr->memoryData[i].memoryName = gText_None;
+                sAlbumPtr->memoryData[i].memoryDesc = gText_Desc_None;
+            }
         }
     }
+
+    sAlbumPtr->memoryCount = count;
 }
 
 static void DisplayAlbumBG(void)
@@ -273,7 +318,7 @@ static void DisplayAlbumBG(void)
 
 static void PrintGUIAlbumHeader(void)
 {
-    const u8* text = gText_AlbumHeader;
+    const u8* text = sAlbumPtr->isBonusPage ? gText_BonusHeader : gText_AlbumHeader;
     u8 fontSize = 1; // Normal text
     CleanWindow(WIN_ALBUM_HEADER);
 
@@ -290,7 +335,7 @@ static void PrintGUIAlbumMemoryNames(void)
 
     CleanWindow(WIN_ALBUM_MEMORY_NAME);
 
-    for (u8 i = 0; i < ALBUM_MEMORIES_PER_PAGE && (startId + i) < MEMORIES_COUNT; ++i)
+    for (u8 i = 0; i < ALBUM_MEMORIES_PER_PAGE && (startId + i) < sAlbumPtr->memoryCount; ++i)
     {
         WindowPrint(WIN_ALBUM_MEMORY_NAME, fontSize, 0, y, &sWhiteText, 0,
                    sAlbumPtr->memoryData[startId + i].memoryName);
@@ -334,6 +379,16 @@ static void UpdateCursorHighlight(bool8 isKeyUp, bool8 isStartUp)
 
     // Highlight selected cursor
     pal[palId] = RGB(31,31,31); // Pure white
+}
+
+static void ResetHighlightPalettes(void)
+{
+    const u16* romPal = AlbumBGPal;
+    u16* pal = gPlttBufferFaded;
+    u16 defaultPal = romPal[7];
+
+    for (u8 i = 0; i < ALBUM_MEMORIES_PER_PAGE; ++i)
+        pal[7 + i] = defaultPal;
 }
 
 static void ClearTasksAndGraphicalStructs(void)
@@ -406,14 +461,47 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
     bool8 redrawNames = FALSE;
     u8 prevStartId = sAlbumPtr->displayedStartId;
 
+    if ((gMain.newKeys & R_BUTTON) && !sAlbumPtr->isBonusPage)
+    {
+        sAlbumPtr->normalSelectedMemory = sAlbumPtr->selectedMemory;
+        sAlbumPtr->normalSelectedMemoryInAlbum = sAlbumPtr->selectedMemoryInAlbum;
+        sAlbumPtr->normalDisplayedStartId = sAlbumPtr->displayedStartId;
+        sAlbumPtr->selectedMemory = sAlbumPtr->bonusSelectedMemory;
+        sAlbumPtr->selectedMemoryInAlbum = sAlbumPtr->bonusSelectedMemoryInAlbum;
+        sAlbumPtr->displayedStartId = sAlbumPtr->bonusDisplayedStartId;
+        sAlbumPtr->isBonusPage = TRUE;
+        InitAlbumData(TRUE);
+        PrintGUIAlbumItems();
+        ResetHighlightPalettes();
+        UpdateCursorHighlight(FALSE, TRUE);
+        PlaySE(SE_SELECT);
+        return;
+    }
+    else if ((gMain.newKeys & L_BUTTON) && sAlbumPtr->isBonusPage)
+    {
+        sAlbumPtr->bonusSelectedMemory = sAlbumPtr->selectedMemory;
+        sAlbumPtr->bonusSelectedMemoryInAlbum = sAlbumPtr->selectedMemoryInAlbum;
+        sAlbumPtr->bonusDisplayedStartId = sAlbumPtr->displayedStartId;
+        sAlbumPtr->selectedMemory = sAlbumPtr->normalSelectedMemory;
+        sAlbumPtr->selectedMemoryInAlbum = sAlbumPtr->normalSelectedMemoryInAlbum;
+        sAlbumPtr->displayedStartId = sAlbumPtr->normalDisplayedStartId;
+        sAlbumPtr->isBonusPage = FALSE;
+        InitAlbumData(FALSE);
+        PrintGUIAlbumItems();
+        ResetHighlightPalettes();
+        UpdateCursorHighlight(FALSE, TRUE);
+        PlaySE(SE_SELECT);
+        return;
+    }
+
     if (JOY_NEW_AND_REPEATED(DPAD_DOWN))
     {
-        if (sAlbumPtr->selectedMemory < MEMORIES_COUNT - 1)
+        if (sAlbumPtr->selectedMemory < sAlbumPtr->memoryCount - 1)
         {
             sAlbumPtr->selectedMemory++;
 
             if (sAlbumPtr->selectedMemoryInAlbum < ALBUM_MEMORIES_PER_PAGE - 1 &&
-                sAlbumPtr->selectedMemoryInAlbum < MEMORIES_COUNT - 1)
+                sAlbumPtr->selectedMemoryInAlbum < sAlbumPtr->memoryCount - 1)
             {
                 sAlbumPtr->selectedMemoryInAlbum++;
             }
@@ -505,7 +593,15 @@ static void InitAlbum(void)
 
     sAlbumPtr->displayedStartId = sAlbumPtr->selectedMemory - sAlbumPtr->selectedMemoryInAlbum;
 
-    InitAlbumData();
+    sAlbumPtr->normalSelectedMemory = sAlbumPtr->selectedMemory;
+    sAlbumPtr->normalSelectedMemoryInAlbum = sAlbumPtr->selectedMemoryInAlbum;
+    sAlbumPtr->normalDisplayedStartId = sAlbumPtr->displayedStartId;
+    sAlbumPtr->bonusSelectedMemory = 0;
+    sAlbumPtr->bonusSelectedMemoryInAlbum = 0;
+    sAlbumPtr->bonusDisplayedStartId = 0;
+    sAlbumPtr->isBonusPage = FALSE;
+
+    InitAlbumData(FALSE);
     PrintGUIAlbumItems();
 }
 
