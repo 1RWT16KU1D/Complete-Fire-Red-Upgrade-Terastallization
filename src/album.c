@@ -39,6 +39,8 @@
 #include "../include/new/ram_locs.h"
 #include "../include/new/Vanilla_functions.h"
 
+static bool8 sLastWasBonus;
+
 // This file's functions
 static void CommitWindow(u8 windowId);
 static void CleanWindow(u8 windowId);
@@ -445,6 +447,7 @@ static void Task_AlbumFadeOut(u8 taskId)
         Free(sAlbumPtr->bgMap);
         Free(sAlbumPtr);
         sAlbumPtr = NULL;
+        sLastWasBonus = FALSE;
         FreeAllWindowBuffers();
         DestroyTask(taskId);
     }
@@ -479,7 +482,7 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
         PrintGUIAlbumItems();
         ResetHighlightPalettes();
         UpdateCursorHighlight(FALSE, TRUE);
-        PlaySE(SE_SELECT);
+        PlaySE(SE_WIN_OPEN);
         return;
     }
     else if ((gMain.newKeys & L_BUTTON) && sAlbumPtr->isBonusPage)
@@ -496,7 +499,7 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
         PrintGUIAlbumItems();
         ResetHighlightPalettes();
         UpdateCursorHighlight(FALSE, TRUE);
-        PlaySE(SE_SELECT);
+        PlaySE(SE_WIN_OPEN);
         return;
     }
 
@@ -557,6 +560,8 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
         {
             BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
             PlaySE(SE_SELECT);
+            sAlbumPtr->isBonus = sAlbumPtr->isBonusPage;
+            sLastWasBonus = sAlbumPtr->isBonus;
             gTasks[taskId].func = Task_AlbumShowImage;
         }
     }
@@ -599,16 +604,31 @@ static void InitAlbum(void)
 
     sAlbumPtr->displayedStartId = sAlbumPtr->selectedMemory - sAlbumPtr->selectedMemoryInAlbum;
 
-    sAlbumPtr->normalSelectedMemory = sAlbumPtr->selectedMemory;
-    sAlbumPtr->normalSelectedMemoryInAlbum = sAlbumPtr->selectedMemoryInAlbum;
-    sAlbumPtr->normalDisplayedStartId = sAlbumPtr->displayedStartId;
+    sAlbumPtr->normalSelectedMemory = 0;
+    sAlbumPtr->normalSelectedMemoryInAlbum = 0;
+    sAlbumPtr->normalDisplayedStartId = 0;
     sAlbumPtr->bonusSelectedMemory = 0;
     sAlbumPtr->bonusSelectedMemoryInAlbum = 0;
     sAlbumPtr->bonusDisplayedStartId = 0;
-    sAlbumPtr->isBonusPage = FALSE;
+    sAlbumPtr->isBonus = sLastWasBonus;
+    sAlbumPtr->isBonusPage = sAlbumPtr->isBonus;
 
-    InitAlbumData(FALSE);
+    if (sAlbumPtr->isBonusPage)
+    {
+        sAlbumPtr->bonusSelectedMemory = sAlbumPtr->selectedMemory;
+        sAlbumPtr->bonusSelectedMemoryInAlbum = sAlbumPtr->selectedMemoryInAlbum;
+        sAlbumPtr->bonusDisplayedStartId = sAlbumPtr->displayedStartId;
+    }
+    else
+    {
+        sAlbumPtr->normalSelectedMemory = sAlbumPtr->selectedMemory;
+        sAlbumPtr->normalSelectedMemoryInAlbum = sAlbumPtr->selectedMemoryInAlbum;
+        sAlbumPtr->normalDisplayedStartId = sAlbumPtr->displayedStartId;
+    }
+
+    InitAlbumData(sAlbumPtr->isBonusPage);
     PrintGUIAlbumItems();
+    sLastWasBonus = FALSE;
 }
 
 static void CB2_Album(void)
@@ -619,7 +639,11 @@ static void CB2_Album(void)
             SetVBlankCallback(NULL);
             ClearVramOamPlttRegs();
             if (sAlbumPtr == NULL)
+            {
                 sAlbumPtr = Calloc(sizeof(struct Album));
+                sAlbumPtr->isBonusPage = sLastWasBonus;
+                sAlbumPtr->isBonus = sLastWasBonus;
+            }
             gMain.state++;
             break;
         case 1:

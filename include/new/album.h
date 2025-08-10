@@ -63,6 +63,7 @@ struct Album
     u8 bonusDisplayedStartId;
     u8 memoryCount;
     bool8 isBonusPage;
+    bool8 isBonus;
 };
 
 static const struct TextColor sWhiteText =
