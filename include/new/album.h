@@ -44,20 +44,13 @@ enum AlbumBGs
     BG_BACKGROUND,
 };
 
-struct Memory
-{
-    bool8 unlocked;
-    const u8* memoryName;
-    const u8* memoryDesc;
-};
-
 struct Album
 {
     // Image Data
     u16* bgMap;
 
     // Memory Data
-    struct Memory memoryData[MEMORIES_COUNT + BONUS_MEMORIES_COUNT + 2];
+    bool8 unlocked[MEMORIES_COUNT + BONUS_MEMORIES_COUNT + 2];
 
     // Tracker Data
     u8 selectedMemory;
