@@ -22,7 +22,7 @@
 #define FLAG_ALBUM_SE_DONE 0x15FE
 #define FLAG_ALBUM_GET 0x15FF
 #define FLAG_FIRST_MEMORY 0x1600
-#define FLAG_ALBUM_LAST_MEMORY 0x1625
+#define FLAG_ALBUM_LAST_MEMORY 0x162C
 
 extern bool8 StartMenuAlbumCallback(void);
 
@@ -136,6 +136,7 @@ extern const u8 gText_Memory_40[];
 extern const u8 gText_Memory_41[];
 extern const u8 gText_Memory_42[];
 extern const u8 gText_Memory_43[];
+extern const u8 gText_Memory_44[];
 
 // Memory Descriptions
 extern const u8 gText_Desc_None[];
@@ -182,6 +183,7 @@ extern const u8 gText_MemoryDesc_40[];
 extern const u8 gText_MemoryDesc_41[];
 extern const u8 gText_MemoryDesc_42[];
 extern const u8 gText_MemoryDesc_43[];
+extern const u8 gText_MemoryDesc_44[];
 
 // Instructions
 extern const u8 gText_AlbumPageInstructions[];
