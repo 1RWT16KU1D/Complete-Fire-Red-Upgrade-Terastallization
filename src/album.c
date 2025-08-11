@@ -40,7 +40,6 @@
 #include "../include/new/Vanilla_functions.h"
 
 
-#define ALBUM_IMAGE_CAP 64 // 1 + max image index present in sMemoryOrder or sBonusMemoryOrder
 
 // This file's functions
 static void CommitWindow(u8 windowId);
@@ -167,247 +166,77 @@ static const struct WindowTemplate sAlbumWinTemplates[WIN_MAX_COUNT + 1] =
     DUMMY_WIN_TEMPLATE,
 };
 
-static const u8 *const sMemoryNames[] =
+struct MemoryEntry
 {
-    gText_None,
-    gText_Memory_1,
-    gText_Memory_2,
-    gText_Memory_3,
-    gText_Memory_4,
-    gText_Memory_5,
-    gText_Memory_6,
-    gText_Memory_7,
-    gText_Memory_8,
-    gText_Memory_9,
-    gText_Memory_10,
-    gText_Memory_11,
-    gText_Memory_12,
-    gText_Memory_13,
-    gText_Memory_14,
-    gText_Memory_15,
-    gText_Memory_16,
-    gText_Memory_17,
-    gText_Memory_18,
-    gText_Memory_19,
-    gText_Memory_20,
-    gText_Memory_21,
-    gText_Memory_22,
-    gText_Memory_23,
-    gText_Memory_24,
-    gText_Memory_25,
-    gText_Memory_26,
-    gText_Memory_27,
-    gText_Memory_28,
-    gText_Memory_29,
-    gText_Memory_30,
-    gText_Memory_31,
-    gText_Memory_32,
-    gText_Memory_33,
-    gText_Memory_34,
-    gText_Memory_35,
-    gText_Memory_36,
-    gText_Memory_37,
-    gText_Memory_38,
-};
-
-static const u8 *const sMemoryDescs[] =
-{
-    gText_Desc_None,
-    gText_MemoryDesc_1,
-    gText_MemoryDesc_2,
-    gText_MemoryDesc_3,
-    gText_MemoryDesc_4,
-    gText_MemoryDesc_5,
-    gText_MemoryDesc_6,
-    gText_MemoryDesc_7,
-    gText_MemoryDesc_8,
-    gText_MemoryDesc_9,
-    gText_MemoryDesc_10,
-    gText_MemoryDesc_11,
-    gText_MemoryDesc_12,
-    gText_MemoryDesc_13,
-    gText_MemoryDesc_14,
-    gText_MemoryDesc_15,
-    gText_MemoryDesc_16,
-    gText_MemoryDesc_17,
-    gText_MemoryDesc_18,
-    gText_MemoryDesc_19,
-    gText_MemoryDesc_20,
-    gText_MemoryDesc_21,
-    gText_MemoryDesc_22,
-    gText_MemoryDesc_23,
-    gText_MemoryDesc_24,
-    gText_MemoryDesc_25,
-    gText_MemoryDesc_26,
-    gText_MemoryDesc_27,
-    gText_MemoryDesc_28,
-    gText_MemoryDesc_29,
-    gText_MemoryDesc_30,
-    gText_MemoryDesc_31,
-    gText_MemoryDesc_32,
-    gText_MemoryDesc_33,
-    gText_MemoryDesc_34,
-    gText_MemoryDesc_35,
-    gText_MemoryDesc_36,
-    gText_MemoryDesc_37,
-    gText_MemoryDesc_38,
-};
-
-static const u8 *const sBonusMemoryNames[] =
-{
-    gText_Memory_39,
-    gText_Memory_40,
-    gText_Memory_41,
-    gText_Memory_42,
-    gText_Memory_43,
-    gText_Memory_44,
-};
-
-static const u8 *const sBonusMemoryDescs[] =
-{
-    gText_MemoryDesc_39,
-    gText_MemoryDesc_40,
-    gText_MemoryDesc_41,
-    gText_MemoryDesc_42,
-    gText_MemoryDesc_43,
-    gText_MemoryDesc_44,
-};
-
-// Modify these arrays to reorder memories in the album.
-static const u8 sMemoryOrder[] =
-{
-    7,
-    12,
-    36,
-    4,
-    6,
-    37,
-    14,
-    3,
-    27,
-    26,
-    43,
-    42,
-    34,
-    41,
-    21,
-    22,
-    2,
-    38,
-    25,
-    35,
-    28,
-    39,
-    29,
-    40,
-    30,
-    32,
-    31,
-    24,
-    8,
-    9,
-    33,
-    23
-};
-
-static const u8 sBonusMemoryOrder[] =
-{
-    1,
-    15,
-    20,
-    19,
-    11,
-    16,
-    18,
-    17,
-    13,
-    5,
-    44
-};
-
-struct MemoryMeta
-{
+    u8 imageIndex;
     const u8 *name;
     const u8 *desc;
-    bool8 isBonus;
-    bool8 valid;
-    u16 flagId;
 };
 
-static struct MemoryMeta sMemoryMeta[ALBUM_IMAGE_CAP];
-
-static void BuildMemoryMeta(void)
+// Memory definitions. Each entry links an image index to its name and description.
+static const struct MemoryEntry sMemoryTable[] =
 {
-    u32 i;
+    {7,  gText_Memory_7,  gText_MemoryDesc_7},
+    {12, gText_Memory_12, gText_MemoryDesc_12},
+    {36, gText_Memory_36, gText_MemoryDesc_36},
+    {4,  gText_Memory_4,  gText_MemoryDesc_4},
+    {6,  gText_Memory_6,  gText_MemoryDesc_6},
+    {37, gText_Memory_37, gText_MemoryDesc_37},
+    {14, gText_Memory_14, gText_MemoryDesc_14},
+    {3,  gText_Memory_3,  gText_MemoryDesc_3},
+    {27, gText_Memory_27, gText_MemoryDesc_27},
+    {26, gText_Memory_26, gText_MemoryDesc_26},
+    {43, gText_Memory_43, gText_MemoryDesc_43},
+    {42, gText_Memory_42, gText_MemoryDesc_42},
+    {34, gText_Memory_34, gText_MemoryDesc_34},
+    {41, gText_Memory_41, gText_MemoryDesc_41},
+    {21, gText_Memory_21, gText_MemoryDesc_21},
+    {22, gText_Memory_22, gText_MemoryDesc_22},
+    {2,  gText_Memory_2,  gText_MemoryDesc_2},
+    {38, gText_Memory_38, gText_MemoryDesc_38},
+    {25, gText_Memory_25, gText_MemoryDesc_25},
+    {35, gText_Memory_35, gText_MemoryDesc_35},
+    {28, gText_Memory_28, gText_MemoryDesc_28},
+    {39, gText_Memory_39, gText_MemoryDesc_39},
+    {29, gText_Memory_29, gText_MemoryDesc_29},
+    {40, gText_Memory_40, gText_MemoryDesc_40},
+    {30, gText_Memory_30, gText_MemoryDesc_30},
+    {32, gText_Memory_32, gText_MemoryDesc_32},
+    {31, gText_Memory_31, gText_MemoryDesc_31},
+    {24, gText_Memory_24, gText_MemoryDesc_24},
+    {8,  gText_Memory_8,  gText_MemoryDesc_8},
+    {9,  gText_Memory_9,  gText_MemoryDesc_9},
+    {33, gText_Memory_33, gText_MemoryDesc_33},
+    {23, gText_Memory_23, gText_MemoryDesc_23},
+};
 
-    for (i = 0; i < ALBUM_IMAGE_CAP; i++)
-    {
-        sMemoryMeta[i].name = NULL;
-        sMemoryMeta[i].desc = NULL;
-        sMemoryMeta[i].isBonus = FALSE;
-        sMemoryMeta[i].valid = FALSE;
-        sMemoryMeta[i].flagId = 0;
-    }
-
-    for (i = 0; i < NELEMS(sMemoryOrder); i++)
-    {
-        u8 imageIndex = sMemoryOrder[i];
-        if (imageIndex < ALBUM_IMAGE_CAP)
-        {
-            if (imageIndex < NELEMS(sMemoryNames))
-            {
-                sMemoryMeta[imageIndex].name = sMemoryNames[imageIndex];
-                sMemoryMeta[imageIndex].desc = sMemoryDescs[imageIndex];
-            }
-            else if (imageIndex >= 39 && imageIndex <= 43)
-            {
-                sMemoryMeta[imageIndex].name = sBonusMemoryNames[imageIndex - 39];
-                sMemoryMeta[imageIndex].desc = sBonusMemoryDescs[imageIndex - 39];
-                sMemoryMeta[imageIndex].isBonus = TRUE;
-            }
-            else
-            {
-                sMemoryMeta[imageIndex].name = gText_None;
-                sMemoryMeta[imageIndex].desc = gText_Desc_None;
-            }
-            sMemoryMeta[imageIndex].isBonus = FALSE;
-            sMemoryMeta[imageIndex].valid = TRUE;
-            if (imageIndex > 0 && imageIndex <= 38)
-                sMemoryMeta[imageIndex].flagId = FLAG_FIRST_MEMORY + imageIndex;
-        }
-    }
-
-    for (i = 0; i < NELEMS(sBonusMemoryOrder); i++)
-    {
-        u8 imageIndex = sBonusMemoryOrder[i];
-        if (imageIndex < ALBUM_IMAGE_CAP)
-        {
-            sMemoryMeta[imageIndex].name = sBonusMemoryNames[i];
-            sMemoryMeta[imageIndex].desc = sBonusMemoryDescs[i];
-            sMemoryMeta[imageIndex].isBonus = TRUE;
-            sMemoryMeta[imageIndex].valid = TRUE;
-            sMemoryMeta[imageIndex].flagId = 0;
-        }
-    }
-}
+static const struct MemoryEntry sBonusMemoryTable[] =
+{
+    {1,  gText_Memory_1,  gText_MemoryDesc_1},
+    {15, gText_Memory_15, gText_MemoryDesc_15},
+    {20, gText_Memory_20, gText_MemoryDesc_20},
+    {19, gText_Memory_19, gText_MemoryDesc_19},
+    {11, gText_Memory_11, gText_MemoryDesc_11},
+    {16, gText_Memory_16, gText_MemoryDesc_16},
+    {18, gText_Memory_18, gText_MemoryDesc_18},
+    {17, gText_Memory_17, gText_MemoryDesc_17},
+    {13, gText_Memory_13, gText_MemoryDesc_13},
+    {5,  gText_Memory_5,  gText_MemoryDesc_5},
+    {44, gText_Memory_44, gText_MemoryDesc_44},
+};
 
 static void InitAlbumData(bool8 bonusPage)
 {
-    const u8 *order = bonusPage ? sBonusMemoryOrder : sMemoryOrder;
-    u8 count = bonusPage ? NELEMS(sBonusMemoryOrder) : NELEMS(sMemoryOrder);
+    const struct MemoryEntry *table = bonusPage ? sBonusMemoryTable : sMemoryTable;
+    u8 count = bonusPage ? NELEMS(sBonusMemoryTable) : NELEMS(sMemoryTable);
 
     sAlbumPtr->memoryCount = count;
 
     for (u8 i = 0; i < count; i++)
     {
-        u8 imageIndex = order[i];
-        const struct MemoryMeta *m = (imageIndex < ALBUM_IMAGE_CAP) ? &sMemoryMeta[imageIndex] : NULL;
-
-        const u8 *name = (m && m->valid && m->name) ? m->name : gText_None;
-        const u8 *desc = (m && m->valid && m->desc) ? m->desc : gText_Desc_None;
-
-        sAlbumPtr->memoryData[i].memoryName = name;
-        sAlbumPtr->memoryData[i].memoryDesc = desc;
+        u8 imageIndex = table[i].imageIndex;
+        sAlbumPtr->memoryData[i].memoryName = table[i].name;
+        sAlbumPtr->memoryData[i].memoryDesc = table[i].desc;
 
         if (bonusPage)
         {
@@ -415,8 +244,7 @@ static void InitAlbumData(bool8 bonusPage)
         }
         else
         {
-            // If there is no flag for this image, treat it as unlocked
-            bool8 unlocked = (m && m->valid && m->flagId) ? FlagGet(m->flagId) : TRUE;
+            bool8 unlocked = (imageIndex > 0 && imageIndex <= 38) ? FlagGet(FLAG_FIRST_MEMORY + imageIndex) : TRUE;
             sAlbumPtr->memoryData[i].unlocked = unlocked;
             if (!unlocked)
             {
@@ -803,13 +631,6 @@ static void PrintGUIAlbumItems(void)
 
 static void InitAlbum(void)
 {
-    static bool8 built = FALSE;
-    if (!built)
-    {
-        BuildMemoryMeta();
-        built = TRUE;
-    }
-
     // Remove glitches
     CleanWindows();
     CommitWindows();
@@ -1049,7 +870,7 @@ static void CB2_Image(void)
         {
             u16 index = VarGet(VAR_ALBUM_SELECTED_MEMORY);
             bool8 bonus = VarGet(VAR_IS_BONUS_PAGE);
-            u8 memoryId = bonus ? sBonusMemoryOrder[index] : sMemoryOrder[index];
+            u8 memoryId = bonus ? sBonusMemoryTable[index].imageIndex : sMemoryTable[index].imageIndex;
             LoadAlbumImage(memoryId);
             gMain.state++;
             break;
