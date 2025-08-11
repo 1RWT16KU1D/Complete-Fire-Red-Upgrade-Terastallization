@@ -57,6 +57,15 @@ static void MainCB2_Image(void);
 static void ResetHighlightPalettes(void);
 static void PrintGUIAlbumItems(void);
 
+// Defer copies: do 2 VBlanks per window to catch async printers finishing
+static u8 sWinNeedsCopy[WIN_MAX_COUNT];   // 0 = no copy, >0 = remaining VBlank copies
+
+static void RequestWindowCopy(u8 windowId)
+{
+    if (sWinNeedsCopy[windowId] < 2)       // copy this window for ~2 frames
+        sWinNeedsCopy[windowId] = 2;
+}
+
 static const struct BgTemplate sAlbumBgTemplates[] =
 {
     [BG_INTERFACE] =
@@ -197,11 +206,6 @@ static const u8 *const sMemoryNames[] =
     gText_Memory_36,
     gText_Memory_37,
     gText_Memory_38,
-    gText_Memory_39,
-    gText_Memory_40,
-    gText_Memory_41,
-    gText_Memory_42,
-    gText_Memory_43,
 };
 
 static const u8 *const sMemoryDescs[] =
@@ -245,6 +249,19 @@ static const u8 *const sMemoryDescs[] =
     gText_MemoryDesc_36,
     gText_MemoryDesc_37,
     gText_MemoryDesc_38,
+};
+
+static const u8 *const sBonusMemoryNames[] =
+{
+    gText_Memory_39,
+    gText_Memory_40,
+    gText_Memory_41,
+    gText_Memory_42,
+    gText_Memory_43,
+};
+
+static const u8 *const sBonusMemoryDescs[] =
+{
     gText_MemoryDesc_39,
     gText_MemoryDesc_40,
     gText_MemoryDesc_41,
@@ -252,39 +269,19 @@ static const u8 *const sMemoryDescs[] =
     gText_MemoryDesc_43,
 };
 
-static const u8 *const sBonusMemoryNames[] =
-{
-    gText_BonusMemory_1,
-    gText_BonusMemory_2,
-    gText_BonusMemory_3,
-    gText_BonusMemory_4,
-    gText_BonusMemory_5,
-};
-
-static const u8 *const sBonusMemoryDescs[] =
-{
-    gText_BonusDesc_1,
-    gText_BonusDesc_2,
-    gText_BonusDesc_3,
-    gText_BonusDesc_4,
-    gText_BonusDesc_5,
-};
-
-// Tables defining the display order for the memories.
 // Modify these arrays to reorder memories in the album.
-static const u8 sMemoryOrder[MEMORIES_COUNT] =
+static const u8 sMemoryOrder[] =
 {
-    0, 1, 2, 3, 4, 5, 6, 7,
-    8, 9, 10, 11, 12, 13, 14, 15,
+    1, 2, 3, 4, 5, 6, 7,
+    8, 9, 11, 12, 13, 14, 15,
     16, 17, 18, 19, 20, 21, 22, 23,
     24, 25, 26, 27, 28, 29, 30, 31,
-    32, 33, 34, 35, 36, 37, 38, 39,
-    40, 41, 42, 43,
+    32, 33, 34, 35, 36, 37, 38
 };
 
-static const u8 sBonusMemoryOrder[BONUS_MEMORIES_COUNT] =
+static const u8 sBonusMemoryOrder[] =
 {
-    0, 1, 2, 3, 4,
+    39, 40, 41, 42, 43
 };
 
 static void InitAlbumData(bool8 bonusPage)
@@ -299,14 +296,14 @@ static void InitAlbumData(bool8 bonusPage)
         names = sBonusMemoryNames;
         descs = sBonusMemoryDescs;
         order = sBonusMemoryOrder;
-        count = BONUS_MEMORIES_COUNT;
+        count = NELEMS(sBonusMemoryOrder);
     }
     else
     {
         names = sMemoryNames;
         descs = sMemoryDescs;
         order = sMemoryOrder;
-        count = MEMORIES_COUNT;
+        count = NELEMS(sMemoryOrder);
     }
 
     for (u8 i = 0; i < count; ++i)
@@ -419,9 +416,21 @@ static void PrintGUIAlbumMemoriesUnlocked(void)
     u8 unlocked = 0;
 
     // Count unlocked memories
-    for (u8 i = 0; i < sAlbumPtr->memoryCount; ++i)
-        if (sAlbumPtr->memoryData[i].unlocked)
-            unlocked++;
+    if (!VarGet(VAR_IS_BONUS_PAGE))
+    {
+        // Count normal memories
+        for (u8 i = 0; i < NELEMS(sMemoryOrder); ++i)
+            if (sAlbumPtr->memoryData[sMemoryOrder[i] - 1].unlocked)
+                unlocked++;
+    }
+    
+    if (VarGet(VAR_IS_BONUS_PAGE))
+    {
+        // Count bonus memories
+        for (u8 i = 0; i < NELEMS(sBonusMemoryOrder); ++i)
+            if (sAlbumPtr->memoryData[sBonusMemoryOrder[i] - 1].unlocked)
+                unlocked++;
+    }
 
     CleanWindow(WIN_ALBUM_MEMORIES_COUNT);
 
@@ -502,6 +511,18 @@ static void VBlankCB_Album(void)
     LoadOam();
     ProcessSpriteCopyRequests();
     TransferPlttBuffer();
+
+    // Flush window gfx/map updates during VBlank (may run twice to catch printers)
+    for (u8 i = 0; i < WIN_MAX_COUNT; i++)
+    {
+        if (sWinNeedsCopy[i] != 0)
+        {
+            CopyWindowToVram(i, COPYWIN_BOTH);
+            sWinNeedsCopy[i]--;
+        }
+    }
+
+    CopyBgTilemapBufferToVram(BG_INTERFACE);
 }
 
 static void MainCB2_Album(void)
@@ -799,6 +820,10 @@ static void CB2_Album(void)
             break;
         case 7:
             SetVBlankCallback(VBlankCB_Album);
+
+            // Reset deferred-copy flags on entry
+            for (u8 i = 0; i < WIN_MAX_COUNT; i++)
+                sWinNeedsCopy[i] = 0;
             InitAlbum();
             CreateTask(Task_AlbumFadeIn, 0);
             SetMainCallback2(MainCB2_Album);
@@ -835,8 +860,8 @@ extern void CleanWindows(void)
 
 extern void CommitWindow(u8 windowId)
 {
-	CopyWindowToVram(windowId, COPYWIN_BOTH);
 	PutWindowTilemap(windowId);
+	RequestWindowCopy(windowId);
 }
 
 static void CommitWindows(void)

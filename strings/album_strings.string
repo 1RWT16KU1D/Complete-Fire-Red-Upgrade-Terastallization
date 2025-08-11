@@ -4,6 +4,15 @@ Memories
 #org @gText_BonusHeader
  Bonus
 
+#org @gText_AlbumPageInstructions
+ Next\n Page [R_BUTTON]
+
+#org @gText_BonusPageInstructions
+ Previous\n Page [L_BUTTON]
+
+#org @gText_AlbumMemoriesUnlocked
+ Memories\n unlocked:
+
 #org @gText_MenuAlbum
 Album
 
@@ -27,7 +36,7 @@ A lovely album capturing your journey\nwith Meloetta.
 -
 
 #org @gText_Memory_1
-Choose your Kanto starter!
+1
 
 #org @gText_Memory_2
 A Pok\ePark Cadence
@@ -36,22 +45,22 @@ A Pok\ePark Cadence
 Ballad by the Sunset Bay
 
 #org @gText_Memory_4
-Wishing under the stars[.]
+4
 
 #org @gText_Memory_5
-Shells by the seaside
+5
 
 #org @gText_Memory_6
-Campfire stories[.]
+6
 
 #org @gText_Memory_7
 Where the leaves first fell
 
 #org @gText_Memory_8
-Snowball fight!
+8
 
 #org @gText_Memory_9
-Strange Lab Discovery
+9
 
 #org @gText_Memory_10
 10
@@ -155,27 +164,12 @@ Serenade in the Safari
 #org @gText_Memory_43
 43
 
-#org @gText_BonusMemory_1
-A Secret Melody
-
-#org @gText_BonusMemory_2
-Festival of Lights
-
-#org @gText_BonusMemory_3
-Mystic Forest Encounter
-
-#org @gText_BonusMemory_4
-Ocean's Gift
-
-#org @gText_BonusMemory_5
-Skyward Journey
-
 // Memory Descriptions
 #org @gText_Desc_None
  No description available
 
 #org @gText_MemoryDesc_1
- You meet Professor Oak and he\n gives you your Kanto partner!
+ 1st Memory
 
 #org @gText_MemoryDesc_2
  Meloetta sings a prelude in the\n Pok\ePark with you!
@@ -184,22 +178,22 @@ Skyward Journey
  Meloetta and you admire the sunset at\n the harbour footbridge.
 
 #org @gText_MemoryDesc_4
- You close your eyes and wish on\n a shooting star in the night sky.
+ 4th Memory
 
 #org @gText_MemoryDesc_5
- You collect colorful shells while\n walking along the calm beach.
+ 5th Memory
 
 #org @gText_MemoryDesc_6
- You and your Pok\emon sit by a\n campfire and share spooky tales.
+ 6th Memory
 
 #org @gText_MemoryDesc_7
  Meloetta takes a look at her\n favourite spot- the Autumn tree!
 
 #org @gText_MemoryDesc_8
- You have a friendly snowball fight\n with a Sneasel and your partner.
+ 8th Memory
 
 #org @gText_MemoryDesc_9
- You discover old notes in a\n forgotten lab about Mega Evolution.
+ 9th Memory
 
 #org @gText_MemoryDesc_10
  10th Memory
@@ -217,7 +211,7 @@ Skyward Journey
  14th Memory
 
 #org @gText_MemoryDesc_15
- A memory of your first visit to the\n Safari Zone with Meloetta.
+ 15th Memory
 
 #org @gText_MemoryDesc_16
  16th Memory
@@ -301,22 +295,7 @@ Skyward Journey
  42nd Memory
 
 #org @gText_MemoryDesc_43
-43rd Memory
-
-#org @gText_BonusDesc_1
- You uncover a hidden melody\n with Meloetta.
-
-#org @gText_BonusDesc_2
- You celebrate a luminous festival\n with friends.
-
-#org @gText_BonusDesc_3
- You and Meloetta meet a rare mythical\n Pok\emon in the forest.
-
-#org @gText_BonusDesc_4
- The sea bestows a mysterious treasure\n upon you.
-
-#org @gText_BonusDesc_5
- You soar above the clouds on a\n thrilling adventure.
+ 43rd Memory
 
 #org @gText_AlbumFlagSet
 Flags set!
