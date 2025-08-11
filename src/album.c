@@ -272,16 +272,52 @@ static const u8 *const sBonusMemoryDescs[] =
 // Modify these arrays to reorder memories in the album.
 static const u8 sMemoryOrder[] =
 {
-    1, 2, 3, 4, 5, 6, 7,
-    8, 9, 11, 12, 13, 14, 15,
-    16, 17, 18, 19, 20, 21, 22, 23,
-    24, 25, 26, 27, 28, 29, 30, 31,
-    32, 33, 34, 35, 36, 37, 38
+    7,
+    12,
+    36,
+    4,
+    6,
+    37,
+    14,
+    3,
+    27,
+    26,
+    43,
+    32,
+    34,
+    41,
+    21,
+    22,
+    2,
+    38,
+    25,
+    35,
+    28,
+    39,
+    29,
+    40,
+    30,
+    32,
+    31,
+    24,
+    8,
+    9,
+    33,
+    23
 };
 
 static const u8 sBonusMemoryOrder[] =
 {
-    39, 40, 41, 42, 43
+    1,
+    15,
+    20,
+    19,
+    11,
+    16,
+    18,
+    17,
+    13,
+    5
 };
 
 static void InitAlbumData(bool8 bonusPage)
@@ -306,23 +342,20 @@ static void InitAlbumData(bool8 bonusPage)
         count = NELEMS(sMemoryOrder);
     }
 
-    for (u8 i = 0; i < count; ++i)
-    {
-        u8 memoryId = order[i];
+    for (u8 i = 0; i < count; ++i) {
+        u8 imageIndex = order[i];
 
-        sAlbumPtr->memoryData[i].memoryName = names[memoryId];
-        sAlbumPtr->memoryData[i].memoryDesc = descs[memoryId];
+        // Subtract 39 from the index if it's a bonus page
+        u8 textIndex = bonusPage ? (imageIndex - 39) : imageIndex;
 
-        if (bonusPage)
-        {
+        sAlbumPtr->memoryData[i].memoryName = names[textIndex];
+        sAlbumPtr->memoryData[i].memoryDesc = descs[textIndex];
+
+        if (bonusPage) {
             sAlbumPtr->memoryData[i].unlocked = TRUE;
-        }
-        else
-        {
-            sAlbumPtr->memoryData[i].unlocked = FlagGet(FLAG_FIRST_MEMORY + memoryId);
-
-            if (!sAlbumPtr->memoryData[i].unlocked)
-            {
+        } else {
+            sAlbumPtr->memoryData[i].unlocked = FlagGet(FLAG_FIRST_MEMORY + imageIndex);
+            if (!sAlbumPtr->memoryData[i].unlocked) {
                 sAlbumPtr->memoryData[i].memoryName = gText_None;
                 sAlbumPtr->memoryData[i].memoryDesc = gText_Desc_None;
             }
@@ -412,25 +445,13 @@ static void PrintGUIAlbumDescription(void)
 static void PrintGUIAlbumMemoriesUnlocked(void)
 {
     u8 fontSize = 0; // Smaller text
-    u8 y = 0;
     u8 unlocked = 0;
 
-    // Count unlocked memories
-    if (!VarGet(VAR_IS_BONUS_PAGE))
-    {
-        // Count normal memories
-        for (u8 i = 0; i < NELEMS(sMemoryOrder); ++i)
-            if (sAlbumPtr->memoryData[sMemoryOrder[i] - 1].unlocked)
-                unlocked++;
-    }
-    
-    if (VarGet(VAR_IS_BONUS_PAGE))
-    {
-        // Count bonus memories
-        for (u8 i = 0; i < NELEMS(sBonusMemoryOrder); ++i)
-            if (sAlbumPtr->memoryData[sBonusMemoryOrder[i] - 1].unlocked)
-                unlocked++;
-    }
+    // Count unlocked memories for the current page
+    for (u8 i = 0; i < sAlbumPtr->memoryCount; ++i)
+        if (sAlbumPtr->memoryData[i].unlocked)
+            unlocked++;
+
 
     CleanWindow(WIN_ALBUM_MEMORIES_COUNT);
 
@@ -441,7 +462,7 @@ static void PrintGUIAlbumMemoriesUnlocked(void)
     ConvertIntToDecimalStringN(num, unlocked, STR_CONV_MODE_LEFT_ALIGN, 3);
 
     StringAppend(buff, num);
-    WindowPrint(WIN_ALBUM_MEMORIES_COUNT, fontSize, 0, y, &sWhiteText, 0, buff);
+    WindowPrint(WIN_ALBUM_MEMORIES_COUNT, fontSize, 0, 0, &sWhiteText, 0, buff);
 
     CommitWindow(WIN_ALBUM_MEMORIES_COUNT);
 }
