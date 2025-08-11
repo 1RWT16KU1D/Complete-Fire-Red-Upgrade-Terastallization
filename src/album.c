@@ -57,6 +57,15 @@ static void MainCB2_Image(void);
 static void ResetHighlightPalettes(void);
 static void PrintGUIAlbumItems(void);
 
+// Defer copies: do 2 VBlanks per window to catch async printers finishing
+static u8 sWinNeedsCopy[WIN_MAX_COUNT];   // 0 = no copy, >0 = remaining VBlank copies
+
+static void RequestWindowCopy(u8 windowId)
+{
+    if (sWinNeedsCopy[windowId] < 2)       // copy this window for ~2 frames
+        sWinNeedsCopy[windowId] = 2;
+}
+
 static const struct BgTemplate sAlbumBgTemplates[] =
 {
     [BG_INTERFACE] =
@@ -197,11 +206,6 @@ static const u8 *const sMemoryNames[] =
     gText_Memory_36,
     gText_Memory_37,
     gText_Memory_38,
-    gText_Memory_39,
-    gText_Memory_40,
-    gText_Memory_41,
-    gText_Memory_42,
-    gText_Memory_43,
 };
 
 static const u8 *const sMemoryDescs[] =
@@ -245,6 +249,19 @@ static const u8 *const sMemoryDescs[] =
     gText_MemoryDesc_36,
     gText_MemoryDesc_37,
     gText_MemoryDesc_38,
+};
+
+static const u8 *const sBonusMemoryNames[] =
+{
+    gText_Memory_39,
+    gText_Memory_40,
+    gText_Memory_41,
+    gText_Memory_42,
+    gText_Memory_43,
+};
+
+static const u8 *const sBonusMemoryDescs[] =
+{
     gText_MemoryDesc_39,
     gText_MemoryDesc_40,
     gText_MemoryDesc_41,
@@ -252,58 +269,93 @@ static const u8 *const sMemoryDescs[] =
     gText_MemoryDesc_43,
 };
 
-static const u8 *const sBonusMemoryNames[] =
+// Modify these arrays to reorder memories in the album.
+static const u8 sMemoryOrder[] =
 {
-    gText_BonusMemory_1,
-    gText_BonusMemory_2,
-    gText_BonusMemory_3,
-    gText_BonusMemory_4,
-    gText_BonusMemory_5,
+    7,
+    12,
+    36,
+    4,
+    6,
+    37,
+    14,
+    3,
+    27,
+    26,
+    43,
+    32,
+    34,
+    41,
+    21,
+    22,
+    2,
+    38,
+    25,
+    35,
+    28,
+    39,
+    29,
+    40,
+    30,
+    32,
+    31,
+    24,
+    8,
+    9,
+    33,
+    23
 };
 
-static const u8 *const sBonusMemoryDescs[] =
+static const u8 sBonusMemoryOrder[] =
 {
-    gText_BonusDesc_1,
-    gText_BonusDesc_2,
-    gText_BonusDesc_3,
-    gText_BonusDesc_4,
-    gText_BonusDesc_5,
+    1,
+    15,
+    20,
+    19,
+    11,
+    16,
+    18,
+    17,
+    13,
+    5
 };
 
 static void InitAlbumData(bool8 bonusPage)
 {
     const u8 *const *names;
     const u8 *const *descs;
+    const u8 *order;
     u8 count;
 
     if (bonusPage)
     {
         names = sBonusMemoryNames;
         descs = sBonusMemoryDescs;
-        count = BONUS_MEMORIES_COUNT;
+        order = sBonusMemoryOrder;
+        count = NELEMS(sBonusMemoryOrder);
     }
     else
     {
         names = sMemoryNames;
         descs = sMemoryDescs;
-        count = MEMORIES_COUNT;
+        order = sMemoryOrder;
+        count = NELEMS(sMemoryOrder);
     }
 
-    for (u8 i = 0; i < count; ++i)
-    {
-        sAlbumPtr->memoryData[i].memoryName = names[i];
-        sAlbumPtr->memoryData[i].memoryDesc = descs[i];
+    for (u8 i = 0; i < count; ++i) {
+        u8 imageIndex = order[i];
 
-        if (bonusPage)
-        {
+        // Subtract 39 from the index if it's a bonus page
+        u8 textIndex = bonusPage ? (imageIndex - 39) : imageIndex;
+
+        sAlbumPtr->memoryData[i].memoryName = names[textIndex];
+        sAlbumPtr->memoryData[i].memoryDesc = descs[textIndex];
+
+        if (bonusPage) {
             sAlbumPtr->memoryData[i].unlocked = TRUE;
-        }
-        else
-        {
-            sAlbumPtr->memoryData[i].unlocked = FlagGet(FLAG_FIRST_MEMORY + i);
-
-            if (!sAlbumPtr->memoryData[i].unlocked)
-            {
+        } else {
+            sAlbumPtr->memoryData[i].unlocked = FlagGet(FLAG_FIRST_MEMORY + imageIndex);
+            if (!sAlbumPtr->memoryData[i].unlocked) {
                 sAlbumPtr->memoryData[i].memoryName = gText_None;
                 sAlbumPtr->memoryData[i].memoryDesc = gText_Desc_None;
             }
@@ -393,13 +445,13 @@ static void PrintGUIAlbumDescription(void)
 static void PrintGUIAlbumMemoriesUnlocked(void)
 {
     u8 fontSize = 0; // Smaller text
-    u8 y = 0;
     u8 unlocked = 0;
 
-    // Count unlocked memories
+    // Count unlocked memories for the current page
     for (u8 i = 0; i < sAlbumPtr->memoryCount; ++i)
         if (sAlbumPtr->memoryData[i].unlocked)
             unlocked++;
+
 
     CleanWindow(WIN_ALBUM_MEMORIES_COUNT);
 
@@ -410,7 +462,7 @@ static void PrintGUIAlbumMemoriesUnlocked(void)
     ConvertIntToDecimalStringN(num, unlocked, STR_CONV_MODE_LEFT_ALIGN, 3);
 
     StringAppend(buff, num);
-    WindowPrint(WIN_ALBUM_MEMORIES_COUNT, fontSize, 0, y, &sWhiteText, 0, buff);
+    WindowPrint(WIN_ALBUM_MEMORIES_COUNT, fontSize, 0, 0, &sWhiteText, 0, buff);
 
     CommitWindow(WIN_ALBUM_MEMORIES_COUNT);
 }
@@ -480,6 +532,18 @@ static void VBlankCB_Album(void)
     LoadOam();
     ProcessSpriteCopyRequests();
     TransferPlttBuffer();
+
+    // Flush window gfx/map updates during VBlank (may run twice to catch printers)
+    for (u8 i = 0; i < WIN_MAX_COUNT; i++)
+    {
+        if (sWinNeedsCopy[i] != 0)
+        {
+            CopyWindowToVram(i, COPYWIN_BOTH);
+            sWinNeedsCopy[i]--;
+        }
+    }
+
+    CopyBgTilemapBufferToVram(BG_INTERFACE);
 }
 
 static void MainCB2_Album(void)
@@ -777,6 +841,10 @@ static void CB2_Album(void)
             break;
         case 7:
             SetVBlankCallback(VBlankCB_Album);
+
+            // Reset deferred-copy flags on entry
+            for (u8 i = 0; i < WIN_MAX_COUNT; i++)
+                sWinNeedsCopy[i] = 0;
             InitAlbum();
             CreateTask(Task_AlbumFadeIn, 0);
             SetMainCallback2(MainCB2_Album);
@@ -813,8 +881,8 @@ extern void CleanWindows(void)
 
 extern void CommitWindow(u8 windowId)
 {
-	CopyWindowToVram(windowId, COPYWIN_BOTH);
 	PutWindowTilemap(windowId);
+	RequestWindowCopy(windowId);
 }
 
 static void CommitWindows(void)
@@ -908,9 +976,14 @@ static void CB2_Image(void)
             gMain.state++;
             break;
         case 2:
-            LoadAlbumImage(VarGet(VAR_ALBUM_SELECTED_MEMORY));
+        {
+            u16 index = VarGet(VAR_ALBUM_SELECTED_MEMORY);
+            bool8 bonus = VarGet(VAR_IS_BONUS_PAGE);
+            u8 memoryId = bonus ? sBonusMemoryOrder[index] : sMemoryOrder[index];
+            LoadAlbumImage(memoryId);
             gMain.state++;
             break;
+        }
         case 3:
             if (!free_temp_tile_data_buffers_if_possible())
             {

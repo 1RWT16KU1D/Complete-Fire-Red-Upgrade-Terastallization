@@ -136,11 +136,6 @@ extern const u8 gText_Memory_40[];
 extern const u8 gText_Memory_41[];
 extern const u8 gText_Memory_42[];
 extern const u8 gText_Memory_43[];
-extern const u8 gText_BonusMemory_1[];
-extern const u8 gText_BonusMemory_2[];
-extern const u8 gText_BonusMemory_3[];
-extern const u8 gText_BonusMemory_4[];
-extern const u8 gText_BonusMemory_5[];
 
 // Memory Descriptions
 extern const u8 gText_Desc_None[];
@@ -187,11 +182,6 @@ extern const u8 gText_MemoryDesc_40[];
 extern const u8 gText_MemoryDesc_41[];
 extern const u8 gText_MemoryDesc_42[];
 extern const u8 gText_MemoryDesc_43[];
-extern const u8 gText_BonusDesc_1[];
-extern const u8 gText_BonusDesc_2[];
-extern const u8 gText_BonusDesc_3[];
-extern const u8 gText_BonusDesc_4[];
-extern const u8 gText_BonusDesc_5[];
 
 // Instructions
 extern const u8 gText_AlbumPageInstructions[];
