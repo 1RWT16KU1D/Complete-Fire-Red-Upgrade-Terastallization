@@ -40,6 +40,8 @@
 #include "../include/new/Vanilla_functions.h"
 
 
+#define ALBUM_IMAGE_CAP 64 // 1 + max image index present in sMemoryOrder or sBonusMemoryOrder
+
 // This file's functions
 static void CommitWindow(u8 windowId);
 static void CleanWindow(u8 windowId);
@@ -320,48 +322,86 @@ static const u8 sBonusMemoryOrder[] =
     5
 };
 
+struct MemoryMeta
+{
+    const u8 *name;
+    const u8 *desc;
+    bool8 isBonus;
+    bool8 valid;
+};
+
+static struct MemoryMeta sMemoryMeta[ALBUM_IMAGE_CAP];
+
+static void BuildMemoryMeta(void)
+{
+    u32 i;
+
+    for (i = 0; i < ALBUM_IMAGE_CAP; i++)
+    {
+        sMemoryMeta[i].name = NULL;
+        sMemoryMeta[i].desc = NULL;
+        sMemoryMeta[i].isBonus = FALSE;
+        sMemoryMeta[i].valid = FALSE;
+    }
+
+    for (i = 0; i < NELEMS(sMemoryOrder); i++)
+    {
+        u8 imageIndex = sMemoryOrder[i];
+        if (imageIndex < ALBUM_IMAGE_CAP)
+        {
+            sMemoryMeta[imageIndex].name = sMemoryNames[i];
+            sMemoryMeta[imageIndex].desc = sMemoryDescs[i];
+            sMemoryMeta[imageIndex].isBonus = FALSE;
+            sMemoryMeta[imageIndex].valid = TRUE;
+        }
+    }
+
+    for (i = 0; i < NELEMS(sBonusMemoryOrder); i++)
+    {
+        u8 imageIndex = sBonusMemoryOrder[i];
+        if (imageIndex < ALBUM_IMAGE_CAP)
+        {
+            sMemoryMeta[imageIndex].name = sBonusMemoryNames[i];
+            sMemoryMeta[imageIndex].desc = sBonusMemoryDescs[i];
+            sMemoryMeta[imageIndex].isBonus = TRUE;
+            sMemoryMeta[imageIndex].valid = TRUE;
+        }
+    }
+}
+
 static void InitAlbumData(bool8 bonusPage)
 {
-    const u8 *const *names;
-    const u8 *const *descs;
-    const u8 *order;
-    u8 count;
+    const u8 *order = bonusPage ? sBonusMemoryOrder : sMemoryOrder;
+    u8 count = bonusPage ? NELEMS(sBonusMemoryOrder) : NELEMS(sMemoryOrder);
 
-    if (bonusPage)
-    {
-        names = sBonusMemoryNames;
-        descs = sBonusMemoryDescs;
-        order = sBonusMemoryOrder;
-        count = NELEMS(sBonusMemoryOrder);
-    }
-    else
-    {
-        names = sMemoryNames;
-        descs = sMemoryDescs;
-        order = sMemoryOrder;
-        count = NELEMS(sMemoryOrder);
-    }
+    sAlbumPtr->memoryCount = count;
 
-    for (u8 i = 0; i < count; ++i) {
+    for (u8 i = 0; i < count; i++)
+    {
         u8 imageIndex = order[i];
+        const struct MemoryMeta *m = (imageIndex < ALBUM_IMAGE_CAP) ? &sMemoryMeta[imageIndex] : NULL;
 
-        // Subtract 39 from the index if it's a bonus page
-        u8 textIndex = bonusPage ? (imageIndex - 39) : imageIndex;
+        const u8 *name = (m && m->valid && m->name) ? m->name : gText_None;
+        const u8 *desc = (m && m->valid && m->desc) ? m->desc : gText_Desc_None;
 
-        sAlbumPtr->memoryData[i].memoryName = names[textIndex];
-        sAlbumPtr->memoryData[i].memoryDesc = descs[textIndex];
+        sAlbumPtr->memoryData[i].memoryName = name;
+        sAlbumPtr->memoryData[i].memoryDesc = desc;
 
-        if (bonusPage) {
+        if (bonusPage)
+        {
             sAlbumPtr->memoryData[i].unlocked = TRUE;
-        } else {
-            sAlbumPtr->memoryData[i].unlocked = FlagGet(FLAG_FIRST_MEMORY + imageIndex);
-            if (!sAlbumPtr->memoryData[i].unlocked) {
+        }
+        else
+        {
+            bool8 unlocked = (m && m->valid) ? FlagGet(FLAG_FIRST_MEMORY + imageIndex) : FALSE;
+            sAlbumPtr->memoryData[i].unlocked = unlocked;
+            if (!unlocked)
+            {
                 sAlbumPtr->memoryData[i].memoryName = gText_None;
                 sAlbumPtr->memoryData[i].memoryDesc = gText_Desc_None;
             }
         }
     }
-    sAlbumPtr->memoryCount = count;
 }
 
 static void DisplayAlbumBG(void)
@@ -740,6 +780,13 @@ static void PrintGUIAlbumItems(void)
 
 static void InitAlbum(void)
 {
+    static bool8 built = FALSE;
+    if (!built)
+    {
+        BuildMemoryMeta();
+        built = TRUE;
+    }
+
     // Remove glitches
     CleanWindows();
     CommitWindows();
