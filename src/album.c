@@ -260,6 +260,7 @@ static const u8 *const sBonusMemoryNames[] =
     gText_Memory_41,
     gText_Memory_42,
     gText_Memory_43,
+    gText_Memory_44,
 };
 
 static const u8 *const sBonusMemoryDescs[] =
@@ -269,6 +270,7 @@ static const u8 *const sBonusMemoryDescs[] =
     gText_MemoryDesc_41,
     gText_MemoryDesc_42,
     gText_MemoryDesc_43,
+    gText_MemoryDesc_44,
 };
 
 // Modify these arrays to reorder memories in the album.
@@ -285,7 +287,7 @@ static const u8 sMemoryOrder[] =
     27,
     26,
     43,
-    32,
+    42,
     34,
     41,
     21,
@@ -319,7 +321,8 @@ static const u8 sBonusMemoryOrder[] =
     18,
     17,
     13,
-    5
+    5,
+    44
 };
 
 struct MemoryMeta
@@ -328,6 +331,7 @@ struct MemoryMeta
     const u8 *desc;
     bool8 isBonus;
     bool8 valid;
+    u16 flagId;
 };
 
 static struct MemoryMeta sMemoryMeta[ALBUM_IMAGE_CAP];
@@ -342,6 +346,7 @@ static void BuildMemoryMeta(void)
         sMemoryMeta[i].desc = NULL;
         sMemoryMeta[i].isBonus = FALSE;
         sMemoryMeta[i].valid = FALSE;
+        sMemoryMeta[i].flagId = 0;
     }
 
     for (i = 0; i < NELEMS(sMemoryOrder); i++)
@@ -349,10 +354,26 @@ static void BuildMemoryMeta(void)
         u8 imageIndex = sMemoryOrder[i];
         if (imageIndex < ALBUM_IMAGE_CAP)
         {
-            sMemoryMeta[imageIndex].name = sMemoryNames[i];
-            sMemoryMeta[imageIndex].desc = sMemoryDescs[i];
+            if (imageIndex < NELEMS(sMemoryNames))
+            {
+                sMemoryMeta[imageIndex].name = sMemoryNames[imageIndex];
+                sMemoryMeta[imageIndex].desc = sMemoryDescs[imageIndex];
+            }
+            else if (imageIndex >= 39 && imageIndex <= 43)
+            {
+                sMemoryMeta[imageIndex].name = sBonusMemoryNames[imageIndex - 39];
+                sMemoryMeta[imageIndex].desc = sBonusMemoryDescs[imageIndex - 39];
+                sMemoryMeta[imageIndex].isBonus = TRUE;
+            }
+            else
+            {
+                sMemoryMeta[imageIndex].name = gText_None;
+                sMemoryMeta[imageIndex].desc = gText_Desc_None;
+            }
             sMemoryMeta[imageIndex].isBonus = FALSE;
             sMemoryMeta[imageIndex].valid = TRUE;
+            if (imageIndex > 0 && imageIndex <= 38)
+                sMemoryMeta[imageIndex].flagId = FLAG_FIRST_MEMORY + imageIndex;
         }
     }
 
@@ -365,6 +386,7 @@ static void BuildMemoryMeta(void)
             sMemoryMeta[imageIndex].desc = sBonusMemoryDescs[i];
             sMemoryMeta[imageIndex].isBonus = TRUE;
             sMemoryMeta[imageIndex].valid = TRUE;
+            sMemoryMeta[imageIndex].flagId = 0;
         }
     }
 }
@@ -393,7 +415,8 @@ static void InitAlbumData(bool8 bonusPage)
         }
         else
         {
-            bool8 unlocked = (m && m->valid) ? FlagGet(FLAG_FIRST_MEMORY + imageIndex) : FALSE;
+            // If there is no flag for this image, treat it as unlocked
+            bool8 unlocked = (m && m->valid && m->flagId) ? FlagGet(m->flagId) : TRUE;
             sAlbumPtr->memoryData[i].unlocked = unlocked;
             if (!unlocked)
             {
