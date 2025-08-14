@@ -10,7 +10,7 @@
 #include "../include/field_weather.h"
 #include "../include/fieldmap.h"
 #include "../include/gpu_regs.h"
-#include "../include/international_string_util.h"
+#include "../include/string_util.h"
 #include "../include/item_menu.h"
 #include "../include/map_name_popup.h"
 #include "../include/menu.h"
@@ -235,16 +235,7 @@ static void InitAlbumData(bool8 bonusPage)
     for (u8 i = 0; i < count; i++)
     {
         u8 imageIndex = table[i].imageIndex;
-
-        if (bonusPage)
-        {
-            sAlbumPtr->unlocked[i] = TRUE;
-        }
-        else
-        {
-            bool8 unlocked = (imageIndex > 0 && imageIndex <= 38) ? FlagGet(FLAG_FIRST_MEMORY + imageIndex) : TRUE;
-            sAlbumPtr->unlocked[i] = unlocked;
-        }
+        sAlbumPtr->unlocked[i] = FlagGet(FLAG_FIRST_MEMORY + imageIndex) ? TRUE : FALSE;
     }
 }
 
@@ -337,7 +328,6 @@ static void PrintGUIAlbumMemoriesUnlocked(void)
     for (u8 i = 0; i < sAlbumPtr->memoryCount; ++i)
         if (sAlbumPtr->unlocked[i])
             unlocked++;
-
 
     CleanWindow(WIN_ALBUM_MEMORIES_COUNT);
 
@@ -444,6 +434,7 @@ static void Task_AlbumFadeOut(u8 taskId)
 {
     if (!gPaletteFade->active)
     {
+        Overworld_ChangeMusicToDefault();
         SetMainCallback2(CB2_ReturnToFieldWithOpenMenu);
         Free(sAlbumPtr->bgMap);
         Free(sAlbumPtr);
@@ -743,6 +734,7 @@ bool8 StartMenuAlbumCallback(void)
 {
     if (!gPaletteFade->active)
     {
+        FadeOutAndPlayNewMapMusic(0x194, 0x5);
         CleanWindows();
         PlayRainStoppingSoundEffect();
         DestroySafariZoneStatsWindow();

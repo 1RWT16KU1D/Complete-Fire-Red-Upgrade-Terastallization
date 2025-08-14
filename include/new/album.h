@@ -50,7 +50,7 @@ struct Album
     u16* bgMap;
 
     // Memory Data
-    bool8 unlocked[MEMORIES_COUNT + BONUS_MEMORIES_COUNT + 2];
+    bool8 unlocked[MEMORIES_COUNT];
 
     // Tracker Data
     u8 selectedMemory;
@@ -185,6 +185,7 @@ extern const u8 gText_BonusPageInstructions[];
 // Memories unlocked
 extern const u8 gText_AlbumMemoriesUnlocked[];
 
+extern const u8 CallScript_Album[];
 struct ImageData 
 {
     u8 *tiles;
