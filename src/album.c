@@ -10,7 +10,7 @@
 #include "../include/field_weather.h"
 #include "../include/fieldmap.h"
 #include "../include/gpu_regs.h"
-#include "../include/international_string_util.h"
+#include "../include/string_util.h"
 #include "../include/item_menu.h"
 #include "../include/map_name_popup.h"
 #include "../include/menu.h"
@@ -235,23 +235,7 @@ static void InitAlbumData(bool8 bonusPage)
     for (u8 i = 0; i < count; i++)
     {
         u8 imageIndex = table[i].imageIndex;
-        sAlbumPtr->memoryData[i].memoryName = table[i].name;
-        sAlbumPtr->memoryData[i].memoryDesc = table[i].desc;
-
-        if (bonusPage)
-        {
-            sAlbumPtr->memoryData[i].unlocked = TRUE;
-        }
-        else
-        {
-            bool8 unlocked = (imageIndex > 0 && imageIndex <= 38) ? FlagGet(FLAG_FIRST_MEMORY + imageIndex) : TRUE;
-            sAlbumPtr->memoryData[i].unlocked = unlocked;
-            if (!unlocked)
-            {
-                sAlbumPtr->memoryData[i].memoryName = gText_None;
-                sAlbumPtr->memoryData[i].memoryDesc = gText_Desc_None;
-            }
-        }
+        sAlbumPtr->unlocked[i] = FlagGet(FLAG_FIRST_MEMORY + imageIndex) ? TRUE : FALSE;
     }
 }
 
@@ -307,13 +291,14 @@ static void PrintGUIAlbumMemoryNames(void)
     u8 fontSize = 1; // Normal Text
     u8 y = 0;
     u8 startId = sAlbumPtr->displayedStartId;
+    const struct MemoryEntry *table = sAlbumPtr->isBonusPage ? sBonusMemoryTable : sMemoryTable;
 
     CleanWindow(WIN_ALBUM_MEMORY_NAME);
 
     for (u8 i = 0; i < ALBUM_MEMORIES_PER_PAGE && (startId + i) < sAlbumPtr->memoryCount; ++i)
     {
-        WindowPrint(WIN_ALBUM_MEMORY_NAME, fontSize, 0, y, &sWhiteText, 0,
-                   sAlbumPtr->memoryData[startId + i].memoryName);
+        const u8 *name = sAlbumPtr->unlocked[startId + i] ? table[startId + i].name : gText_None;
+        WindowPrint(WIN_ALBUM_MEMORY_NAME, fontSize, 0, y, &sWhiteText, 0, name);
         y += 16;
     }
 
@@ -326,10 +311,11 @@ static void PrintGUIAlbumDescription(void)
     u8 x = 0;
     u8 y = 0;
     u8 memoryId = sAlbumPtr->selectedMemory;
+    const struct MemoryEntry *table = sAlbumPtr->isBonusPage ? sBonusMemoryTable : sMemoryTable;
 
     CleanWindow(WIN_ALBUM_MEMORY_DESC);
-    WindowPrint(WIN_ALBUM_MEMORY_DESC, fontSize, x, y, &sWhiteText, 0,
-                   sAlbumPtr->memoryData[memoryId].memoryDesc);
+    const u8 *desc = sAlbumPtr->unlocked[memoryId] ? table[memoryId].desc : gText_Desc_None;
+    WindowPrint(WIN_ALBUM_MEMORY_DESC, fontSize, x, y, &sWhiteText, 0, desc);
     CommitWindow(WIN_ALBUM_MEMORY_DESC);
 }
 
@@ -340,9 +326,8 @@ static void PrintGUIAlbumMemoriesUnlocked(void)
 
     // Count unlocked memories for the current page
     for (u8 i = 0; i < sAlbumPtr->memoryCount; ++i)
-        if (sAlbumPtr->memoryData[i].unlocked)
+        if (sAlbumPtr->unlocked[i])
             unlocked++;
-
 
     CleanWindow(WIN_ALBUM_MEMORIES_COUNT);
 
@@ -449,6 +434,7 @@ static void Task_AlbumFadeOut(u8 taskId)
 {
     if (!gPaletteFade->active)
     {
+        Overworld_ChangeMusicToDefault();
         SetMainCallback2(CB2_ReturnToFieldWithOpenMenu);
         Free(sAlbumPtr->bgMap);
         Free(sAlbumPtr);
@@ -591,7 +577,7 @@ static void Task_AlbumWaitForKeyPress(u8 taskId)
             VarSet(VAR_ALBUM_BONUS_DISPLAYED_START_ID,         sAlbumPtr->bonusDisplayedStartId);
         }
 
-        if (sAlbumPtr->memoryData[sAlbumPtr->selectedMemory].unlocked)
+        if (sAlbumPtr->unlocked[sAlbumPtr->selectedMemory])
         {
             BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
             PlaySE(SE_SELECT);
@@ -748,6 +734,7 @@ bool8 StartMenuAlbumCallback(void)
 {
     if (!gPaletteFade->active)
     {
+        FadeOutAndPlayNewMapMusic(0x194, 0x5);
         CleanWindows();
         PlayRainStoppingSoundEffect();
         DestroySafariZoneStatsWindow();
