@@ -298,16 +298,33 @@ void HandleInputChooseMove(void)
     {
         if (!MoveSelectionDisplayZMove()) // Only one special mechanic is allowed at a time
         {
-            if (gNewBS->teraData.chosen[gActiveBattler])
+            if (gBattleTypeFlags & BATTLE_TYPE_DYNAMAX &&
+                DynamaxEnabled(gActiveBattler) &&
+                TerastalEnabled(gActiveBattler))
             {
-                gNewBS->teraData.chosen[gActiveBattler] = FALSE; // Cancel Tera and show Dynamax menu
-                MoveSelectionDisplayMoveEffectiveness();
-
-                if (!TriggerMegaEvolution() && (gBattleTypeFlags & BATTLE_TYPE_DYNAMAX))
+                if (gNewBS->teraData.chosen[gActiveBattler])
+                {
+                    gNewBS->teraData.chosen[gActiveBattler] = FALSE; // Deactivate both
+                    MoveSelectionDisplayMoveEffectiveness();
+                }
+                else if (gNewBS->dynamaxData.viewing)
+                {
+                    CloseMaxMoveDetails();            // Deactivate Dynamax
+                    TriggerTerastallization();        // Activate Tera
+                }
+                else if (!TriggerMegaEvolution())       // Activate Dynamax
                     MoveSelectionDisplayMaxMove();
             }
-            else if (!TriggerTerastallization() && (!TriggerMegaEvolution() && (gBattleTypeFlags & BATTLE_TYPE_DYNAMAX)))
-                MoveSelectionDisplayMaxMove();
+            else // Original behaviour
+            {
+                if (gNewBS->teraData.chosen[gActiveBattler])
+                {
+                    gNewBS->teraData.chosen[gActiveBattler] = FALSE;
+                    MoveSelectionDisplayMoveEffectiveness();
+                }
+                else if (!TriggerTerastallization() && (!TriggerMegaEvolution() && (gBattleTypeFlags & BATTLE_TYPE_DYNAMAX)))
+                    MoveSelectionDisplayMaxMove();
+            }
         }
     }
 	else if (gMain.newKeys & L_BUTTON)

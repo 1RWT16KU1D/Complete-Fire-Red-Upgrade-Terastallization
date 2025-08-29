@@ -895,14 +895,23 @@ static void SpriteCB_MegaTrigger(struct Sprite* self)
 			self->invisible = FALSE;
 	}
 
-	s16 xShift = 0;
-	if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
-	{
-		if (GetBattlerPosition(TRIGGER_BANK) == B_POSITION_PLAYER_LEFT)
-			xShift = -48; //X Pos = 16
-		else
-			xShift = 10; //X Pos = 74
-	}
+        s16 xShift = 0;
+        bool8 bothAvailable = (gBattleTypeFlags & BATTLE_TYPE_DYNAMAX)
+                              && DynamaxEnabled(TRIGGER_BANK)
+                              && TerastalEnabled(TRIGGER_BANK);
+
+        if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+        {
+                if (GetBattlerPosition(TRIGGER_BANK) == B_POSITION_PLAYER_LEFT)
+                        xShift = -48; //X Pos = 16
+                else
+                        xShift = 10; //X Pos = 74
+
+                if (bothAvailable)
+                        xShift += 16; //Tera trigger to the right
+        }
+        else if (bothAvailable)
+                xShift = 24; //Right side when both triggers
 
 	self->pos1.x = 64 + (32 / 2);
 	self->pos1.y = 80 + (32 / 2);
@@ -1018,14 +1027,23 @@ static void SpriteCB_TeraTrigger(struct Sprite* self)
 			self->invisible = FALSE;
 	}
 
-	s16 xShift = 0;
-	if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
-	{
-		if (GetBattlerPosition(TRIGGER_BANK) == B_POSITION_PLAYER_LEFT)
-			xShift = -48; //X Pos = 16
-		else
-			xShift = 10; //X Pos = 74
-	}
+        s16 xShift = 0;
+        bool8 bothAvailable = (gBattleTypeFlags & BATTLE_TYPE_DYNAMAX)
+                              && DynamaxEnabled(TRIGGER_BANK)
+                              && TerastalEnabled(TRIGGER_BANK);
+
+        if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+        {
+                if (GetBattlerPosition(TRIGGER_BANK) == B_POSITION_PLAYER_LEFT)
+                        xShift = -48; //X Pos = 16
+                else
+                        xShift = 10; //X Pos = 74
+
+                if (bothAvailable)
+                        xShift += 16; //Tera trigger to the right
+        }
+        else if (bothAvailable)
+                xShift = 24; //Right side when both triggers
 
 	self->pos1.x = 64 + (32 / 2);
 	self->pos1.y = 80 + (32 / 2);
@@ -1304,14 +1322,23 @@ static void SpriteCB_ZTrigger(struct Sprite* self)
 
 static void SpriteCB_DynamaxTrigger(struct Sprite* self)
 {
-	s16 xShift = 0;
-	if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
-	{
-		if (GetBattlerPosition(TRIGGER_BANK) == B_POSITION_PLAYER_LEFT)
-			xShift = -48; //X Pos = 16
-		else
-			xShift = 10; //X Pos = 74
-	}
+        s16 xShift = 0;
+        bool8 bothAvailable = (gBattleTypeFlags & BATTLE_TYPE_DYNAMAX)
+                              && DynamaxEnabled(TRIGGER_BANK)
+                              && TerastalEnabled(TRIGGER_BANK);
+
+        if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+        {
+                if (GetBattlerPosition(TRIGGER_BANK) == B_POSITION_PLAYER_LEFT)
+                        xShift = -48; //X Pos = 16
+                else
+                        xShift = 10; //X Pos = 74
+
+                if (bothAvailable)
+                        xShift -= 16; //Place Dynamax left of Tera
+        }
+        else if (bothAvailable)
+                xShift = -24; //Single battle left shift
 
 	self->pos1.x = 64 + (32 / 2);
 	self->pos1.y = 80 + (32 / 2);
